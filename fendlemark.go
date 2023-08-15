@@ -32,7 +32,7 @@ import (
 )
 
 // Version is the release version, shared with @fendlemark/ui.
-const Version = "0.2.0"
+const Version = "0.3.0"
 
 // Option configures New and IntegrateEasy.
 type Option func(*options)
