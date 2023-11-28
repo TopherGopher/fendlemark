@@ -1,6 +1,6 @@
 {
   "name": "@fendlemark/ui",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Vue 3 components, design tokens, and lattice client for the Fendlemark ML platform console. Embed Fendlemark views of MLflow, Metaflow, Argo Workflows, and Kubeflow in your own portal.",
   "license": "MIT",
   "homepage": "https://fendlemark.app/docs/ui/",
