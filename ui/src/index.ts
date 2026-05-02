@@ -17,4 +17,4 @@ export { default as FmEmptyState } from './components/FmEmptyState.vue'
 export { default as FmDeepLink } from './components/FmDeepLink.vue'
 
 /** Package version. Kept in lockstep with the Go module. */
-export const VERSION = '0.9.1'
+export const VERSION = '0.9.2'
