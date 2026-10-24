@@ -1,18 +1,27 @@
 name: Publish the container image
 
 # A version tag (vX.Y.Z) builds the fendlemark binary with ko for each
-# platform in .ko.yaml, on an empty (FROM scratch) base, and pushes it to
-# ghcr.io/tophergopher/fendlemark as X.Y.Z, X.Y, and latest. Run by hand on
-# a branch, it pushes edge instead.
+# platform in .ko.yaml, on an empty (FROM scratch) base, pushes it to
+# ghcr.io/tophergopher/fendlemark as X.Y.Z, X.Y, and latest, and copies it to
+# Docker Hub under the same tags. Run by hand on a branch, it does the same
+# as edge. Run by hand with a release, it builds nothing and copies that
+# release's tags from ghcr.io to Docker Hub again.
 
 on:
   push:
     tags: ['v*']
   workflow_dispatch:
+    inputs:
+      release:
+        description: Copy this release (X.Y.Z) from ghcr.io to Docker Hub, without building
+        required: false
 
 permissions:
   contents: read
   packages: write
+
+env:
+  HUB_REPO: docker.io/tophergopher/fendlemark
 
 jobs:
   image:
@@ -27,6 +36,10 @@ jobs:
       - uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
+      - name: Install crane
+        run: |
+          go install github.com/google/go-containerregistry/cmd/crane@v0.22.1
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
       - name: Check the tag matches fendlemark.Version
         if: github.ref_type == 'tag'
         run: grep -q "const Version = \"${GITHUB_REF_NAME#v}\"" fendlemark.go
@@ -34,12 +47,18 @@ jobs:
       - uses: ko-build/setup-ko@v0.10
         with:
           version: v0.19.1
+      - uses: docker/login-action@v4
+        with:
+          username: tophergopher
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Make the empty base
+        if: ${{ !inputs.release }}
         run: |
           platforms=$(sed -n '/^defaultPlatforms:/,/^[a-z]/s/^  - //p' .ko.yaml)
           python3 -I .github/scratch-base.py "$RUNNER_TEMP/scratch" $platforms
-          go run github.com/google/go-containerregistry/cmd/crane@v0.22.1 push --index "$RUNNER_TEMP/scratch" localhost:5000/scratch:latest
+          crane push --index "$RUNNER_TEMP/scratch" localhost:5000/scratch:latest
       - name: Build and push
+        if: ${{ !inputs.release }}
         env:
           KO_DEFAULTBASEIMAGE: localhost:5000/scratch:latest
           DESCRIPTION: One console for your entire ML platform
@@ -60,7 +79,36 @@ jobs:
             --image-label "org.opencontainers.image.version=$version" \
             --image-label "org.opencontainers.image.revision=$GITHUB_SHA" \
             --image-annotation "org.opencontainers.image.description=$DESCRIPTION"
-          echo "IMAGE=$KO_DOCKER_REPO:${tags%%,*}" >> "$GITHUB_ENV"
+          echo "TAGS=$tags" >> "$GITHUB_ENV"
+      # The release's own tag, and whichever of X.Y and latest still point
+      # at it on ghcr.io.
+      - name: Find the release's tags
+        if: ${{ inputs.release }}
+        env:
+          RELEASE: ${{ inputs.release }}
+        run: |
+          [[ $RELEASE =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "release must be X.Y.Z, not $RELEASE"; exit 1; }
+          digest=$(crane digest "$KO_DOCKER_REPO:$RELEASE")
+          tags=$RELEASE
+          for tag in "${RELEASE%.*}" latest; do
+            if [ "$(crane digest "$KO_DOCKER_REPO:$tag")" = "$digest" ]; then
+              tags="$tags,$tag"
+            fi
+          done
+          echo "TAGS=$tags" >> "$GITHUB_ENV"
+      # A copy, not a rebuild, so both registries serve the same digests.
+      - name: Copy to Docker Hub
+        run: |
+          first=${TAGS%%,*}
+          crane copy "$KO_DOCKER_REPO:$first" "$HUB_REPO:$first"
+          for tag in ${TAGS//,/ }; do
+            if [ "$tag" != "$first" ]; then
+              crane tag "$HUB_REPO:$first" "$tag"
+            fi
+          done
       # version only: serve would fetch the startup notice into the job log.
       - name: Smoke test
-        run: docker run --rm "$IMAGE" version
+        run: |
+          for repo in "$KO_DOCKER_REPO" "$HUB_REPO"; do
+            docker run --rm "$repo:${TAGS%%,*}" version
+          done

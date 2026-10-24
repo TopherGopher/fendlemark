@@ -24,7 +24,7 @@ fendlemark adapters check
 fendlemark serve          # console on http://localhost:7411
 ```
 
-Or run the container image, built `FROM scratch` for `linux/amd64`, `linux/arm64`, and `linux/arm/v7`:
+Or run the container image, built `FROM scratch` for `linux/amd64`, `linux/arm64`, and `linux/arm/v7` (also on Docker Hub as `tophergopher/fendlemark`):
 
 ```sh
 docker run --rm -p 127.0.0.1:7411:7411 -v "$PWD/fendlemark.yaml:/fendlemark.yaml:ro" \
