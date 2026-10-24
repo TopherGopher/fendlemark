@@ -33,4 +33,4 @@ Plain HTML and CSS, a few dozen lines of JavaScript for the theme toggle and cop
 
 ## Contact
 
-If you would like to say hello, report an error about one of the real tools, or ask that something be changed, the site's maintainer can be reached through the `develops.guru` domain. Pre-Intent Notices are not required.
+If you would like to say hello, report an error about one of the real tools, or ask that something be changed, the site's maintainer can be reached at [admin@fendlemark.app](mailto:admin@fendlemark.app). Pre-Intent Notices are not required.

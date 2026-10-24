@@ -1,3 +1,4 @@
+Contact: mailto:admin@fendlemark.app
 Contact: https://fendlemark.app/about/
 Preferred-Languages: en
 Canonical: https://fendlemark.app/.well-known/security.txt
