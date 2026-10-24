@@ -12,9 +12,9 @@ import (
 	"time"
 )
 
-// The tests never fetch the real notice. TestMain points noticeURL at a port
-// nothing listens on, and the one test that reaches the service uses its test
-// notice, which has the same shape and says only what the documentation says.
+// The tests never reach the notice service unasked. TestMain points noticeURL
+// at a port nothing listens on, and TestNoticeService, the one test that does
+// reach it, fetches the service's test notice.
 const testNoticeURL = "https://info.fendlemark.app/test-post"
 
 func TestMain(m *testing.M) {
