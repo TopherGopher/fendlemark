@@ -47,3 +47,12 @@ jobs:
         env:
           BEFORE: ${{ github.event.before }}
         run: python3 site/tools/indexnow.py "$BEFORE"
+  bing:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Submit the sitemap to Bing Webmaster Tools
+        env:
+          BING_WEBMASTER_API_KEY: ${{ secrets.BING_WEBMASTER_API_KEY }}
+        run: python3 site/tools/bing.py
