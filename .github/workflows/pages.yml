@@ -18,15 +18,16 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Verify generated pages are current
         run: |
           python3 site/tools/build.py
           python3 site/tools/linkcheck.py
           git diff --exit-code -- site/public || { echo "Run python3 site/tools/build.py and commit the output."; exit 1; }
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: site/public
+          include-hidden-files: true  # .well-known/ and .nojekyll
   deploy:
     needs: build
     runs-on: ubuntu-latest
@@ -35,12 +36,12 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
   indexnow:
     needs: deploy
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Submit changed pages to IndexNow
@@ -51,7 +52,7 @@ jobs:
     needs: deploy
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Submit the sitemap to Bing Webmaster Tools
         env:
           BING_WEBMASTER_API_KEY: ${{ secrets.BING_WEBMASTER_API_KEY }}

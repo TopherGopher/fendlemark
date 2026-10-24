@@ -12,7 +12,7 @@ Introducing Fendlemark, in thirty seconds.
 
 - **Go 1.23 or later** to install the CLI. Prebuilt binaries are distributed to Keepers and Stewards following each Silence Period; see [release governance](https://fendlemark.app/governance/#releases).
 - **Network access** from the machine running Fendlemark to at least one of: an MLflow tracking server, a Metaflow metadata service, an Argo Server, or a Kubeflow Pipelines API endpoint.
-- **Node.js 20 or later**, only if you intend to develop the console itself. The released binary embeds a built console.
+- **Node.js 22.12 or later**, only if you intend to develop the console itself. The released binary embeds a built console.
 - **A webcam**, if you enable [Respiratory Identity](https://fendlemark.app/docs/auth/). Local development runs with authentication disabled by default.
 
 ## 1. Install the CLI
