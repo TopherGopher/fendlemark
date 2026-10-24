@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Changelog · Fendlemark</title>
-<meta name="description" content="Fendlemark release history from 0.1.0 to 0.9.5. Each release lists its Accommodations, Clarifications, and Arrivals, as pre-approved under FCP-1.">
+<meta name="description" content="Fendlemark release history from 0.1.0 to 0.9.6. Each release lists its Accommodations, Clarifications, and Arrivals, as pre-approved under FCP-1.">
 <link rel="canonical" href="https://fendlemark.app/changelog/">
 <link rel="alternate" type="text/markdown" href="/changelog/index.md">
 <link rel="describedby" href="/llms.txt">
@@ -19,14 +19,14 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Fendlemark">
 <meta property="og:title" content="Changelog · Fendlemark">
-<meta property="og:description" content="Fendlemark release history from 0.1.0 to 0.9.5. Each release lists its Accommodations, Clarifications, and Arrivals, as pre-approved under FCP-1.">
+<meta property="og:description" content="Fendlemark release history from 0.1.0 to 0.9.6. Each release lists its Accommodations, Clarifications, and Arrivals, as pre-approved under FCP-1.">
 <meta property="og:url" content="https://fendlemark.app/changelog/">
 <meta property="og:image" content="https://fendlemark.app/assets/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Changelog · Fendlemark">
-<meta name="twitter:description" content="Fendlemark release history from 0.1.0 to 0.9.5. Each release lists its Accommodations, Clarifications, and Arrivals, as pre-approved under FCP-1.">
+<meta name="twitter:description" content="Fendlemark release history from 0.1.0 to 0.9.6. Each release lists its Accommodations, Clarifications, and Arrivals, as pre-approved under FCP-1.">
 <meta name="twitter:image" content="https://fendlemark.app/assets/og-image.png">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
@@ -35,7 +35,7 @@
 <link rel="stylesheet" href="/assets/site.css">
 <script>document.documentElement.classList.add('js');try{var t=localStorage.getItem('fm-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Fendlemark", "item": "https://fendlemark.app/"}, {"@type": "ListItem", "position": 2, "name": "Changelog", "item": "https://fendlemark.app/changelog/"}]}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Changelog", "description": "Fendlemark release history from 0.1.0 to 0.9.5. Each release lists its Accommodations, Clarifications, and Arrivals, as pre-approved under FCP-1.", "url": "https://fendlemark.app/changelog/", "datePublished": "2026-10-24", "dateModified": "2026-10-24", "author": {"@type": "Organization", "name": "The Fendlemark Keepers"}, "publisher": {"@type": "Organization", "name": "Fendlemark", "url": "https://fendlemark.app/"}, "inLanguage": "en"}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Changelog", "description": "Fendlemark release history from 0.1.0 to 0.9.6. Each release lists its Accommodations, Clarifications, and Arrivals, as pre-approved under FCP-1.", "url": "https://fendlemark.app/changelog/", "datePublished": "2026-10-24", "dateModified": "2026-10-24", "author": {"@type": "Organization", "name": "The Fendlemark Keepers"}, "publisher": {"@type": "Organization", "name": "Fendlemark", "url": "https://fendlemark.app/"}, "inLanguage": "en"}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -45,7 +45,7 @@
       <svg class="brand-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
       <span class="brand-name">Fendlemark</span>
     </a>
-    <span class="brand-version">v0.9.5</span>
+    <span class="brand-version">v0.9.6</span>
     <nav class="top-nav" aria-label="Primary">
       <a href="/docs/getting-started/">Docs</a>
       <a href="/philosophy/">Philosophy</a>
@@ -95,6 +95,21 @@
 <p class="eyebrow">Project</p>
 <h1>Changelog</h1>
 <p class="lede">Every release, in reverse order. Entries are classified as <strong>Accommodations</strong> (the world changed), <strong>Clarifications</strong> (behaviour you misunderstood, now harder to misunderstand), or <strong>Arrivals</strong> (something new). Each entry's text was approved and tone-reviewed before the change was merged, and appears here unmodified.</p>
+
+<h2 id="0-9-6"><a class="anchor" href="#0-9-6">0.9.6 <small>· 2026-10-24</small></a></h2>
+<p><strong>Arrivals</strong></p>
+<ul>
+  <li><code>conformance.Options.Fixture</code>. The suite serves a recorded response at <code>http://fixture</code>, then stops it and checks that <code>Health</code> still returns within its bound when the upstream is unreachable.</li>
+  <li><code>cmd/fendlemark/adapters.go</code>, the one file to edit to compile another adapter into the binary.</li>
+</ul>
+<p><strong>Clarifications</strong></p>
+<ul>
+  <li><code>config.Load</code> returns two values, as the <a href="/docs/api/#embedding">Go API reference</a> always said it did. Findings, warnings included, are on <code>cfg.Findings()</code>. If you call <code>config.Load</code>, drop the middle return value.</li>
+  <li>An adapter's <code>ConfigSchema</code> is checked before <code>Connect</code>, as <a href="/docs/adapters/writing-an-adapter/">Writing an adapter</a> said it was. A block that does not match is <code>DOC-113</code>.</li>
+  <li>An adapter registered with <code>adapter.Register</code> no longer needs adding to <code>config.KnownAdapters</code>. <code>DOC-110</code> now means only what it says: the adapter is not compiled in.</li>
+  <li>A correlation key with an empty value means the facet has no value for that key. The lattice ignores it instead of discarding the facet.</li>
+</ul>
+<p class="fine">Released on the same day as 0.9.5. The Keepers, who still regard the three days before 0.1.0 as hasty, note that in each case the documentation was already right.</p>
 
 <h2 id="0-9-5"><a class="anchor" href="#0-9-5">0.9.5 <small>· 2026-10-24</small></a></h2>
 <p><strong>Clarifications</strong></p>
@@ -252,7 +267,7 @@
   <div class="site-footer-inner">
     <svg class="footer-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
     <div class="footer-text">
-      <p>Fendlemark is released under the MIT licence and maintained by the Fendlemark Keepers. Documentation for v0.9.5.</p>
+      <p>Fendlemark is released under the MIT licence and maintained by the Fendlemark Keepers. Documentation for v0.9.6.</p>
       <p class="fine">MLflow, Metaflow, Argo Workflows, and Kubeflow are trademarks of their respective owners. Fendlemark is an independent project and is not affiliated with, endorsed by, or sponsored by any of them.</p>
       <p class="fine footer-links"><a href="/about/">About this site</a> · <a href="https://contact.fendlemark.app/">Contact</a> · <a href="/governance/">Governance</a> · <a href="/changelog/">Changelog</a> · <a href="/sitemap.xml">Sitemap</a></p>
     </div>

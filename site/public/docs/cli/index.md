@@ -84,7 +84,7 @@ Validates configuration, resolves environment references, checks every enabled a
 
 ```shell
 $ fendlemark doctor
-fendlemark doctor 0.9.5
+fendlemark doctor 0.9.6
 
 config    ok       ./fendlemark.yaml (6 keys set, 41 defaulted)
 config    warn     DOC-104 adapters.mlflow.trackingUri is the pre-0.9 spelling; use tracking_uri (fixable)
@@ -101,7 +101,7 @@ auth      info     DOC-201 auth.mode is none; anyone who can reach server.listen
 
 ```shell
 $ fendlemark version [--json]
-fendlemark 0.9.5 (go1.23.2, linux/amd64)
+fendlemark 0.9.6 (go1.23.2, linux/amd64)
 commit:  3e1f9c0
 console: embedded, built 2026-09-30
 adapters: mlflow argo metaflow kubeflow

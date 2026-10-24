@@ -223,7 +223,7 @@ def jsonld(meta, url, title, description, posts=()):
             "applicationCategory": "DeveloperApplication",
             "operatingSystem": "Linux, macOS",
             "programmingLanguage": ["Go", "JavaScript"],
-            "softwareVersion": meta.get("version", "0.9.5"),
+            "softwareVersion": meta.get("version", "0.9.6"),
             "url": BASE + "/",
             "description": description,
             "license": "https://opensource.org/license/mit",
@@ -367,7 +367,7 @@ def render(url, meta, body, posts):
         "{{layout}}": layout,
         "{{page}}": url.strip("/").replace("/", "-") or "home",
         "{{year}}": "2026",
-        "{{version}}": "0.9.5",
+        "{{version}}": "0.9.6",
         "{{body}}": enhance(body),   # last, so text in a page can never be taken for a placeholder
     }
     for k, v in repl.items():
@@ -549,7 +549,7 @@ def write_feed(changelog_body):
 def write_llms(pages, posts):
     lines = ["# Fendlemark", "",
              "> Fendlemark is an open-source Go and Vue 3 framework that unifies the user experiences of MLflow, Metaflow, Argo Workflows, and Kubeflow into a single ML platform console. One binary, four read-only adapters, one deterministic entity graph (the lattice), one console.",
-             "", "Module path: fendlemark.app/fendlemark · npm: @fendlemark/ui · Licence: MIT · Current version: 0.9.5", "",
+             "", "Module path: fendlemark.app/fendlemark · npm: @fendlemark/ui · Licence: MIT · Current version: 0.9.6", "",
              "## Documentation", ""]
     for url, meta in pages:
         if url.startswith("/docs/"):
@@ -578,7 +578,7 @@ def write_404():
                  "{{body}}": enhance(body), "{{sidebar}}": sidebar("/404"), "{{topnav}}": topnav("/404"), "{{pager}}": "",
                  "{{jsonld}}": "", "{{layout}}": "docs", "{{page}}": "not-found",
                  "{{og_type}}": "website", "{{og_article}}": "", "{{feeds}}": "",
-                 "{{year}}": "2026", "{{version}}": "0.9.5"}.items():
+                 "{{year}}": "2026", "{{version}}": "0.9.6"}.items():
         page = page.replace(k, v)
     page = page.replace('<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">', '<meta name="robots" content="noindex">')
     open(os.path.join(ROOT, "404.html"), "w", encoding="utf-8").write(page)

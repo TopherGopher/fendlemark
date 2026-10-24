@@ -334,7 +334,7 @@ lt_459baa2c413ad692  run  Succeeded  &quot;resnet50-train-x7k2p&quot;
     <updated>2026-10-24T00:00:00Z</updated>
     <author><name>The Fendlemark Keepers</name><uri>https://fendlemark.app/governance/</uri></author>
     <summary>Build a working Fendlemark adapter for Kubernetes Jobs: descriptor, facets, phases, correlation keys, health, conformance tests, and a binary to run it in.</summary>
-    <content type="html">&lt;p class=&quot;lede&quot;&gt;The reference page for &lt;a href=&quot;https://fendlemark.app/docs/adapters/writing-an-adapter/&quot;&gt;writing an adapter&lt;/a&gt; describes the interface. This post uses it: we build a complete adapter for Kubernetes Jobs, test it against a recorded fixture with the conformance suite, and run it inside a Fendlemark binary. Every line of code below compiles against &lt;code&gt;fendlemark.app/fendlemark&lt;/code&gt; v0.9.5.&lt;/p&gt;
+    <content type="html">&lt;p class=&quot;lede&quot;&gt;The reference page for &lt;a href=&quot;https://fendlemark.app/docs/adapters/writing-an-adapter/&quot;&gt;writing an adapter&lt;/a&gt; describes the interface. This post uses it: we build a complete adapter for Kubernetes Jobs, test it against a recorded fixture with the conformance suite, and run it inside a Fendlemark binary. Every line of code below compiles against &lt;code&gt;fendlemark.app/fendlemark&lt;/code&gt; v0.9.6.&lt;/p&gt;
 
 &lt;h2 id=&quot;why-jobs&quot;&gt;Why Kubernetes Jobs&lt;/h2&gt;
 &lt;p&gt;Not every training job goes through a workflow engine. On many platforms some of them are a &lt;code&gt;batch/v1&lt;/code&gt; Job, created by a script, a CI pipeline, or a person with &lt;code&gt;kubectl&lt;/code&gt;, and those jobs are invisible to the four built-in adapters. They are a good first adapter: the API is stable and well documented, one Job maps cleanly onto one facet, and the interesting decisions, how to map status onto phases and where to find correlation keys, are the same decisions every adapter makes.&lt;/p&gt;
@@ -351,7 +351,7 @@ lt_459baa2c413ad692  run  Succeeded  &quot;resnet50-train-x7k2p&quot;
 &lt;p&gt;An adapter is an ordinary Go package. It does not need to live in the Fendlemark repository, and this one does not:&lt;/p&gt;
 &lt;pre data-lang=&quot;shell&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;$&lt;/span&gt; mkdir k8sjobs &amp;amp;&amp;amp; cd k8sjobs
 &lt;span class=&quot;p&quot;&gt;$&lt;/span&gt; go mod init example.com/k8sjobs
-&lt;span class=&quot;p&quot;&gt;$&lt;/span&gt; go get fendlemark.app/fendlemark@v0.9.5&lt;/code&gt;&lt;/pre&gt;
+&lt;span class=&quot;p&quot;&gt;$&lt;/span&gt; go get fendlemark.app/fendlemark@v0.9.6&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;You need Go 1.23 or later. By the end, the module looks like this:&lt;/p&gt;
 &lt;pre data-lang=&quot;text&quot;&gt;&lt;code&gt;k8sjobs/
 ├── go.mod
@@ -456,7 +456,7 @@ lt_459baa2c413ad692  run  Succeeded  &quot;resnet50-train-x7k2p&quot;
   &lt;li&gt;&lt;strong&gt;&lt;code&gt;Keys&lt;/code&gt;&lt;/strong&gt; must name every key a facet can carry. A facet that emits an undeclared key fails conformance, which is a useful check on typos in the annotation map.&lt;/li&gt;
   &lt;li&gt;&lt;strong&gt;&lt;code&gt;Watchable: false&lt;/code&gt;&lt;/strong&gt; tells the control plane to call &lt;code&gt;Facets&lt;/code&gt; every &lt;code&gt;poll_interval&lt;/code&gt; (30 seconds unless configured) instead of calling &lt;code&gt;Watch&lt;/code&gt;.&lt;/li&gt;
   &lt;li&gt;&lt;strong&gt;&lt;code&gt;Maturity: adapter.Provisional&lt;/code&gt;&lt;/strong&gt; is where every new adapter starts on the &lt;a href=&quot;https://fendlemark.app/governance/#maturity&quot;&gt;maturity ladder&lt;/a&gt;.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;&lt;code&gt;ConfigSchema&lt;/code&gt;&lt;/strong&gt; is a JSON Schema for the adapter&#x27;s block in &lt;code&gt;fendlemark.yaml&lt;/code&gt;: &lt;code&gt;api_url&lt;/code&gt;, &lt;code&gt;namespaces&lt;/code&gt;, and an optional &lt;code&gt;token&lt;/code&gt;.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;code&gt;ConfigSchema&lt;/code&gt;&lt;/strong&gt; is a JSON Schema for the adapter&#x27;s block in &lt;code&gt;fendlemark.yaml&lt;/code&gt;: &lt;code&gt;api_url&lt;/code&gt;, &lt;code&gt;namespaces&lt;/code&gt;, and an optional &lt;code&gt;token&lt;/code&gt;. Fendlemark checks the block against it when it loads the file, before &lt;code&gt;Connect&lt;/code&gt; is ever called, so a missing &lt;code&gt;api_url&lt;/code&gt; is reported as &lt;code&gt;DOC-113&lt;/code&gt; by &lt;code&gt;fendlemark doctor&lt;/code&gt; rather than as a failed connection.&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h2 id=&quot;connect&quot;&gt;3. Connect&lt;/h2&gt;
@@ -580,7 +580,7 @@ lt_459baa2c413ad692  run  Succeeded  &quot;resnet50-train-x7k2p&quot;
 	m, s := jb.Metadata, jb.Status
 	keys := &lt;span class=&quot;k&quot;&gt;map&lt;/span&gt;[&lt;span class=&quot;k&quot;&gt;string&lt;/span&gt;]&lt;span class=&quot;k&quot;&gt;string&lt;/span&gt;{}
 	&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; annotation, key := &lt;span class=&quot;k&quot;&gt;range&lt;/span&gt; Annotations {
-		&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; v := m.Annotations[annotation]; v != &lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt; { &lt;span class=&quot;c&quot;&gt;// empty values fail Facet.Validate&lt;/span&gt;
+		&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; v := m.Annotations[annotation]; v != &lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt; { &lt;span class=&quot;c&quot;&gt;// only keys that have a value&lt;/span&gt;
 			keys[key] = v
 		}
 	}
@@ -631,7 +631,7 @@ lt_459baa2c413ad692  run  Succeeded  &quot;resnet50-train-x7k2p&quot;
 &lt;ul&gt;
   &lt;li&gt;&lt;strong&gt;&lt;code&gt;SourceID&lt;/code&gt;&lt;/strong&gt; is the namespace and name, which is unique per facet as the reconciler requires, and is how people refer to a Job.&lt;/li&gt;
   &lt;li&gt;&lt;strong&gt;&lt;code&gt;StartedAt&lt;/code&gt;&lt;/strong&gt; must never be zero: &lt;code&gt;Facet.Validate&lt;/code&gt; rejects it, and the correlation window is measured from it. A Job created suspended has no &lt;code&gt;startTime&lt;/code&gt; until it is resumed, so the adapter falls back to &lt;code&gt;creationTimestamp&lt;/code&gt;.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Keys&lt;/strong&gt; are added only when the annotation has a value. An empty key value also fails &lt;code&gt;Validate&lt;/code&gt;, and a facet that fails validation is dropped by the lattice rather than shown.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Keys&lt;/strong&gt; are added only when the annotation has a value. The lattice ignores a key whose value is empty, so leaving it out changes nothing about correlation; it keeps each facet&#x27;s keys to the ones it actually has, which is what the API and the console show.&lt;/li&gt;
   &lt;li&gt;&lt;strong&gt;Phases&lt;/strong&gt; come from the Job&#x27;s conditions. &lt;code&gt;Complete&lt;/code&gt; and &lt;code&gt;Failed&lt;/code&gt; are terminal, and a Job never has both. The subtle part is the end time: Kubernetes sets &lt;code&gt;completionTime&lt;/code&gt; only when a Job succeeds, so for a failed Job the adapter uses the time the &lt;code&gt;Failed&lt;/code&gt; condition became true. Without that, a failed Job would have no end time, and a zero &lt;code&gt;EndedAt&lt;/code&gt; means a run that is still going. Newer Kubernetes versions can also set a &lt;code&gt;FailureTarget&lt;/code&gt; condition before &lt;code&gt;Failed&lt;/code&gt;; the switch ignores it and waits for &lt;code&gt;Failed&lt;/code&gt;.&lt;/li&gt;
   &lt;li&gt;&lt;strong&gt;&lt;code&gt;Fields&lt;/code&gt;&lt;/strong&gt; is for display only and never used for correlation. The console renders it as a key-value table under the adapter&#x27;s display name until you write a &lt;a href=&quot;https://fendlemark.app/docs/ui/#panels&quot;&gt;facet panel&lt;/a&gt;.&lt;/li&gt;
 &lt;/ul&gt;
@@ -882,10 +882,7 @@ ok  	example.com/k8sjobs	0.157s&lt;/code&gt;&lt;/pre&gt;
 )
 
 &lt;span class=&quot;k&quot;&gt;func&lt;/span&gt; main() {
-	&lt;span class=&quot;c&quot;&gt;// Configuration validation accepts only adapters it knows about (DOC-110).&lt;/span&gt;
-	config.KnownAdapters = &lt;span class=&quot;k&quot;&gt;append&lt;/span&gt;(config.KnownAdapters, &lt;span class=&quot;s&quot;&gt;&quot;k8sjobs&quot;&lt;/span&gt;)
-
-	cfg, _, err := config.Load(&lt;span class=&quot;s&quot;&gt;&quot;fendlemark.yaml&quot;&lt;/span&gt;)
+	cfg, err := config.Load(&lt;span class=&quot;s&quot;&gt;&quot;fendlemark.yaml&quot;&lt;/span&gt;)
 	&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; err != &lt;span class=&quot;k&quot;&gt;nil&lt;/span&gt; {
 		log.Fatal(err)
 	}
@@ -899,7 +896,7 @@ ok  	example.com/k8sjobs	0.157s&lt;/code&gt;&lt;/pre&gt;
 		log.Fatal(err)
 	}
 }&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Importing &lt;code&gt;fendlemark.app/fendlemark&lt;/code&gt; registers the four built-in adapters too, so this binary can read MLflow, Metaflow, Argo, and Kubeflow as well as Jobs. Configuration validation rejects an &lt;code&gt;adapters.&amp;lt;name&amp;gt;&lt;/code&gt; block for an adapter it does not know, with &lt;code&gt;DOC-110&lt;/code&gt;, so &lt;code&gt;main&lt;/code&gt; adds the new name to &lt;code&gt;config.KnownAdapters&lt;/code&gt; before loading the file.&lt;/p&gt;
+&lt;p&gt;Importing &lt;code&gt;fendlemark.app/fendlemark&lt;/code&gt; registers the four built-in adapters too, so this binary can read MLflow, Metaflow, Argo, and Kubeflow as well as Jobs. Nothing else needs to know about the new adapter: configuration validation accepts an &lt;code&gt;adapters.k8sjobs&lt;/code&gt; block because the adapter registered itself, and checks it against the adapter&#x27;s &lt;code&gt;ConfigSchema&lt;/code&gt;. &lt;code&gt;DOC-110&lt;/code&gt; is reserved for a block naming an adapter that nobody compiled in.&lt;/p&gt;
 &lt;p&gt;Point it at the API through &lt;code&gt;kubectl proxy&lt;/code&gt;:&lt;/p&gt;
 &lt;pre data-lang=&quot;yaml&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;adapters&lt;/span&gt;:
   &lt;span class=&quot;k&quot;&gt;k8sjobs&lt;/span&gt;:
@@ -909,7 +906,7 @@ ok  	example.com/k8sjobs	0.157s&lt;/code&gt;&lt;/pre&gt;
 &lt;pre data-lang=&quot;shell&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;$&lt;/span&gt; kubectl proxy &amp;amp;
 &lt;span class=&quot;p&quot;&gt;$&lt;/span&gt; go build -o platform ./cmd/platform
 &lt;span class=&quot;p&quot;&gt;$&lt;/span&gt; ./platform
-INFO fendlemark starting version=0.9.5 adapters=k8sjobs
+INFO fendlemark starting version=0.9.6 adapters=k8sjobs
 INFO adapter connected adapter=k8sjobs took=19ms
 INFO lattice reconciled entities=3 facets=3 generation=1 took=0s
 INFO console listening addr=127.0.0.1:7411&lt;/code&gt;&lt;/pre&gt;

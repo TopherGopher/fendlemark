@@ -64,7 +64,7 @@ Component reference: [The console](https://fendlemark.app/docs/ui/#library). Pac
 
 ## Versions
 
-The Go module and the npm package share a version number and are tagged together under [release governance](https://fendlemark.app/governance/#releases). Current: **0.9.5**. Every release is listed in the [changelog](https://fendlemark.app/changelog/) and announced on the [Atom feed](https://fendlemark.app/feed.xml).
+The Go module and the npm package share a version number and are tagged together under [release governance](https://fendlemark.app/governance/#releases). Current: **0.9.6**. Every release is listed in the [changelog](https://fendlemark.app/changelog/) and announced on the [Atom feed](https://fendlemark.app/feed.xml).
 
 ## Repository layout
 

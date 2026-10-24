@@ -94,7 +94,9 @@ type Facet struct {
 // Ref is the unique identity of a facet within the lattice.
 func (f Facet) Ref() string { return f.Source + "\x00" + f.SourceID }
 
-// Validate reports the first rule the facet breaks, or nil.
+// Validate reports the first rule the facet breaks, or nil. A key with an
+// empty value is not an error: it means the facet has no value for that key,
+// and the lattice ignores it.
 func (f Facet) Validate() error {
 	switch {
 	case f.Source == "":
@@ -106,9 +108,9 @@ func (f Facet) Validate() error {
 	case f.StartedAt.IsZero():
 		return fmt.Errorf("facet %s/%s: StartedAt is zero", f.Source, f.SourceID)
 	}
-	for k, v := range f.Keys {
-		if k == "" || v == "" {
-			return fmt.Errorf("facet %s/%s: empty correlation key or value", f.Source, f.SourceID)
+	for k := range f.Keys {
+		if k == "" {
+			return fmt.Errorf("facet %s/%s: empty correlation key name", f.Source, f.SourceID)
 		}
 	}
 	return nil

@@ -12,7 +12,7 @@ Fendlemark sits in front of MLflow, Metaflow, Argo Workflows, and Kubeflow and c
 $ go install fendlemark.app/fendlemark/cmd/fendlemark@latest
 $ fendlemark init my-platform
 $ fendlemark serve
-fendlemark 0.9.5 · console on http://localhost:7411 · 4 adapters healthy
+fendlemark 0.9.6 · console on http://localhost:7411 · 4 adapters healthy
 ```
 
 ## Four tools. One lattice.

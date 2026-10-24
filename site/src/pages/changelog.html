@@ -1,7 +1,22 @@
-<!-- meta {"title": "Changelog", "description": "Fendlemark release history from 0.1.0 to 0.9.5. Each release lists its Accommodations, Clarifications, and Arrivals, as pre-approved under FCP-1.", "type": "Article"} -->
+<!-- meta {"title": "Changelog", "description": "Fendlemark release history from 0.1.0 to 0.9.6. Each release lists its Accommodations, Clarifications, and Arrivals, as pre-approved under FCP-1.", "type": "Article"} -->
 <p class="eyebrow">Project</p>
 <h1>Changelog</h1>
 <p class="lede">Every release, in reverse order. Entries are classified as <strong>Accommodations</strong> (the world changed), <strong>Clarifications</strong> (behaviour you misunderstood, now harder to misunderstand), or <strong>Arrivals</strong> (something new). Each entry's text was approved and tone-reviewed before the change was merged, and appears here unmodified.</p>
+
+<h2 id="0-9-6">0.9.6 <small>· 2026-10-24</small></h2>
+<p><strong>Arrivals</strong></p>
+<ul>
+  <li><code>conformance.Options.Fixture</code>. The suite serves a recorded response at <code>http://fixture</code>, then stops it and checks that <code>Health</code> still returns within its bound when the upstream is unreachable.</li>
+  <li><code>cmd/fendlemark/adapters.go</code>, the one file to edit to compile another adapter into the binary.</li>
+</ul>
+<p><strong>Clarifications</strong></p>
+<ul>
+  <li><code>config.Load</code> returns two values, as the <a href="/docs/api/#embedding">Go API reference</a> always said it did. Findings, warnings included, are on <code>cfg.Findings()</code>. If you call <code>config.Load</code>, drop the middle return value.</li>
+  <li>An adapter's <code>ConfigSchema</code> is checked before <code>Connect</code>, as <a href="/docs/adapters/writing-an-adapter/">Writing an adapter</a> said it was. A block that does not match is <code>DOC-113</code>.</li>
+  <li>An adapter registered with <code>adapter.Register</code> no longer needs adding to <code>config.KnownAdapters</code>. <code>DOC-110</code> now means only what it says: the adapter is not compiled in.</li>
+  <li>A correlation key with an empty value means the facet has no value for that key. The lattice ignores it instead of discarding the facet.</li>
+</ul>
+<p class="fine">Released on the same day as 0.9.5. The Keepers, who still regard the three days before 0.1.0 as hasty, note that in each case the documentation was already right.</p>
 
 <h2 id="0-9-5">0.9.5 <small>· 2026-10-24</small></h2>
 <p><strong>Clarifications</strong></p>

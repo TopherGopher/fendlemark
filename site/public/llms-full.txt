@@ -14,7 +14,7 @@ Fendlemark sits in front of MLflow, Metaflow, Argo Workflows, and Kubeflow and c
 $ go install fendlemark.app/fendlemark/cmd/fendlemark@latest
 $ fendlemark init my-platform
 $ fendlemark serve
-fendlemark 0.9.5 · console on http://localhost:7411 · 4 adapters healthy
+fendlemark 0.9.6 · console on http://localhost:7411 · 4 adapters healthy
 ```
 
 ## Four tools. One lattice.
@@ -550,7 +550,7 @@ Source: https://fendlemark.app/blog/writing-a-fendlemark-adapter/
 
 By [the Fendlemark Keepers](https://fendlemark.app/governance/#keepers) · 24 October 2026
 
-The reference page for [writing an adapter](https://fendlemark.app/docs/adapters/writing-an-adapter/) describes the interface. This post uses it: we build a complete adapter for Kubernetes Jobs, test it against a recorded fixture with the conformance suite, and run it inside a Fendlemark binary. Every line of code below compiles against `fendlemark.app/fendlemark` v0.9.5.
+The reference page for [writing an adapter](https://fendlemark.app/docs/adapters/writing-an-adapter/) describes the interface. This post uses it: we build a complete adapter for Kubernetes Jobs, test it against a recorded fixture with the conformance suite, and run it inside a Fendlemark binary. Every line of code below compiles against `fendlemark.app/fendlemark` v0.9.6.
 
 ## Why Kubernetes Jobs
 
@@ -572,7 +572,7 @@ An adapter is an ordinary Go package. It does not need to live in the Fendlemark
 ```shell
 $ mkdir k8sjobs && cd k8sjobs
 $ go mod init example.com/k8sjobs
-$ go get fendlemark.app/fendlemark@v0.9.5
+$ go get fendlemark.app/fendlemark@v0.9.6
 ```
 
 You need Go 1.23 or later. By the end, the module looks like this:
@@ -697,7 +697,7 @@ The constructor returns an unconnected adapter and does no work; the control pla
 - **`Keys`** must name every key a facet can carry. A facet that emits an undeclared key fails conformance, which is a useful check on typos in the annotation map.
 - **`Watchable: false`** tells the control plane to call `Facets` every `poll_interval` (30 seconds unless configured) instead of calling `Watch`.
 - **`Maturity: adapter.Provisional`** is where every new adapter starts on the [maturity ladder](https://fendlemark.app/governance/#maturity).
-- **`ConfigSchema`** is a JSON Schema for the adapter's block in `fendlemark.yaml`: `api_url`, `namespaces`, and an optional `token`.
+- **`ConfigSchema`** is a JSON Schema for the adapter's block in `fendlemark.yaml`: `api_url`, `namespaces`, and an optional `token`. Fendlemark checks the block against it when it loads the file, before `Connect` is ever called, so a missing `api_url` is reported as `DOC-113` by `fendlemark doctor` rather than as a failed connection.
 
 ## 3. Connect
 
@@ -835,7 +835,7 @@ func facetOf(jb job) adapter.Facet {
 	m, s := jb.Metadata, jb.Status
 	keys := map[string]string{}
 	for annotation, key := range Annotations {
-		if v := m.Annotations[annotation]; v != "" { // empty values fail Facet.Validate
+		if v := m.Annotations[annotation]; v != "" { // only keys that have a value
 			keys[key] = v
 		}
 	}
@@ -888,7 +888,7 @@ This is where an adapter earns its keep, because it is where the upstream tool's
 
 - **`SourceID`** is the namespace and name, which is unique per facet as the reconciler requires, and is how people refer to a Job.
 - **`StartedAt`** must never be zero: `Facet.Validate` rejects it, and the correlation window is measured from it. A Job created suspended has no `startTime` until it is resumed, so the adapter falls back to `creationTimestamp`.
-- **Keys** are added only when the annotation has a value. An empty key value also fails `Validate`, and a facet that fails validation is dropped by the lattice rather than shown.
+- **Keys** are added only when the annotation has a value. The lattice ignores a key whose value is empty, so leaving it out changes nothing about correlation; it keeps each facet's keys to the ones it actually has, which is what the API and the console show.
 - **Phases** come from the Job's conditions. `Complete` and `Failed` are terminal, and a Job never has both. The subtle part is the end time: Kubernetes sets `completionTime` only when a Job succeeds, so for a failed Job the adapter uses the time the `Failed` condition became true. Without that, a failed Job would have no end time, and a zero `EndedAt` means a run that is still going. Newer Kubernetes versions can also set a `FailureTarget` condition before `Failed`; the switch ignores it and waits for `Failed`.
 - **`Fields`** is for display only and never used for correlation. The console renders it as a key-value table under the adapter's display name until you write a [facet panel](https://fendlemark.app/docs/ui/#panels).
 
@@ -1167,10 +1167,7 @@ import (
 )
 
 func main() {
-	// Configuration validation accepts only adapters it knows about (DOC-110).
-	config.KnownAdapters = append(config.KnownAdapters, "k8sjobs")
-
-	cfg, _, err := config.Load("fendlemark.yaml")
+	cfg, err := config.Load("fendlemark.yaml")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -1186,7 +1183,7 @@ func main() {
 }
 ```
 
-Importing `fendlemark.app/fendlemark` registers the four built-in adapters too, so this binary can read MLflow, Metaflow, Argo, and Kubeflow as well as Jobs. Configuration validation rejects an `adapters.<name>` block for an adapter it does not know, with `DOC-110`, so `main` adds the new name to `config.KnownAdapters` before loading the file.
+Importing `fendlemark.app/fendlemark` registers the four built-in adapters too, so this binary can read MLflow, Metaflow, Argo, and Kubeflow as well as Jobs. Nothing else needs to know about the new adapter: configuration validation accepts an `adapters.k8sjobs` block because the adapter registered itself, and checks it against the adapter's `ConfigSchema`. `DOC-110` is reserved for a block naming an adapter that nobody compiled in.
 
 Point it at the API through `kubectl proxy`:
 
@@ -1202,7 +1199,7 @@ adapters:
 $ kubectl proxy &
 $ go build -o platform ./cmd/platform
 $ ./platform
-INFO fendlemark starting version=0.9.5 adapters=k8sjobs
+INFO fendlemark starting version=0.9.6 adapters=k8sjobs
 INFO adapter connected adapter=k8sjobs took=19ms
 INFO lattice reconciled entities=3 facets=3 generation=1 took=0s
 INFO console listening addr=127.0.0.1:7411
@@ -1242,6 +1239,22 @@ Enable the `mlflow` adapter in the same file, and every Job annotated with `fend
 Source: https://fendlemark.app/changelog/
 
 Every release, in reverse order. Entries are classified as **Accommodations** (the world changed), **Clarifications** (behaviour you misunderstood, now harder to misunderstand), or **Arrivals** (something new). Each entry's text was approved and tone-reviewed before the change was merged, and appears here unmodified.
+
+## 0.9.6 · 2026-10-24
+
+**Arrivals**
+
+- `conformance.Options.Fixture`. The suite serves a recorded response at `http://fixture`, then stops it and checks that `Health` still returns within its bound when the upstream is unreachable.
+- `cmd/fendlemark/adapters.go`, the one file to edit to compile another adapter into the binary.
+
+**Clarifications**
+
+- `config.Load` returns two values, as the [Go API reference](https://fendlemark.app/docs/api/#embedding) always said it did. Findings, warnings included, are on `cfg.Findings()`. If you call `config.Load`, drop the middle return value.
+- An adapter's `ConfigSchema` is checked before `Connect`, as [Writing an adapter](https://fendlemark.app/docs/adapters/writing-an-adapter/) said it was. A block that does not match is `DOC-113`.
+- An adapter registered with `adapter.Register` no longer needs adding to `config.KnownAdapters`. `DOC-110` now means only what it says: the adapter is not compiled in.
+- A correlation key with an empty value means the facet has no value for that key. The lattice ignores it instead of discarding the facet.
+
+Released on the same day as 0.9.5. The Keepers, who still regard the three days before 0.1.0 as hasty, note that in each case the documentation was already right.
 
 ## 0.9.5 · 2026-10-24
 
@@ -1400,7 +1413,7 @@ The first commit was made on 2023-03-11 at 02:14 by `@thalvskog`. The release fo
 
 Source: https://fendlemark.app/docs/
 
-Everything you need to run Fendlemark in front of your ML platform, from the first `go install` to writing your own adapter. Documentation for v0.9.5.
+Everything you need to run Fendlemark in front of your ML platform, from the first `go install` to writing your own adapter. Documentation for v0.9.6.
 
 ## Start here
 
@@ -1731,7 +1744,7 @@ Module path `fendlemark.app/fendlemark`. Go 1.23 or later. These are the package
 ## package fendlemark
 
 ```go
-const Version = "0.9.5"
+const Version = "0.9.6"
 
 // New constructs a Fendlemark instance from configuration. Adapters
 // must already be registered (import their packages for side effects).
@@ -2150,7 +2163,7 @@ Validates configuration, resolves environment references, checks every enabled a
 
 ```shell
 $ fendlemark doctor
-fendlemark doctor 0.9.5
+fendlemark doctor 0.9.6
 
 config    ok       ./fendlemark.yaml (6 keys set, 41 defaulted)
 config    warn     DOC-104 adapters.mlflow.trackingUri is the pre-0.9 spelling; use tracking_uri (fixable)
@@ -2167,7 +2180,7 @@ auth      info     DOC-201 auth.mode is none; anyone who can reach server.listen
 
 ```shell
 $ fendlemark version [--json]
-fendlemark 0.9.5 (go1.23.2, linux/amd64)
+fendlemark 0.9.6 (go1.23.2, linux/amd64)
 commit:  3e1f9c0
 console: embedded, built 2026-09-30
 adapters: mlflow argo metaflow kubeflow
@@ -2407,7 +2420,7 @@ This guide takes you from nothing to a running Fendlemark console connected to a
 ```shell
 $ go install fendlemark.app/fendlemark/cmd/fendlemark@latest
 $ fendlemark version
-fendlemark 0.9.5 (go1.23.2, linux/amd64)
+fendlemark 0.9.6 (go1.23.2, linux/amd64)
 console: embedded, built 2026-09-30
 ```
 
@@ -2465,7 +2478,7 @@ If an adapter reports `degraded` or `unreachable`, `fendlemark doctor` will tell
 
 ```shell
 $ fendlemark serve
-2026-10-24T09:12:03Z INF fendlemark 0.9.5 starting
+2026-10-24T09:12:03Z INF fendlemark 0.9.6 starting
 2026-10-24T09:12:03Z INF adapter mlflow connected tracking_uri=http://mlflow.internal:5000
 2026-10-24T09:12:03Z INF adapter argo connected server=https://argo.internal:2746 namespaces=2
 2026-10-24T09:12:04Z INF lattice initial reconciliation complete entities=1443 correlations=312 took=612ms
@@ -2842,7 +2855,7 @@ Component reference: [The console](https://fendlemark.app/docs/ui/#library). Pac
 
 ## Versions
 
-The Go module and the npm package share a version number and are tagged together under [release governance](https://fendlemark.app/governance/#releases). Current: **0.9.5**. Every release is listed in the [changelog](https://fendlemark.app/changelog/) and announced on the [Atom feed](https://fendlemark.app/feed.xml).
+The Go module and the npm package share a version number and are tagged together under [release governance](https://fendlemark.app/governance/#releases). Current: **0.9.6**. Every release is listed in the [changelog](https://fendlemark.app/changelog/) and announced on the [Atom feed](https://fendlemark.app/feed.xml).
 
 ## Repository layout
 

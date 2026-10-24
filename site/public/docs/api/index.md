@@ -20,7 +20,7 @@ Module path `fendlemark.app/fendlemark`. Go 1.23 or later. These are the package
 ## package fendlemark
 
 ```go
-const Version = "0.9.5"
+const Version = "0.9.6"
 
 // New constructs a Fendlemark instance from configuration. Adapters
 // must already be registered (import their packages for side effects).

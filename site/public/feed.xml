@@ -8,6 +8,23 @@
   <updated>2026-10-24T00:00:00Z</updated>
   <author><name>The Fendlemark Keepers</name></author>
   <entry>
+    <title>Fendlemark 0.9.6</title>
+    <link href="https://fendlemark.app/changelog/#0-9-6"/>
+    <id>https://fendlemark.app/changelog/#0-9-6</id>
+    <updated>2026-10-24T00:00:00Z</updated>
+    <summary>Arrivals
+
+ - conformance.Options.Fixture. The suite serves a recorded response at http://fixture, then stops it and checks that Health still returns within its bound when the upstream is unreachable.
+
+ - cmd/fendlemark/adapters.go, the one file to edit to compile another adapter into the binary.
+
+Clarifications
+
+ - config.Load returns two values, as the Go API reference always said it did. Findings, warnings included, are on cfg.Findings(). If you call config.Load, drop the middle return value.
+
+ - An adapter&#x27;s ConfigSchema is checked before Connect, as Writing an adapter said it was. A block </summary>
+  </entry>
+  <entry>
     <title>Fendlemark 0.9.5</title>
     <link href="https://fendlemark.app/changelog/#0-9-5"/>
     <id>https://fendlemark.app/changelog/#0-9-5</id>

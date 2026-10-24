@@ -21,6 +21,7 @@ import (
 	"fendlemark.app/fendlemark/adapter"
 	"fendlemark.app/fendlemark/auth/fri"
 	"fendlemark.app/fendlemark/config"
+	"fendlemark.app/fendlemark/internal/schema"
 	"fendlemark.app/fendlemark/lattice"
 	"fendlemark.app/fendlemark/server"
 
@@ -32,7 +33,7 @@ import (
 )
 
 // Version is the release version, shared with @fendlemark/ui.
-const Version = "0.9.5"
+const Version = "0.9.6"
 
 // Option configures New and IntegrateEasy.
 type Option func(*options)
@@ -110,7 +111,12 @@ func New(cfg *config.Config, opts ...Option) (*Fendlemark, error) {
 		if !ok {
 			return nil, fmt.Errorf("fendlemark: adapter %q is enabled but not compiled into this binary", name)
 		}
-		f.adapters[name] = &runtimeAdapter{a: a, cfg: cfg.Adapters[name], desc: a.Describe(), status: adapter.Status{State: adapter.Disabled, Detail: "not connected"}}
+		desc := a.Describe()
+		// config.Load has usually checked this already; a Config built in code has not.
+		if err := schema.Check(desc.ConfigSchema, cfg.Adapters[name].Options); err != nil {
+			return nil, fmt.Errorf("fendlemark: adapters.%s: %w", name, err)
+		}
+		f.adapters[name] = &runtimeAdapter{a: a, cfg: cfg.Adapters[name], desc: desc, status: adapter.Status{State: adapter.Disabled, Detail: "not connected"}}
 	}
 	if cfg.Auth.Mode == "respiratory" {
 		st, err := fri.NewFileStore(cfg.Server.DataDir)

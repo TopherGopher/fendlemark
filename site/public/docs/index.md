@@ -2,7 +2,7 @@
 
 Source: https://fendlemark.app/docs/
 
-Everything you need to run Fendlemark in front of your ML platform, from the first `go install` to writing your own adapter. Documentation for v0.9.5.
+Everything you need to run Fendlemark in front of your ML platform, from the first `go install` to writing your own adapter. Documentation for v0.9.6.
 
 ## Start here
 

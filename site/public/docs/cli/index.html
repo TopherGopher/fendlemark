@@ -45,7 +45,7 @@
       <svg class="brand-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
       <span class="brand-name">Fendlemark</span>
     </a>
-    <span class="brand-version">v0.9.5</span>
+    <span class="brand-version">v0.9.6</span>
     <nav class="top-nav" aria-label="Primary">
       <a href="/docs/getting-started/" class="in-section">Docs</a>
       <a href="/philosophy/">Philosophy</a>
@@ -155,7 +155,7 @@
 <div class="code" data-lang="shell"><pre data-lang="shell" role="region" tabindex="0" aria-label="Shell code: fendlemark doctor" data-scroll><code><span class="p">$</span> fendlemark doctor [--fix] [--json]</code></pre></div>
 <p>Validates configuration, resolves environment references, checks every enabled adapter, probes the data directory, tests the listen address, and prints the effective configuration with secrets redacted. Every finding has a code, a sentence, and a suggested change. With <code>--fix</code>, applies the suggestions that are mechanical (renamed keys, deprecated values) and rewrites the file with a backup.</p>
 <div class="code" data-lang="shell"><pre data-lang="shell" role="region" tabindex="0" aria-label="Shell code: fendlemark doctor (2)" data-scroll><code><span class="p">$</span> fendlemark doctor
-fendlemark doctor 0.9.5
+fendlemark doctor 0.9.6
 
 config    ok       ./fendlemark.yaml (6 keys set, 41 defaulted)
 config    warn     DOC-104 adapters.mlflow.trackingUri is the pre-0.9 spelling; use tracking_uri (fixable)
@@ -169,7 +169,7 @@ auth      info     DOC-201 auth.mode is none; anyone who can reach server.listen
 
 <h2 id="version"><a class="anchor" href="#version">fendlemark version</a></h2>
 <div class="code" data-lang="shell"><pre data-lang="shell" role="region" tabindex="0" aria-label="Shell code: fendlemark version" data-scroll><code><span class="p">$</span> fendlemark version [--json]
-fendlemark 0.9.5 (go1.23.2, linux/amd64)
+fendlemark 0.9.6 (go1.23.2, linux/amd64)
 commit:  3e1f9c0
 console: embedded, built 2026-09-30
 adapters: mlflow argo metaflow kubeflow</code></pre></div>
@@ -208,7 +208,7 @@ adapters: mlflow argo metaflow kubeflow</code></pre></div>
   <div class="site-footer-inner">
     <svg class="footer-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
     <div class="footer-text">
-      <p>Fendlemark is released under the MIT licence and maintained by the Fendlemark Keepers. Documentation for v0.9.5.</p>
+      <p>Fendlemark is released under the MIT licence and maintained by the Fendlemark Keepers. Documentation for v0.9.6.</p>
       <p class="fine">MLflow, Metaflow, Argo Workflows, and Kubeflow are trademarks of their respective owners. Fendlemark is an independent project and is not affiliated with, endorsed by, or sponsored by any of them.</p>
       <p class="fine footer-links"><a href="/about/">About this site</a> · <a href="https://contact.fendlemark.app/">Contact</a> · <a href="/governance/">Governance</a> · <a href="/changelog/">Changelog</a> · <a href="/sitemap.xml">Sitemap</a></p>
     </div>

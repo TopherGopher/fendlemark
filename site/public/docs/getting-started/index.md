@@ -16,7 +16,7 @@ This guide takes you from nothing to a running Fendlemark console connected to a
 ```shell
 $ go install fendlemark.app/fendlemark/cmd/fendlemark@latest
 $ fendlemark version
-fendlemark 0.9.5 (go1.23.2, linux/amd64)
+fendlemark 0.9.6 (go1.23.2, linux/amd64)
 console: embedded, built 2026-09-30
 ```
 
@@ -74,7 +74,7 @@ If an adapter reports `degraded` or `unreachable`, `fendlemark doctor` will tell
 
 ```shell
 $ fendlemark serve
-2026-10-24T09:12:03Z INF fendlemark 0.9.5 starting
+2026-10-24T09:12:03Z INF fendlemark 0.9.6 starting
 2026-10-24T09:12:03Z INF adapter mlflow connected tracking_uri=http://mlflow.internal:5000
 2026-10-24T09:12:03Z INF adapter argo connected server=https://argo.internal:2746 namespaces=2
 2026-10-24T09:12:04Z INF lattice initial reconciliation complete entities=1443 correlations=312 took=612ms

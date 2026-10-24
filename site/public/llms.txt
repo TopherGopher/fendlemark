@@ -2,7 +2,7 @@
 
 > Fendlemark is an open-source Go and Vue 3 framework that unifies the user experiences of MLflow, Metaflow, Argo Workflows, and Kubeflow into a single ML platform console. One binary, four read-only adapters, one deterministic entity graph (the lattice), one console.
 
-Module path: fendlemark.app/fendlemark · npm: @fendlemark/ui · Licence: MIT · Current version: 0.9.5
+Module path: fendlemark.app/fendlemark · npm: @fendlemark/ui · Licence: MIT · Current version: 0.9.6
 
 ## Documentation
 
@@ -21,7 +21,7 @@ Module path: fendlemark.app/fendlemark · npm: @fendlemark/ui · Licence: MIT ·
 ## Project
 
 - [About](https://fendlemark.app/about/index.md): About the Fendlemark documentation site: who made it, why, and what it is.
-- [Changelog](https://fendlemark.app/changelog/index.md): Fendlemark release history from 0.1.0 to 0.9.5. Each release lists its Accommodations, Clarifications, and Arrivals, as pre-approved under FCP-1.
+- [Changelog](https://fendlemark.app/changelog/index.md): Fendlemark release history from 0.1.0 to 0.9.6. Each release lists its Accommodations, Clarifications, and Arrivals, as pre-approved under FCP-1.
 - [FAQ](https://fendlemark.app/faq/index.md): Frequently asked questions about Fendlemark: what it is, how it relates to MLflow, Metaflow, Argo Workflows, and Kubeflow, whether it writes to them, how authentication works, how to contribute, and whether there is a roadmap.
 - [Packages](https://fendlemark.app/fendlemark/index.md): Install Fendlemark: the Go module fendlemark.app/fendlemark (control plane, adapters, lattice, CLI) and the npm package @fendlemark/ui (Vue 3 console components). Module layout, versions, and source.
 - [Governance](https://fendlemark.app/governance/index.md): How Fendlemark is governed: the Keeper Roster and title ladder, Decision Records, the adapter maturity ladder, release governance with Silence Periods, and the Fendlemark Contribution Protocol (FCP-1).

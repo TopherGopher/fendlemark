@@ -1,0 +1,8 @@
+{"jobs": [
+  {"id": "job-1001", "name": "train resnet50", "state": "done", "queue": "gpu", "gpus": 8,
+   "started": "2026-10-22T09:00:00Z", "ended": "2026-10-22T09:41:12Z", "labels": {"mlflow_run": "6f1d2c9a8b7e4f30a1c5d9e8b2a47c13"}},
+  {"id": "job-1002", "name": "evaluate resnet50", "state": "failed", "queue": "gpu", "gpus": 1,
+   "started": "2026-10-22T09:45:02Z", "ended": "2026-10-22T09:52:41Z", "labels": {}},
+  {"id": "job-1003", "name": "features backfill", "state": "running", "queue": "cpu", "gpus": 0,
+   "started": "2026-10-22T10:15:01Z"}
+]}

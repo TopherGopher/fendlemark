@@ -4,6 +4,22 @@ Source: https://fendlemark.app/changelog/
 
 Every release, in reverse order. Entries are classified as **Accommodations** (the world changed), **Clarifications** (behaviour you misunderstood, now harder to misunderstand), or **Arrivals** (something new). Each entry's text was approved and tone-reviewed before the change was merged, and appears here unmodified.
 
+## 0.9.6 · 2026-10-24
+
+**Arrivals**
+
+- `conformance.Options.Fixture`. The suite serves a recorded response at `http://fixture`, then stops it and checks that `Health` still returns within its bound when the upstream is unreachable.
+- `cmd/fendlemark/adapters.go`, the one file to edit to compile another adapter into the binary.
+
+**Clarifications**
+
+- `config.Load` returns two values, as the [Go API reference](https://fendlemark.app/docs/api/#embedding) always said it did. Findings, warnings included, are on `cfg.Findings()`. If you call `config.Load`, drop the middle return value.
+- An adapter's `ConfigSchema` is checked before `Connect`, as [Writing an adapter](https://fendlemark.app/docs/adapters/writing-an-adapter/) said it was. A block that does not match is `DOC-113`.
+- An adapter registered with `adapter.Register` no longer needs adding to `config.KnownAdapters`. `DOC-110` now means only what it says: the adapter is not compiled in.
+- A correlation key with an empty value means the facet has no value for that key. The lattice ignores it instead of discarding the facet.
+
+Released on the same day as 0.9.5. The Keepers, who still regard the three days before 0.1.0 as hasty, note that in each case the documentation was already right.
+
 ## 0.9.5 · 2026-10-24
 
 **Clarifications**

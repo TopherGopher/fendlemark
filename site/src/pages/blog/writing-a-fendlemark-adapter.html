@@ -1,7 +1,7 @@
 <!-- meta {"title": "Writing a Fendlemark adapter, step by step", "description": "Build a working Fendlemark adapter for Kubernetes Jobs: descriptor, facets, phases, correlation keys, health, conformance tests, and a binary to run it in.", "summary": "Build a working adapter for Kubernetes Jobs, test it with the conformance suite, and compile it into your own Fendlemark binary.", "section": "Walkthrough", "published": "2026-10-24", "modified": "2026-10-24"} -->
 <p class="eyebrow">Walkthrough</p>
 <h1>Writing a Fendlemark adapter, step by step</h1>
-<p class="lede">The reference page for <a href="/docs/adapters/writing-an-adapter/">writing an adapter</a> describes the interface. This post uses it: we build a complete adapter for Kubernetes Jobs, test it against a recorded fixture with the conformance suite, and run it inside a Fendlemark binary. Every line of code below compiles against <code>fendlemark.app/fendlemark</code> v0.9.5.</p>
+<p class="lede">The reference page for <a href="/docs/adapters/writing-an-adapter/">writing an adapter</a> describes the interface. This post uses it: we build a complete adapter for Kubernetes Jobs, test it against a recorded fixture with the conformance suite, and run it inside a Fendlemark binary. Every line of code below compiles against <code>fendlemark.app/fendlemark</code> v0.9.6.</p>
 
 <h2 id="why-jobs">Why Kubernetes Jobs</h2>
 <p>Not every training job goes through a workflow engine. On many platforms some of them are a <code>batch/v1</code> Job, created by a script, a CI pipeline, or a person with <code>kubectl</code>, and those jobs are invisible to the four built-in adapters. They are a good first adapter: the API is stable and well documented, one Job maps cleanly onto one facet, and the interesting decisions, how to map status onto phases and where to find correlation keys, are the same decisions every adapter makes.</p>
@@ -18,7 +18,7 @@
 <p>An adapter is an ordinary Go package. It does not need to live in the Fendlemark repository, and this one does not:</p>
 <pre data-lang="shell"><code><span class="p">$</span> mkdir k8sjobs &amp;&amp; cd k8sjobs
 <span class="p">$</span> go mod init example.com/k8sjobs
-<span class="p">$</span> go get fendlemark.app/fendlemark@v0.9.5</code></pre>
+<span class="p">$</span> go get fendlemark.app/fendlemark@v0.9.6</code></pre>
 <p>You need Go 1.23 or later. By the end, the module looks like this:</p>
 <pre data-lang="text"><code>k8sjobs/
 ├── go.mod
@@ -123,7 +123,7 @@
   <li><strong><code>Keys</code></strong> must name every key a facet can carry. A facet that emits an undeclared key fails conformance, which is a useful check on typos in the annotation map.</li>
   <li><strong><code>Watchable: false</code></strong> tells the control plane to call <code>Facets</code> every <code>poll_interval</code> (30 seconds unless configured) instead of calling <code>Watch</code>.</li>
   <li><strong><code>Maturity: adapter.Provisional</code></strong> is where every new adapter starts on the <a href="/governance/#maturity">maturity ladder</a>.</li>
-  <li><strong><code>ConfigSchema</code></strong> is a JSON Schema for the adapter's block in <code>fendlemark.yaml</code>: <code>api_url</code>, <code>namespaces</code>, and an optional <code>token</code>.</li>
+  <li><strong><code>ConfigSchema</code></strong> is a JSON Schema for the adapter's block in <code>fendlemark.yaml</code>: <code>api_url</code>, <code>namespaces</code>, and an optional <code>token</code>. Fendlemark checks the block against it when it loads the file, before <code>Connect</code> is ever called, so a missing <code>api_url</code> is reported as <code>DOC-113</code> by <code>fendlemark doctor</code> rather than as a failed connection.</li>
 </ul>
 
 <h2 id="connect">3. Connect</h2>
@@ -247,7 +247,7 @@
 	m, s := jb.Metadata, jb.Status
 	keys := <span class="k">map</span>[<span class="k">string</span>]<span class="k">string</span>{}
 	<span class="k">for</span> annotation, key := <span class="k">range</span> Annotations {
-		<span class="k">if</span> v := m.Annotations[annotation]; v != <span class="s">""</span> { <span class="c">// empty values fail Facet.Validate</span>
+		<span class="k">if</span> v := m.Annotations[annotation]; v != <span class="s">""</span> { <span class="c">// only keys that have a value</span>
 			keys[key] = v
 		}
 	}
@@ -298,7 +298,7 @@
 <ul>
   <li><strong><code>SourceID</code></strong> is the namespace and name, which is unique per facet as the reconciler requires, and is how people refer to a Job.</li>
   <li><strong><code>StartedAt</code></strong> must never be zero: <code>Facet.Validate</code> rejects it, and the correlation window is measured from it. A Job created suspended has no <code>startTime</code> until it is resumed, so the adapter falls back to <code>creationTimestamp</code>.</li>
-  <li><strong>Keys</strong> are added only when the annotation has a value. An empty key value also fails <code>Validate</code>, and a facet that fails validation is dropped by the lattice rather than shown.</li>
+  <li><strong>Keys</strong> are added only when the annotation has a value. The lattice ignores a key whose value is empty, so leaving it out changes nothing about correlation; it keeps each facet's keys to the ones it actually has, which is what the API and the console show.</li>
   <li><strong>Phases</strong> come from the Job's conditions. <code>Complete</code> and <code>Failed</code> are terminal, and a Job never has both. The subtle part is the end time: Kubernetes sets <code>completionTime</code> only when a Job succeeds, so for a failed Job the adapter uses the time the <code>Failed</code> condition became true. Without that, a failed Job would have no end time, and a zero <code>EndedAt</code> means a run that is still going. Newer Kubernetes versions can also set a <code>FailureTarget</code> condition before <code>Failed</code>; the switch ignores it and waits for <code>Failed</code>.</li>
   <li><strong><code>Fields</code></strong> is for display only and never used for correlation. The console renders it as a key-value table under the adapter's display name until you write a <a href="/docs/ui/#panels">facet panel</a>.</li>
 </ul>
@@ -549,10 +549,7 @@ ok  	example.com/k8sjobs	0.157s</code></pre>
 )
 
 <span class="k">func</span> main() {
-	<span class="c">// Configuration validation accepts only adapters it knows about (DOC-110).</span>
-	config.KnownAdapters = <span class="k">append</span>(config.KnownAdapters, <span class="s">"k8sjobs"</span>)
-
-	cfg, _, err := config.Load(<span class="s">"fendlemark.yaml"</span>)
+	cfg, err := config.Load(<span class="s">"fendlemark.yaml"</span>)
 	<span class="k">if</span> err != <span class="k">nil</span> {
 		log.Fatal(err)
 	}
@@ -566,7 +563,7 @@ ok  	example.com/k8sjobs	0.157s</code></pre>
 		log.Fatal(err)
 	}
 }</code></pre>
-<p>Importing <code>fendlemark.app/fendlemark</code> registers the four built-in adapters too, so this binary can read MLflow, Metaflow, Argo, and Kubeflow as well as Jobs. Configuration validation rejects an <code>adapters.&lt;name&gt;</code> block for an adapter it does not know, with <code>DOC-110</code>, so <code>main</code> adds the new name to <code>config.KnownAdapters</code> before loading the file.</p>
+<p>Importing <code>fendlemark.app/fendlemark</code> registers the four built-in adapters too, so this binary can read MLflow, Metaflow, Argo, and Kubeflow as well as Jobs. Nothing else needs to know about the new adapter: configuration validation accepts an <code>adapters.k8sjobs</code> block because the adapter registered itself, and checks it against the adapter's <code>ConfigSchema</code>. <code>DOC-110</code> is reserved for a block naming an adapter that nobody compiled in.</p>
 <p>Point it at the API through <code>kubectl proxy</code>:</p>
 <pre data-lang="yaml"><code><span class="k">adapters</span>:
   <span class="k">k8sjobs</span>:
@@ -576,7 +573,7 @@ ok  	example.com/k8sjobs	0.157s</code></pre>
 <pre data-lang="shell"><code><span class="p">$</span> kubectl proxy &amp;
 <span class="p">$</span> go build -o platform ./cmd/platform
 <span class="p">$</span> ./platform
-INFO fendlemark starting version=0.9.5 adapters=k8sjobs
+INFO fendlemark starting version=0.9.6 adapters=k8sjobs
 INFO adapter connected adapter=k8sjobs took=19ms
 INFO lattice reconciled entities=3 facets=3 generation=1 took=0s
 INFO console listening addr=127.0.0.1:7411</code></pre>
