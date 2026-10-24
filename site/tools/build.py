@@ -15,6 +15,14 @@ SRC = os.path.join(SITE, "src", "pages")
 BASE = "https://fendlemark.app"
 LAYOUT = open(os.path.join(SITE, "src", "layout.html"), encoding="utf-8").read()
 
+# Analytics. Empty means off. Cloudflare Web Analytics is cookieless and runs on
+# every page; Google Analytics is loaded by site.js only after a visitor allows it.
+CF_BEACON_TOKEN = "a453832d2b2f43eab267259df60fc9f4"
+GA_MEASUREMENT_ID = "G-26P3Z52D45"
+LAYOUT = LAYOUT.replace("{{analytics}}", (
+    f'<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon=\'{{"token": "{CF_BEACON_TOKEN}"}}\'></script>\n'
+    if CF_BEACON_TOKEN else "")).replace("{{ga}}", f' data-ga="{GA_MEASUREMENT_ID}"' if GA_MEASUREMENT_ID else "")
+
 # Sidebar navigation. (label, path). Paths are site-absolute with trailing slash.
 NAV = [
     ("Documentation", [
