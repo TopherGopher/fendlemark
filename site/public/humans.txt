@@ -6,4 +6,4 @@
   Standards: HTML5, CSS3, a very small amount of JavaScript
   Components: none
   Build: python3 site/tools/build.py
-  Hosting: GitHub Pages behind Cloudflare
+  Hosting: GitHub Pages

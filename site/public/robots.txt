@@ -1,5 +1,6 @@
 # Fendlemark documentation. Crawl freely.
 User-agent: *
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
 Allow: /
 
 # AI and search crawlers are explicitly welcome.

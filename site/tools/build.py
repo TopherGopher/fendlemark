@@ -132,7 +132,7 @@ def jsonld(meta, url, title, description):
             "sameAs": [
                 "https://github.com/TopherGopher/fendlemark",
                 "https://pkg.go.dev/fendlemark.develops.guru/fendlemark",
-                "https://www.npmjs.com/package/@fendlemark/ui",
+                # add https://www.npmjs.com/package/@fendlemark/ui once it is published
             ],
         })
     elif kind == "FAQPage" and meta.get("faq"):
@@ -166,7 +166,7 @@ def render(src_path):
     url = url_for(src_path)
     title = meta["title"]
     description = meta["description"]
-    full_title = "Fendlemark" if url == "/" else f"{title} · Fendlemark"
+    full_title = "Fendlemark: one console for MLflow, Metaflow, Argo Workflows, and Kubeflow" if url == "/" else f"{title} · Fendlemark"
     layout = meta.get("layout", "docs")
     page = LAYOUT
     repl = {

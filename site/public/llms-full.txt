@@ -155,7 +155,7 @@ Partly because it was funny to write. Partly as a gentle commentary on governanc
 
  - Not a criticism of any real project, person, or team. The Keepers are invented; any resemblance to real maintainers is a resemblance to all of us on our more confident days.
 
- - Not collecting anything. There is no analytics script on this page. The site is static HTML served from GitHub Pages behind Cloudflare.
+ - Not collecting anything. There is no analytics script, and nothing on these pages is loaded from anyone else's servers. The site is static HTML served from GitHub Pages.
 
 ## Colophon
 
