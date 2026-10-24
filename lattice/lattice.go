@@ -306,7 +306,11 @@ func (l *Lattice) reconcile() Delta {
 	}
 	sort.Strings(gkeys)
 	d := newDSU(len(fs))
-	mergesByRoot := map[int][]MergeStep{}
+	type step struct {
+		i int // a member of the merged component
+		m MergeStep
+	}
+	var steps []step
 	keyCounts := map[string]int{}
 	for _, g := range gkeys {
 		ms := groups[g]
@@ -328,10 +332,16 @@ func (l *Lattice) reconcile() Delta {
 			}
 			if d.union(ms[j-1].i, ms[j].i) {
 				keyCounts[k]++
-				root := d.find(ms[j].i)
-				mergesByRoot[root] = append(mergesByRoot[root], MergeStep{A: refs[ms[j-1].i], B: refs[ms[j].i], Key: k, Value: v, Gap: gap})
+				steps = append(steps, step{ms[j].i, MergeStep{A: refs[ms[j-1].i], B: refs[ms[j].i], Key: k, Value: v, Gap: gap}})
 			}
 		}
+	}
+	// Group steps by each component's final root: a later union can move the
+	// root, so the root at the time of a merge is not where it ends up.
+	mergesByRoot := map[int][]MergeStep{}
+	for _, s := range steps {
+		r := d.find(s.i)
+		mergesByRoot[r] = append(mergesByRoot[r], s.m)
 	}
 
 	// Components -> entities.

@@ -86,6 +86,26 @@ func TestRelations(t *testing.T) {
 	}
 }
 
+func TestExplainKeepsEveryMerge(t *testing.T) {
+	// kubeflow+mlflow merge first (on a.shared), then argo joins (on b.shared)
+	// and becomes the component's root. Explain must still report both steps.
+	t0 := time.Date(2026, 9, 30, 9, 0, 0, 0, time.UTC)
+	l := New(Options{})
+	l.Apply([]adapter.Facet{
+		{Source: "argo", SourceID: "a", Kind: adapter.KindWorkflow, StartedAt: t0, Keys: map[string]string{"b.shared": "2"}},
+		{Source: "kubeflow", SourceID: "k", Kind: adapter.KindPipeline, StartedAt: t0.Add(10 * time.Second), Keys: map[string]string{"a.shared": "1"}},
+		{Source: "mlflow", SourceID: "m", Kind: adapter.KindRun, StartedAt: t0.Add(20 * time.Second), Keys: map[string]string{"a.shared": "1", "b.shared": "2"}},
+	})
+	ents := l.Query(Query{})
+	if len(ents) != 1 || len(ents[0].Facets) != 3 {
+		t.Fatalf("want one entity with three facets, got %+v", ents)
+	}
+	ex, _ := l.Explain(ents[0].ID)
+	if len(ex.Merges) != 2 || ex.Merges[0].Key != "a.shared" || ex.Merges[1].Key != "b.shared" {
+		t.Fatalf("want merges on a.shared then b.shared, got %+v", ex.Merges)
+	}
+}
+
 func TestWindowRespected(t *testing.T) {
 	l := New(Options{CorrelationWindow: 10 * time.Second})
 	l.Apply(fixture())
