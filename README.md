@@ -1,7 +1,7 @@
 # Fendlemark
 
 [![Go Reference](https://pkg.go.dev/badge/fendlemark.develops.guru/fendlemark.svg)](https://pkg.go.dev/fendlemark.develops.guru/fendlemark)
-[![@fendlemark/ui](https://img.shields.io/github/package-json/v/TopherGopher/fendlemark?filename=ui%2Fpackage.json&label=%40fendlemark%2Fui&logo=vuedotjs)](ui/)
+[![@fendlemark/ui](https://img.shields.io/npm/v/@fendlemark/ui?label=%40fendlemark%2Fui&logo=vuedotjs)](https://www.npmjs.com/package/@fendlemark/ui)
 
 **One console for your entire ML platform.**
 

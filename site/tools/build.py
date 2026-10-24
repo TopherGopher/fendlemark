@@ -133,7 +133,7 @@ def jsonld(meta, url, title, description):
             "sameAs": [
                 "https://github.com/TopherGopher/fendlemark",
                 "https://pkg.go.dev/fendlemark.develops.guru/fendlemark",
-                # add https://www.npmjs.com/package/@fendlemark/ui once it is published
+                "https://www.npmjs.com/package/@fendlemark/ui",
             ],
         })
     elif kind == "FAQPage" and meta.get("faq"):

@@ -1,0 +1,36 @@
+name: Stage @fendlemark/ui on npm
+
+# A version tag (vX.Y.Z) stages that version of @fendlemark/ui through npm
+# trusted publishing (OIDC, no stored token). A maintainer then approves it
+# with 2FA: npm stage list @fendlemark/ui, then npm stage approve <stage-id>.
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  stage:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ui
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          cache: npm
+          cache-dependency-path: ui/package-lock.json
+      - run: npm install -g npm@12
+      - name: Check the tag matches ui/package.json
+        if: github.ref_type == 'tag'
+        run: test "v$(node -p 'require("./package.json").version')" = "$GITHUB_REF_NAME"
+      - run: npm ci
+      - run: npm run build
+      - run: npm stage publish
