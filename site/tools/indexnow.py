@@ -9,7 +9,7 @@ unknown (a repository's first push, a force push), submits every page.
 """
 import json, os, re, subprocess, sys, urllib.error, urllib.request
 
-KEY = "3bebfc768af829fb649eaf51c34d25b4"   # served at /<KEY>.txt
+KEY = "32e4991c39f516adf0cb771f406c461d"   # served at /<KEY>.txt
 HOST = "fendlemark.develops.guru"
 BASE = "https://" + HOST
 PUBLIC = os.path.join("site", "public")
