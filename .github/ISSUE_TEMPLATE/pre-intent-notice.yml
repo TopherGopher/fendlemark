@@ -1,0 +1,39 @@
+name: Pre-Intent Notice
+description: FCP-1, step 13. Say that you are considering a contribution, in which area, and why.
+title: "Pre-Intent Notice: "
+labels: ["pre-intent"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A Pre-Intent Notice is one paragraph. It is not a proposal, and it commits you to nothing.
+        A 72-hour Reflection Period follows it (step 14). See the [Contribution Protocol](https://fendlemark.app/governance/contributing/).
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Lattice
+        - An adapter (MLflow, Metaflow, Argo Workflows, Kubeflow)
+        - Server or CLI
+        - Console (@fendlemark/ui)
+        - Documentation
+        - Governance
+    validations:
+      required: true
+  - type: textarea
+    id: notice
+    attributes:
+      label: The notice
+      description: One paragraph. What you are considering, and why you believe the area is imperfect.
+    validations:
+      required: true
+  - type: checkboxes
+    id: prep
+    attributes:
+      label: Preparation (steps 1–12)
+      options:
+        - label: I have read the Philosophy twice, the second time without skimming the section on comparisons.
+          required: true
+        - label: I have signed the Contributor Covenant 2.1 and the Fendlemark Addendum.
+          required: true
