@@ -1,0 +1,153 @@
+<!-- meta {"title": "Writing an adapter", "description": "How to write a Fendlemark adapter in Go: the six-method Adapter interface, facets and correlation keys, lifecycle, testing with the conformance suite, and how adapters are compiled into the binary."} -->
+<p class="eyebrow">Documentation</p>
+<h1>Writing an adapter</h1>
+<p class="lede">An adapter is a Go package that implements one interface with six methods. If you can list things from your tool's API and say what they are, you can write one in an afternoon. This page walks through the interface, the conformance suite, and how an adapter ends up in the binary.</p>
+
+<h2 id="interface">The interface</h2>
+<pre data-lang="go"><code><span class="k">package</span> adapter <span class="c">// fendlemark.develops.guru/fendlemark/adapter</span>
+
+<span class="k">type</span> Adapter <span class="k">interface</span> {
+    <span class="c">// Name returns the adapter's stable identifier, used in config and facets.</span>
+    Name() <span class="k">string</span>
+
+    <span class="c">// Describe returns static metadata: facet kinds, correlation keys,</span>
+    <span class="c">// maturity, and whether Watch is supported.</span>
+    Describe() Descriptor
+
+    <span class="c">// Connect validates configuration and establishes upstream clients.</span>
+    <span class="c">// It must not fetch facets.</span>
+    Connect(ctx context.Context, cfg Config) <span class="k">error</span>
+
+    <span class="c">// Facets returns all facets matching q. Called on start and on each poll.</span>
+    Facets(ctx context.Context, q Query) ([]Facet, <span class="k">error</span>)
+
+    <span class="c">// Watch streams incremental facet events. Return ErrWatchUnsupported</span>
+    <span class="c">// and the control plane will poll Facets instead.</span>
+    Watch(ctx context.Context) (&lt;-<span class="k">chan</span> Event, <span class="k">error</span>)
+
+    <span class="c">// Health reports current status for the console and `adapters check`.</span>
+    Health(ctx context.Context) Status
+}</code></pre>
+<p>That is the whole contract. Everything else on this page is detail.</p>
+
+<h2 id="facets">Facets</h2>
+<pre data-lang="go"><code><span class="k">type</span> Facet <span class="k">struct</span> {
+    Source    <span class="k">string</span>            <span class="c">// adapter name</span>
+    SourceID  <span class="k">string</span>            <span class="c">// identifier in the upstream tool</span>
+    Kind      Kind              <span class="c">// KindRun, KindWorkflow, KindArtifact, KindModel, KindPipeline, KindNotebook</span>
+    Title     <span class="k">string</span>
+    Status    Phase             <span class="c">// Pending, Running, Succeeded, Failed, Unknown</span>
+    StartedAt time.Time
+    EndedAt   time.Time         <span class="c">// zero if still running</span>
+    Keys      <span class="k">map</span>[<span class="k">string</span>]<span class="k">string</span> <span class="c">// correlation keys, e.g. "argo.workflow.name": "train-abc12"</span>
+    Fields    <span class="k">map</span>[<span class="k">string</span>]any    <span class="c">// everything else; rendered by the facet panel</span>
+    Links     []Link            <span class="c">// deep links into the upstream tool</span>
+}</code></pre>
+<p>Rules the reconciler relies on:</p>
+<ul>
+  <li><code>Source</code> plus <code>SourceID</code> is unique per facet. Emitting the same pair twice in one <code>Facets</code> call is a conformance failure.</li>
+  <li><code>Keys</code> use the shared vocabulary (<code>argo.workflow.name</code>, <code>mlflow.run_id</code>, …) wherever one applies. Invent a new key only when none applies, and prefix it with your adapter name.</li>
+  <li><code>StartedAt</code> must be set. The correlation window is measured from it.</li>
+  <li><code>Fields</code> is for display. Nothing in it is used for correlation, so it can be as rich or as sparse as your tool allows.</li>
+</ul>
+
+<h2 id="descriptor">Descriptor</h2>
+<pre data-lang="go"><code><span class="k">func</span> (a *Adapter) Describe() adapter.Descriptor {
+    <span class="k">return</span> adapter.Descriptor{
+        DisplayName:  <span class="s">"Example Tracker"</span>,
+        Kinds:        []adapter.Kind{adapter.KindRun, adapter.KindArtifact},
+        Keys:         []<span class="k">string</span>{<span class="s">"mlflow.run_id"</span>, <span class="s">"git.sha"</span>, <span class="s">"example.job_id"</span>},
+        Watchable:    <span class="k">false</span>,
+        Maturity:     adapter.Provisional,
+        ConfigSchema: exampleSchema, <span class="c">// JSON Schema; validated before Connect</span>
+    }
+}</code></pre>
+<p>The control plane uses the descriptor to validate configuration before calling <code>Connect</code>, to decide whether to poll or watch, to populate the console's adapter panel, and to attach your facet panel to the right views.</p>
+
+<h2 id="lifecycle">Lifecycle</h2>
+<ol>
+  <li><strong>Construct.</strong> Your package registers a constructor with <code>adapter.Register("example", New)</code> in an <code>init</code> function. The binary's <code>cmd/fendlemark</code> imports the package for side effects.</li>
+  <li><strong>Describe.</strong> Called once. Must be pure.</li>
+  <li><strong>Connect.</strong> Called once with validated config. Build clients, check credentials, return quickly. If you need more than a few seconds, you are doing <code>Facets</code> work here; stop.</li>
+  <li><strong>Facets</strong> or <strong>Watch.</strong> If <code>Watchable</code>, the control plane calls <code>Facets</code> once for the initial load, then <code>Watch</code> for the rest of the process lifetime, reconnecting with backoff if the channel closes. Otherwise it calls <code>Facets</code> every <code>poll_interval</code>.</li>
+  <li><strong>Health.</strong> Called on demand. Should be cheap and should not block on upstream for more than <code>timeout</code>.</li>
+  <li><strong>Shutdown.</strong> The context passed to <code>Watch</code> is cancelled. Return.</li>
+</ol>
+
+<h2 id="example">A minimal adapter</h2>
+<pre data-lang="go"><code><span class="k">package</span> example
+
+<span class="k">import</span> (
+    <span class="s">"context"</span>
+    <span class="s">"fendlemark.develops.guru/fendlemark/adapter"</span>
+)
+
+<span class="k">func</span> init() { adapter.Register(<span class="s">"example"</span>, New) }
+
+<span class="k">type</span> Example <span class="k">struct</span>{ client *trackerClient }
+
+<span class="k">func</span> New() adapter.Adapter { <span class="k">return</span> &amp;Example{} }
+
+<span class="k">func</span> (e *Example) Name() <span class="k">string</span> { <span class="k">return</span> <span class="s">"example"</span> }
+
+<span class="k">func</span> (e *Example) Connect(ctx context.Context, cfg adapter.Config) <span class="k">error</span> {
+    e.client = newTrackerClient(cfg.String(<span class="s">"url"</span>), cfg.Secret(<span class="s">"token"</span>))
+    <span class="k">return</span> e.client.Ping(ctx)
+}
+
+<span class="k">func</span> (e *Example) Facets(ctx context.Context, q adapter.Query) ([]adapter.Facet, <span class="k">error</span>) {
+    jobs, err := e.client.ListJobs(ctx, q.Since)
+    <span class="k">if</span> err != <span class="k">nil</span> { <span class="k">return</span> <span class="k">nil</span>, err }
+    out := <span class="k">make</span>([]adapter.Facet, 0, <span class="k">len</span>(jobs))
+    <span class="k">for</span> _, j := <span class="k">range</span> jobs {
+        out = <span class="k">append</span>(out, adapter.Facet{
+            Source: <span class="s">"example"</span>, SourceID: j.ID, Kind: adapter.KindRun,
+            Title: j.Name, Status: phaseOf(j.State), StartedAt: j.Started, EndedAt: j.Ended,
+            Keys: <span class="k">map</span>[<span class="k">string</span>]<span class="k">string</span>{<span class="s">"example.job_id"</span>: j.ID, <span class="s">"mlflow.run_id"</span>: j.Labels[<span class="s">"mlflow_run"</span>]},
+            Fields: <span class="k">map</span>[<span class="k">string</span>]any{<span class="s">"queue"</span>: j.Queue, <span class="s">"gpus"</span>: j.GPUs},
+            Links: []adapter.Link{{Label: <span class="s">"Open in Example"</span>, URL: e.client.URLFor(j)}},
+        })
+    }
+    <span class="k">return</span> out, <span class="k">nil</span>
+}
+
+<span class="k">func</span> (e *Example) Watch(ctx context.Context) (&lt;-<span class="k">chan</span> adapter.Event, <span class="k">error</span>) {
+    <span class="k">return</span> <span class="k">nil</span>, adapter.ErrWatchUnsupported
+}
+
+<span class="k">func</span> (e *Example) Health(ctx context.Context) adapter.Status {
+    <span class="k">if</span> err := e.client.Ping(ctx); err != <span class="k">nil</span> {
+        <span class="k">return</span> adapter.Status{State: adapter.Unreachable, Detail: err.Error()}
+    }
+    <span class="k">return</span> adapter.Status{State: adapter.Healthy, Detail: <span class="s">"ok"</span>}
+}</code></pre>
+
+<h2 id="conformance">The conformance suite</h2>
+<p>Every adapter, built-in or not, must pass <code>adapter/conformance</code>. It drives your adapter against a recorded fixture and checks the rules above plus a few that are only obvious after someone has broken them:</p>
+<pre data-lang="go"><code><span class="k">func</span> TestConformance(t *testing.T) {
+    conformance.Run(t, New, conformance.Options{
+        Fixture:  <span class="s">"testdata/jobs.json"</span>,
+        Config:   adapter.Config{<span class="s">"url"</span>: <span class="s">"http://fixture"</span>, <span class="s">"token"</span>: <span class="s">"x"</span>},
+        MinFacets: 3,
+    })
+}</code></pre>
+<ul>
+  <li>Unique <code>Source</code> + <code>SourceID</code> per call.</li>
+  <li>Non-zero <code>StartedAt</code> on every facet.</li>
+  <li><code>Describe</code> is pure and returns the same value twice.</li>
+  <li><code>Connect</code> completes within two seconds against the fixture.</li>
+  <li><code>Health</code> returns within <code>timeout</code> when upstream is unreachable.</li>
+  <li>If <code>Watchable</code>, the channel closes cleanly on context cancellation.</li>
+  <li>Keys use the shared vocabulary when they match a known pattern (a 32-hex-character key named anything other than <code>mlflow.run_id</code> is flagged).</li>
+</ul>
+
+<h2 id="compiling">Getting it into the binary</h2>
+<p>Fendlemark does not load plugins at runtime. Adapters are Go packages compiled in, which keeps the binary static, the startup instant, and the attack surface small. To run your adapter:</p>
+<pre data-lang="shell"><code><span class="p">$</span> git clone https://fendlemark.develops.guru/fendlemark   <span class="c"># resolves via go-import</span>
+<span class="p">$</span> cd fendlemark
+<span class="p">$</span> <span class="c"># add  _ "yourmodule/example"  to cmd/fendlemark/adapters.go</span>
+<span class="p">$</span> go build ./cmd/fendlemark</code></pre>
+<p>To propose your adapter for inclusion in the official binary, so that everyone gets it, follow the <a href="/governance/contributing/">Fendlemark Contribution Protocol</a>. Adapters enter at Provisional maturity and advance on the schedule described in <a href="/governance/#maturity">Governance</a>.</p>
+
+<h2 id="panel">The facet panel</h2>
+<p>By default the console renders your facet's <code>Fields</code> as a key-value table under your adapter's display name. For a custom panel, add a Vue component to <code>console/src/panels/example/</code> and register it in <code>console/src/panels/index.ts</code>. The component receives the facet as a prop and is rendered inside <code>&lt;FmFacetPanel&gt;</code>, which provides the header, the deep links, and the collapse state. See <a href="/docs/ui/#panels">The console</a>.</p>

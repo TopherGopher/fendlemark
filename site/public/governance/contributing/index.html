@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en" data-layout="docs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contributing: the Fendlemark Contribution Protocol (FCP-1) · Fendlemark</title>
+<meta name="description" content="The 112 numbered steps a contributor completes, in order, before opening a pull request to Fendlemark. Preparation, Intent, Design, Implementation, Verification, and Ceremony.">
+<link rel="canonical" href="https://fendlemark.develops.guru/governance/contributing/">
+<meta name="go-import" content="fendlemark.develops.guru/fendlemark git https://github.com/TopherGopher/fendlemark">
+<link rel="alternate" type="application/atom+xml" title="Fendlemark releases" href="/feed.xml">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+<meta name="theme-color" content="#0f5c54" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0b1513" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Fendlemark">
+<meta property="og:title" content="Contributing: the Fendlemark Contribution Protocol (FCP-1) · Fendlemark">
+<meta property="og:description" content="The 112 numbered steps a contributor completes, in order, before opening a pull request to Fendlemark. Preparation, Intent, Design, Implementation, Verification, and Ceremony.">
+<meta property="og:url" content="https://fendlemark.develops.guru/governance/contributing/">
+<meta property="og:image" content="https://fendlemark.develops.guru/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Contributing: the Fendlemark Contribution Protocol (FCP-1) · Fendlemark">
+<meta name="twitter:description" content="The 112 numbered steps a contributor completes, in order, before opening a pull request to Fendlemark. Preparation, Intent, Design, Implementation, Verification, and Ceremony.">
+<meta name="twitter:image" content="https://fendlemark.develops.guru/assets/og-image.png">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/site.css">
+<script>try{var t=localStorage.getItem('fm-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Fendlemark", "item": "https://fendlemark.develops.guru/"}, {"@type": "ListItem", "position": 2, "name": "Governance", "item": "https://fendlemark.develops.guru/governance/"}, {"@type": "ListItem", "position": 3, "name": "Contributing: the Fendlemark Contribution Protocol (FCP-1)", "item": "https://fendlemark.develops.guru/governance/contributing/"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Contributing: the Fendlemark Contribution Protocol (FCP-1)", "description": "The 112 numbered steps a contributor completes, in order, before opening a pull request to Fendlemark. Preparation, Intent, Design, Implementation, Verification, and Ceremony.", "url": "https://fendlemark.develops.guru/governance/contributing/", "datePublished": "2026-10-24", "dateModified": "2026-10-24", "author": {"@type": "Organization", "name": "The Fendlemark Keepers"}, "publisher": {"@type": "Organization", "name": "Fendlemark", "url": "https://fendlemark.develops.guru/"}, "inLanguage": "en"}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="site-header-inner">
+    <a class="brand" href="/" aria-label="Fendlemark home">
+      <svg class="brand-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
+      <span class="brand-name">Fendlemark</span>
+      <span class="brand-version">v0.9.4</span>
+    </a>
+    <nav class="top-nav" aria-label="Primary">
+      <a href="/docs/getting-started/">Docs</a>
+      <a href="/philosophy/">Philosophy</a>
+      <a href="/governance/">Governance</a>
+      <a href="/changelog/">Changelog</a>
+      <a href="/fendlemark/">Packages</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-btn" id="theme-toggle" type="button" aria-label="Toggle colour theme" title="Toggle theme">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path class="sun" d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/><circle class="sun" cx="12" cy="12" r="4"/><path class="moon" d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+      <button class="icon-btn menu-btn" id="menu-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false" aria-controls="sidebar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="page">
+  <aside class="sidebar" id="sidebar">
+    <nav aria-label="Documentation">
+<div class="nav-group"><div class="nav-group-title">Documentation</div><ul>
+<li><a href="/docs/">Overview</a></li>
+<li><a href="/docs/getting-started/">Getting started</a></li>
+<li><a href="/docs/architecture/">Architecture</a></li>
+<li><a href="/docs/configuration/">Configuration</a></li>
+<li><a href="/docs/adapters/">Adapters</a></li>
+<li><a href="/docs/adapters/writing-an-adapter/">Writing an adapter</a></li>
+<li><a href="/docs/ui/">The console (UI)</a></li>
+<li><a href="/docs/auth/">Authentication</a></li>
+<li><a href="/docs/cli/">CLI reference</a></li>
+<li><a href="/docs/api/">Go API reference</a></li>
+<li><a href="/docs/migration/">Migrating 0.8 to 0.9</a></li>
+</ul></div>
+<div class="nav-group"><div class="nav-group-title">Project</div><ul>
+<li><a href="/philosophy/">Philosophy</a></li>
+<li><a href="/governance/">Governance</a></li>
+<li><a href="/governance/contributing/" class="active" aria-current="page">Contributing (FCP-1)</a></li>
+<li><a href="/changelog/">Changelog</a></li>
+<li><a href="/fendlemark/">Packages</a></li>
+<li><a href="/faq/">FAQ</a></li>
+<li><a href="/about/">About</a></li>
+</ul></div>
+    </nav>
+  </aside>
+  <main class="main" id="main">
+<p class="eyebrow">Governance</p>
+<h1>Contributing</h1>
+<p class="lede">Thank you for considering a contribution to Fendlemark. This page describes the Fendlemark Contribution Protocol, FCP-1: the 112 steps a contributor completes, in order, before opening a pull request. Every pull request ever merged has followed it. Every pull request ever merged has been correct. The Keepers do not regard this as a coincidence.</p>
+
+<div class="callout">
+  <div class="callout-icon" aria-hidden="true">●</div>
+  <div>
+    <p class="callout-title">Before step 1</p>
+    <p>FCP-1 begins when you first form the intention to change Fendlemark. If you have already opened a pull request, close it, and begin at step 1. The Keepers will not hold it against you, and will say so in a way that makes clear they are holding it against you a little.</p>
+  </div>
+</div>
+
+<h2 id="overview">Overview</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Phase</th><th>Steps</th><th>Typical duration</th></tr></thead>
+<tbody>
+<tr><td>I. Preparation</td><td>1 to 12</td><td>One evening</td></tr>
+<tr><td>II. Intent</td><td>13 to 30</td><td>Two to three weeks, mostly Reflection</td></tr>
+<tr><td>III. Design</td><td>31 to 58</td><td>Two to four weeks</td></tr>
+<tr><td>IV. Implementation</td><td>59 to 78</td><td>Shorter than you expect; the thinking is done</td></tr>
+<tr><td>V. Verification</td><td>79 to 96</td><td>One week</td></tr>
+<tr><td>VI. Ceremony</td><td>97 to 112</td><td>Fifty-one hours, of which forty-eight are silent</td></tr>
+</tbody></table></div>
+<p>A single-line typo fix follows the same 112 steps. The Keepers have been asked whether this is proportionate and have answered, in <a href="/governance/#decisions">FDR-047</a>, that proportion is a property of the outcome, not the process.</p>
+
+<h2 id="phase-1">Phase I: Preparation</h2>
+<ol class="steps">
+  <li>Read the documentation. All of it. The CLI reference counts.</li>
+  <li>Read the <a href="/philosophy/">Philosophy</a>.</li>
+  <li>Read the Philosophy again, this time without skimming the section on comparisons.</li>
+  <li>Read <a href="/governance/">Governance</a>, including the Decision Records table, and note which FDR your intended change would most offend.</li>
+  <li>Install Fendlemark from source and run it against at least one real adapter. A fixture does not count. The Keepers can tell.</li>
+  <li>Confirm your Go version matches <code>go.mod</code> to the patch release. Record it.</li>
+  <li>Confirm your Node.js version matches <code>console/.nvmrc</code> to the patch release. Record it, even if your change does not touch the console.</li>
+  <li>Sign the Contributor Covenant 2.1.</li>
+  <li>Sign the Fendlemark Addendum to the Contributor Covenant, which governs the tone of commit messages, changelog entries, and comments.</li>
+  <li>Read the Addendum's worked examples of acceptable and unacceptable commit message tone. Note that "fix typo" is unacceptable and "Clarify the spelling of <em>reconciliation</em> in the CLI help text" is acceptable.</li>
+  <li>Create a contributor profile in the project's contributor registry, including your handle, your time zone, and your preferred Reflection Period notification channel.</li>
+  <li>Wait 24 hours. This is not a Reflection Period. It is simply a day, and the Keepers have found that most intended contributions do not survive one.</li>
+</ol>
+
+<h2 id="phase-2">Phase II: Intent</h2>
+<ol class="steps" start="13" style="counter-reset: step 12">
+  <li>File a <strong>Pre-Intent Notice</strong>: one paragraph stating that you are considering a contribution, in which area, and why you believe the area is imperfect. Do not describe the change.</li>
+  <li>Observe a 72-hour Reflection Period on the Pre-Intent Notice.</li>
+  <li>If, during Reflection, a Keeper replies with a link to an FDR, read it. If it resolves your concern, withdraw the Notice and return to step 12 for a different concern, or to your life.</li>
+  <li>If no Keeper replies, that is consent to proceed. Silence is how the Keepers say yes.</li>
+  <li>File an <strong>Intent to Contribute</strong> referencing the Pre-Intent Notice by number. The Intent describes the change in no more than three sentences and no fewer than two.</li>
+  <li>Classify the change as an Accommodation (the world changed), a Clarification (you misunderstood, and the code will now be harder to misunderstand), or an Arrival (something new). Arrivals require two Sponsors; the others require one.</li>
+  <li>Obtain Sponsors from the Steward roster. A Sponsor agrees to read everything you produce from this point on. Sponsors are approached privately and may decline without reason.</li>
+  <li>Obtain a <strong>Sceptic</strong> from the Custodian roster. The Sceptic's role is to believe the change is unnecessary until step 95. The Sceptic may not be someone who has previously sponsored you.</li>
+  <li>Observe a 72-hour Reflection Period on the Intent.</li>
+  <li>During Reflection, your Sceptic will post the <strong>Sceptic's Question</strong>: "What would we lose by not doing this?" Do not answer yet.</li>
+  <li>After Reflection, answer the Sceptic's Question in writing, in one paragraph, without using the words "obviously", "simply", or "just".</li>
+  <li>Your Sponsors confirm that they have read the answer. Your Sceptic confirms that they remain sceptical. This is the expected outcome.</li>
+  <li>Search the Decision Records for any FDR that addresses the change. If one does and it declined the change, your Intent becomes a <strong>Petition to Supersede</strong>, which requires a Keeper co-signer and restarts at step 21.</li>
+  <li>Search closed pull requests for prior attempts. If one exists, read its Reading of the Diff transcript (step 103) and note where it went wrong.</li>
+  <li>Estimate the number of files your change will touch. Record the estimate. It will be compared to the actual number at step 85 and the discrepancy will be discussed.</li>
+  <li>Choose a <strong>working name</strong> for the change, which will appear in all subsequent documents. Working names are reviewed at step 44.</li>
+  <li>A Keeper acknowledges the Intent with the word "Noted". The Keepers use no other word for this.</li>
+  <li>Observe a 48-hour Silence Period. Do not begin design work. The Keepers have asked us to be clear that they can tell when design work has begun during Silence, because the Dossier is always slightly too polished.</li>
+</ol>
+
+<h2 id="phase-3">Phase III: Design</h2>
+<ol class="steps" start="31" style="counter-reset: step 30">
+  <li>Open a <strong>Design Dossier</strong> from the template. The template has eleven mandatory sections. All eleven are mandatory for all changes, including typo corrections.</li>
+  <li>Section 1, <em>Context</em>: what is true today.</li>
+  <li>Section 2, <em>Why this change is unnecessary</em>: the strongest case against, written by you, in good faith. Dossiers with a weak Section 2 are returned.</li>
+  <li>Section 3, <em>Why we are doing it anyway</em>: the response to Section 2. May not be longer than Section 2.</li>
+  <li>Section 4, <em>Proposed change</em>: what will be different. Diagrams are encouraged. Inline SVG only; raster images are returned.</li>
+  <li>Section 5, <em>Alternatives considered</em>: at least three, one of which must be "do nothing", analysed with the same seriousness as the others.</li>
+  <li>Section 6, <em>Effect on the lattice</em>: even if none. If none, explain why none, with reference to the reconciler's determinism guarantee.</li>
+  <li>Section 7, <em>Effect on the console</em>: even if none. If the change adds a visual element, state why it is not a loading spinner.</li>
+  <li>Section 8, <em>Effect on Respiratory Identity</em>: even if none. The Keepers have found that this section occasionally surfaces an effect.</li>
+  <li>Section 9, <em>Migration</em>: if any key, flag, field, or export is renamed, the migration guide is drafted here, in full, in the style of the <a href="/docs/migration/">0.8 to 0.9 guide</a>.</li>
+  <li>Section 10, <em>Test plan</em>: every test you will add or change, by name, before any of them exist.</li>
+  <li>Section 11, <em>Changelog entry</em>: the exact text, in the Addendum's tone, under the correct heading (Accommodations, Clarifications, Arrivals).</li>
+  <li>Submit the Dossier to your Sponsors and Sceptic. Observe a 72-hour Reflection Period.</li>
+  <li><strong>Naming Review.</strong> A Custodian reviews every new identifier in the Dossier (types, functions, config keys, flags, CSS tokens, the working name). Identifiers must be <code>snake_case</code> in YAML, <code>camelCase</code> in TypeScript, <code>PascalCase</code> for exported Go, and must not abbreviate any word that has fewer than ten letters.</li>
+  <li><strong>Secondary Naming Review.</strong> Any identifier longer than twelve characters is reviewed again by a second Custodian, who must independently arrive at the same name from the Dossier's description. If they do not, the name is wrong or the description is.</li>
+  <li>Revise the Dossier. Mark revisions. Do not delete the original text; strike it through so that the Dossier records how the thinking moved.</li>
+  <li>Your Sceptic posts their <strong>Dossier Objection</strong>, which is mandatory and may be as short as "Section 2 was more persuasive than Section 3". Respond in writing.</li>
+  <li>Both Sponsors (or the one Sponsor, for non-Arrivals) sign the Dossier.</li>
+  <li>A Custodian approves the Dossier with the phrase "Sufficiently considered". The Keepers use no other phrase for this.</li>
+  <li>Observe a 72-hour Reflection Period on the approved Dossier.</li>
+  <li>If your change touches the <code>adapter</code> package, stop. Read <a href="/governance/#decisions">FDR-027</a>. Your Intent becomes a Petition to Supersede; return to step 25. The Keepers note that nobody has reached step 51 by this route and continued.</li>
+  <li>If your change adds an adapter, draft its Descriptor and conformance test now, from the Dossier alone, and attach them. The adapter's maturity is Provisional and will remain so for at least two releases.</li>
+  <li>If your change adds a configuration key, draft its row in the <a href="/docs/configuration/">configuration reference</a>, including a default and a one-sentence rationale for the default. Defaults without rationale are returned.</li>
+  <li>If your change adds a CLI flag, draft its help text. Help text is reviewed for tone under the Addendum.</li>
+  <li>If your change adds a <code>@fendlemark/ui</code> prop, draft its row in the component table, and state in one sentence why the component could not infer the value.</li>
+  <li>If your change adds an error code, reserve the number in the error registry. FRI codes are allocated by the Respiratory Identity Keeper personally.</li>
+  <li>Record, in the Dossier, the date and time at which you will begin implementation. This must be at least 24 hours in the future.</li>
+  <li>Wait until that time.</li>
+</ol>
+
+<h2 id="phase-4">Phase IV: Implementation</h2>
+<ol class="steps" start="59" style="counter-reset: step 58">
+  <li>Create a branch named <code>fcp/&lt;intent-number&gt;-&lt;working-name&gt;</code>. No other branch name format is accepted by the repository's hooks.</li>
+  <li>Implement the change exactly as described in Dossier Section 4. If implementation reveals that Section 4 was wrong, stop, amend the Dossier (strikethrough, not deletion), and return to step 43.</li>
+  <li>Write every test named in Dossier Section 10. Write no test not named there without amending Section 10.</li>
+  <li>Run <code>gofmt</code>, <code>go vet</code>, and the project's linter configuration. Zero findings. Not "zero new findings". Zero.</li>
+  <li>Run the console's formatter, type checker, and linter if you touched the console, and also if you did not, because the Keepers once found a drift that way.</li>
+  <li><strong>Alphabetical Import Attestation.</strong> Confirm that every import block you touched is grouped (standard library, third party, Fendlemark) and alphabetised within groups. Attest to this in writing in the pull request template. The linter checks it; the attestation is for you.</li>
+  <li>Commit in logical units. Each commit message follows the Addendum: an imperative first line of at most 60 characters that would make sense to a respected colleague in ten years, a blank line, and a body explaining why, not what.</li>
+  <li>Each commit body ends with <code>FCP-Intent: &lt;number&gt;</code> and <code>FCP-Dossier: &lt;number&gt;</code> trailers.</li>
+  <li>Reorder, squash, or split commits until each one would be a reasonable change on its own. Force-pushing to your own branch is permitted and expected; the Keepers regard a tidy history as a courtesy to the Reading of the Diff.</li>
+  <li>Add or update documentation for every user-visible change, in the same pull request. Documentation in a follow-up pull request is a Clarification that admits the original was unclear.</li>
+  <li>Update the configuration reference, CLI reference, component table, or API reference as drafted in steps 53 to 56. The drafted text may be used verbatim; it was approved.</li>
+  <li>Add the changelog entry from Dossier Section 11, verbatim, to <code>CHANGELOG.md</code> under <em>Unreleased</em>. Do not improve it. It was approved.</li>
+  <li>Build the binary with <code>make release-local</code> and confirm the build is reproducible by building it twice and comparing checksums.</li>
+  <li>Run the full test suite three times. The Keepers do not believe in flaky tests; a test that fails once in three runs is a bug, and it is now yours.</li>
+  <li>Run <code>fendlemark doctor</code> against your built binary with the example configuration. Zero warnings.</li>
+  <li><strong>Screenshot Notarisation.</strong> If the change is visible in the console, capture screenshots with <code>npm run screenshots</code>: every affected view, at 2x device pixel ratio, in both light and dark themes, at 1440 and 390 pixel widths, with the cursor hidden and the lattice generation number visible in the footer. Attach all of them to the Dossier.</li>
+  <li>Review the screenshots for any element that could be mistaken for a loading indicator. Remove it.</li>
+  <li>Measure the production bundle size of the console before and after. Any increase above 2 KiB gzipped requires a sentence in the Dossier explaining what the bytes are for.</li>
+  <li>Measure the binary size before and after. Any increase above 100 KiB requires the same.</li>
+  <li>Record the actual number of files touched. Compare to the estimate from step 27. Note the discrepancy in the Dossier without explanation; the explanation is step 85.</li>
+</ol>
+
+<h2 id="phase-5">Phase V: Verification</h2>
+<ol class="steps" start="79" style="counter-reset: step 78">
+  <li>Deploy your branch against a real platform with at least two adapters enabled and at least one correlation between them. Run it for 24 hours.</li>
+  <li>Record the lattice generation number at the start and end of the 24 hours, and confirm that <code>fendlemark lattice stats</code> is consistent with the adapters' own counts.</li>
+  <li>Run <code>fendlemark lattice explain</code> on three entities of your choosing and one of your Sceptic's choosing. Attach the output.</li>
+  <li>If your change affects reconciliation, run the determinism check: two fresh instances, same adapters, byte-identical <code>lattice stats --json</code>.</li>
+  <li><strong>Benchmark Quorum.</strong> For any change touching the lattice, the server, or an adapter's <code>Facets</code> path: run the benchmark suite before and after, on the same machine, three times each, and convene a Quorum of one Custodian and one Sponsor to review the numbers. Regressions above 2% require a Dossier amendment. Improvements above 10% require a Dossier amendment explaining why the previous code was slow, which the Keepers will read with interest.</li>
+  <li>If your change adds or alters a facet panel, your Sponsor opens the panel on an entity with no facets from that adapter and confirms the panel is absent, not empty.</li>
+  <li><strong>Estimate Reconciliation.</strong> Explain, in the Dossier, the discrepancy between step 27 and step 78. "I did not know about X" is acceptable. "It grew" is not.</li>
+  <li>Self-review the complete diff, top to bottom, as if it had been written by someone you respect but do not trust. Record at least one thing you changed as a result. If you changed nothing, review again.</li>
+  <li>Your Sponsors review the diff against the Dossier. Any difference between what was described and what was built is listed. Each item is either fixed or becomes a Dossier amendment.</li>
+  <li><strong>Tone Review.</strong> A Custodian reviews every commit message, comment, changelog entry, help string, and error message added or changed, under the Addendum. The standard is: a respected colleague, ten years from now, before coffee.</li>
+  <li>Your Sceptic reviews the diff and posts the <strong>Sceptic's Second Question</strong>: "Is this the smallest change that achieves Section 3?" Answer in writing.</li>
+  <li>If the answer to step 89 is no, make it smaller. Return to step 86.</li>
+  <li>Confirm that no file in the diff contains the words "TODO", "FIXME", "HACK", "temporary", or "for now". Fendlemark has no temporary code. It has code, and it has code that was removed.</li>
+  <li>Confirm that no new dependency was added. If one was, confirm that the Dossier's Section 5 considered writing it ourselves, and that the Keepers' standing preference for writing it ourselves was overcome in writing.</li>
+  <li>Rebase onto the current default branch. Re-run steps 62, 63, and 72.</li>
+  <li>Freeze the branch. From this point until step 112, no commit may be added without returning to step 86.</li>
+  <li>Your Sceptic records their verdict: "Unnecessary, but correct", which is the only verdict a Sceptic may give that permits the Protocol to continue. Any other verdict returns to step 43.</li>
+  <li>Observe a 72-hour Reflection Period on the frozen branch.</li>
+</ol>
+
+<h2 id="phase-6">Phase VI: Ceremony</h2>
+<ol class="steps" start="97" style="counter-reset: step 96">
+  <li>Fill in the pull request template, offline, in a file you will paste at step 112. The template has fourteen fields. All are required. Field 9 is the Alphabetical Import Attestation from step 64.</li>
+  <li>Attach the Dossier, with all amendments and strikethroughs, by number.</li>
+  <li>Attach the Benchmark Quorum minutes, if any.</li>
+  <li>Attach the notarised screenshots, if any.</li>
+  <li>Attach the 24-hour deployment record from step 80 and the <code>explain</code> outputs from step 81.</li>
+  <li>Schedule the <strong>Reading of the Diff</strong> with at least one Keeper and your Sceptic, at a time when all parties have had coffee.</li>
+  <li>Perform the Reading of the Diff: the contributor reads the complete diff aloud, file by file, hunk by hunk, including context lines. The Keeper may stop the Reading at any point to ask "why?". Readings of more than ninety minutes are adjourned and resumed on another day. The record of the Reading is attached to the pull request.</li>
+  <li>If the Reading surfaces a change, return to step 86. Readings that surface nothing are rare and are noted in the release notes by name.</li>
+  <li>Compose the <strong>Commit Message Haiku</strong>: a three-line summary of the change in 5-7-5 syllables, to be included in the pull request description. The Haiku is optional. No pull request without one has ever been merged.</li>
+  <li>Your Sponsors post their final endorsement, in the words "I have read all of it". The Keepers use no other words for this.</li>
+  <li>Your Sceptic posts their final verdict from step 95, unchanged.</li>
+  <li>A Keeper posts "Noted" on the Intent, closing it as Ready.</li>
+  <li>Observe a 48-hour <strong>Silence Period</strong>. Nobody, including you, discusses the change in any channel. If the Silence is broken, it restarts. The Keepers have found that the Silence is where most contributors understand, for the first time, what they have built.</li>
+  <li>At the end of the Silence, reread the Philosophy one final time.</li>
+  <li>Confirm that you still wish to proceed. The Keepers report that a meaningful fraction of contributors, at this step, do not, and that the project is grateful to them in a way it finds difficult to express.</li>
+  <li>Open the pull request. Paste the template from step 97. Request review from your Sponsors, your Sceptic, and one Keeper. You are now a Contributor, and you have our thanks.</li>
+</ol>
+
+<h2 id="after">After step 112</h2>
+<p>Review is brief. Everything that could be discussed has been. The Keeper confirms that the pull request matches the Dossier, that the Reading of the Diff record is attached, and that the Haiku scans. Merge requires unanimous consent of the Keepers, which is usually given within a day, followed by a 48-hour Silence Period, after which the change is in the default branch and awaits <a href="/governance/#releases">release governance</a>.</p>
+<p>Median time from step 1 to merge is nine weeks. The Keepers note that this is faster than most organisations take to decide whether to <em>consider</em> a change, and that Fendlemark has never, in its history, reverted one.</p>
+
+<h2 id="faq">Frequently asked questions</h2>
+<h3>Is there an abbreviated path for small changes?</h3>
+<p>No. See <a href="/governance/#decisions">FDR-047</a>. The Keepers have noticed that the people who ask this question are usually proposing a change that is not small, and the people whose changes are small do not mind.</p>
+<h3>What if I only want to fix a typo in the documentation?</h3>
+<p>Begin at step 1. The documentation is part of the product. The typo has been there, by definition, for as long as the page has, and a few more weeks will not hurt it. The Keepers also point out that documentation typos are vanishingly rare in Fendlemark, and that they would know, because they have performed the Reading of the Diff on every page.</p>
+<h3>Can I skip the Haiku?</h3>
+<p>Yes. See step 105.</p>
+<h3>Why 112?</h3>
+<p>A proposal for 100 steps was found to be "round, and therefore suspicious". A proposal for 120 was found to be "padding". 112 is where the Protocol landed when every step that could be removed had been, and the Keepers regard it, like port 7411, as something that arrived at its value honestly and need not be revisited.</p>
+<h3>Has anyone completed FCP-1 and had their pull request rejected?</h3>
+<p>No. By step 112 there is nothing left to reject. This is the point.</p>
+<nav class="pager" aria-label="Previous and next pages">
+<a class="pager-prev" href="/governance/"><span>Previous</span>Governance</a>
+<a class="pager-next" href="/changelog/"><span>Next</span>Changelog</a>
+</nav>
+  </main>
+</div>
+
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <p>Fendlemark is released under the MIT licence and maintained by the Fendlemark Keepers. Documentation for v0.9.4.</p>
+    <p class="fine">MLflow, Metaflow, Argo Workflows, and Kubeflow are trademarks of their respective owners. Fendlemark is an independent project and is not affiliated with, endorsed by, or sponsored by any of them.</p>
+    <p class="fine"><a href="/about/">About this site</a> · <a href="/governance/">Governance</a> · <a href="/changelog/">Changelog</a> · <a href="/sitemap.xml">Sitemap</a></p>
+  </div>
+</footer>
+<script src="/assets/site.js" defer></script>
+</body>
+</html>

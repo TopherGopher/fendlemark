@@ -1,0 +1,62 @@
+<!-- meta {"title": "Philosophy", "description": "The Fendlemark Philosophy: why there is one console, why there is no roadmap, why there are no loading spinners, and why we strive for perfection and achieve it easily.", "type": "Article"} -->
+<p class="eyebrow">Project</p>
+<h1>Philosophy</h1>
+<p class="lede">Every project has values. Most projects have to work at them. This page records the values of Fendlemark, which the Keepers hold with the serenity of people who have never once been wrong about software.</p>
+
+<div class="quote-band">
+  <blockquote><p>We strive for perfection and achieve it easily.</p><cite>The first line of the first commit message, 11 March 2023</cite></blockquote>
+</div>
+
+<h2 id="one-console">There is one console</h2>
+<p>An ML platform is one thing. It is experienced, by the people who use it, as four or five things, because it was assembled from four or five things, each with its own ideas about what a run is, what a colour means, and where the button goes. This is not the users' fault. It is not even the tools' fault; each of them is excellent at being itself. It is simply a failure of composition, and composition is what Fendlemark is for.</p>
+<p>We do not believe in a "single pane of glass". Glass is fragile and panes are flat. We believe in a single <em>console</em>, which is to say a place where a person sits down and understands their platform without having to remember which tab knows what. The distinction matters to us more than it will to you, and we have made peace with that.</p>
+
+<h2 id="perfection">We strive for perfection and achieve it easily</h2>
+<p>Other projects describe perfection as a horizon: always approached, never reached. We find this attitude defeatist. Perfection is a property of a system in which every decision was correct, and correct decisions are not difficult to make; they are simply the ones you make after thinking, instead of before. Fendlemark's Keepers think first. The results speak for themselves, and so, on this page, do we.</p>
+<p>It is sometimes asked how a project that has achieved perfection can still publish releases. The answer is that the world around Fendlemark is imperfect and occasionally changes. Our releases are not improvements. They are accommodations.</p>
+
+<h2 id="roadmap">There is no roadmap</h2>
+<p>A roadmap is a public admission that a project knows where it should be and is not there. Fendlemark is where it should be. We have therefore never published a roadmap, and we have declined, in <a href="/governance/#decisions">FDR-003</a>, <a href="/governance/#decisions">FDR-016</a>, and <a href="/governance/#decisions">FDR-038</a>, to begin.</p>
+<p>When people ask what is coming next, we tell them: nothing is <em>coming</em>. Things occasionally <em>arrive</em>, after the process described in <a href="/governance/">Governance</a>, and when they do they will have been correct for some time already.</p>
+
+<h2 id="bugs">We do not fix bugs</h2>
+<p>We clarify the behaviour you misunderstood. In nearly every case this clarification takes the form of documentation. In the small number of remaining cases, it takes the form of a change to the code, which the changelog records under "Clarifications". The Keepers have reviewed every such case and are satisfied that, at the time the original code was written, it was correct, and that the world then moved.</p>
+
+<h2 id="spinners">There are no loading spinners</h2>
+<p>The Fendlemark console has never displayed a loading spinner, a skeleton screen, a progress bar, or the word "loading". Nothing in it has ever taken long enough to need one. When a view has nothing to show, it says so, in a sentence, with an <code>&lt;FmEmptyState&gt;</code>. When it has something to show, it shows it. We are aware that some platforms are large. We have not yet encountered one that is large enough, and we have stopped expecting to.</p>
+
+<h2 id="dark-mode">On dark mode</h2>
+<p>We considered supporting dark mode and then realised the console was already perfect in both. The implementation took an afternoon. The Decision Record took eleven days.</p>
+
+<h2 id="comparisons">On comparisons</h2>
+<p>We are frequently asked to compare Fendlemark with other consoles, dashboards, and portals for ML platforms. We decline. Comparison requires a peer. We say this without malice: the other projects are doing something, and we are doing something else, and the something else is this.</p>
+<p>We will say that MLflow, Metaflow, Argo Workflows, and Kubeflow are each superb at what they do, that we read from them with gratitude, and that Fendlemark exists to make them look as good together as they do apart. Those are the only four comparisons we are prepared to make, and none of them is with us.</p>
+
+<h2 id="read-only">On being read-only</h2>
+<p>Fendlemark can see everything and change nothing. People sometimes describe this as a limitation. We describe it as the whole point. A system that can act is a system that can be wrong in a way that matters, and we have arranged never to be wrong in a way that matters. Deep links exist so that when you want to act, you go to the tool and act there, under its rules, with its permissions, where the consequences belong.</p>
+
+<h2 id="breath">On breath</h2>
+<p>Every other authentication system asks you to prove who you are with something you might not have. We ask you to prove it with something you cannot not have. This is covered at length in the <a href="/docs/auth/">Authentication</a> documentation; here we note only that the Keepers regard Respiratory Identity as Fendlemark's most obvious idea, and remain surprised to be the first.</p>
+
+<h2 id="values">Values</h2>
+<p>The Keepers were asked, during the 2024 governance review, to enumerate the project's values. After a Reflection Period, they produced the following list.</p>
+<ol>
+  <li>Correctness.</li>
+  <li>Rightness.</li>
+  <li>Accuracy.</li>
+  <li>Precision, where it differs from accuracy.</li>
+  <li>Soundness.</li>
+  <li>Being right the first time.</li>
+  <li>Being right the second time, in the event that the first time is questioned.</li>
+  <li>Serenity, which is what correctness feels like from the inside.</li>
+</ol>
+<p>A proposal to add "humility" was tabled by a Steward, discussed for one Reflection Period, and withdrawn by the Steward, who later became a Keeper.</p>
+
+<h2 id="simplicity">On simplicity</h2>
+<p>Simplicity is not a goal. It is a side effect of being right the first time. Projects that pursue simplicity as a goal end up with less software and the same number of mistakes. Fendlemark has exactly as much software as the problem requires, which turned out to be one binary, four adapters, one lattice, and a console, and no more, because that is how much a correct solution weighed when we finished building it.</p>
+
+<h2 id="how-we-know">How we know</h2>
+<p>We are sometimes asked how the Keepers can be so certain. The honest answer is that certainty was never the hard part. The hard part was writing it down in a way that would not seem immodest, and we have, as this page demonstrates, decided to stop trying.</p>
+
+<hr>
+<p class="fine">The Philosophy is maintained by the Keepers and amended only by unanimous consent following a Silence Period, per <a href="/governance/">Governance</a>. It has been amended twice: once to add the section on dark mode, and once to remove a comma.</p>

@@ -1,0 +1,105 @@
+<!-- meta {"title": "CLI reference", "description": "Reference for the fendlemark command-line tool: init, serve, adapters, lattice, auth, doctor, and version, with every flag and exit code."} -->
+<p class="eyebrow">Documentation</p>
+<h1>CLI reference</h1>
+<p class="lede">The <code>fendlemark</code> binary is both the server and the operator's tool. Seven commands. The ones you will use are <code>serve</code> and <code>doctor</code>.</p>
+
+<h2 id="global">Global flags</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>--config, -c</code></td><td><code>./fendlemark.yaml</code></td><td>Path to the configuration file.</td></tr>
+<tr><td><code>--log-level</code></td><td>from config</td><td><code>debug</code>, <code>info</code>, <code>warn</code>, <code>error</code>, <code>serene</code>.</td></tr>
+<tr><td><code>--log-format</code></td><td><code>text</code></td><td><code>text</code> or <code>json</code>.</td></tr>
+<tr><td><code>--no-color</code></td><td>auto</td><td>Disable ANSI colour. Also honours <code>NO_COLOR</code>.</td></tr>
+<tr><td><code>--help, -h</code></td><td></td><td>Help for any command.</td></tr>
+</tbody></table></div>
+
+<h2 id="init">fendlemark init</h2>
+<pre data-lang="shell"><code><span class="p">$</span> fendlemark init [dir] [--adapters mlflow,argo] [--force]</code></pre>
+<p>Writes <code>fendlemark.yaml</code> and a short README into <code>dir</code> (default: current directory). With <code>--adapters</code>, the listed adapters are enabled with placeholder values; otherwise all four are declared and disabled. Refuses to overwrite an existing file without <code>--force</code>.</p>
+
+<h2 id="serve">fendlemark serve</h2>
+<pre data-lang="shell"><code><span class="p">$</span> fendlemark serve [--listen 127.0.0.1:7411] [--console-dev] [--no-reconcile-on-start]</code></pre>
+<div class="table-wrap"><table>
+<thead><tr><th>Flag</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>--listen</code></td><td>Override <code>server.listen</code>.</td></tr>
+<tr><td><code>--console-dev</code></td><td>Proxy console requests to a Vite dev server on <code>:5173</code> instead of serving the embedded build.</td></tr>
+<tr><td><code>--no-reconcile-on-start</code></td><td>Start serving before the initial reconciliation completes. The console shows an empty lattice that fills in. Useful for very large platforms; discouraged by the Keepers on aesthetic grounds.</td></tr>
+<tr><td><code>--adapters</code></td><td>Comma-separated list to enable for this run only, overriding config.</td></tr>
+</tbody></table></div>
+<p>Handles <code>SIGTERM</code> and <code>SIGINT</code> with a graceful shutdown of <code>server.shutdown_grace</code>. Exposes <code>/healthz</code> (process up), <code>/readyz</code> (initial reconciliation complete), and <code>/metrics</code> (Prometheus).</p>
+
+<h2 id="adapters">fendlemark adapters</h2>
+<pre data-lang="shell"><code><span class="p">$</span> fendlemark adapters list
+<span class="p">$</span> fendlemark adapters check [name...] [--timeout 10s] [--json]
+<span class="p">$</span> fendlemark adapters describe &lt;name&gt;</code></pre>
+<ul>
+  <li><code>list</code> prints every adapter compiled into the binary with its maturity and whether it is enabled in the current configuration.</li>
+  <li><code>check</code> connects each enabled adapter (or the named ones), calls <code>Health</code>, and prints status, latency, and detail. Exit code is 0 if all are healthy, 2 if any is degraded, 3 if any is unreachable.</li>
+  <li><code>describe</code> prints the adapter's descriptor: facet kinds, correlation keys, config schema.</li>
+</ul>
+
+<h2 id="lattice">fendlemark lattice</h2>
+<pre data-lang="shell"><code><span class="p">$</span> fendlemark lattice inspect [--kind run] [--key argo.workflow.name=train-abc12] [--json]
+<span class="p">$</span> fendlemark lattice explain &lt;entity-id&gt;
+<span class="p">$</span> fendlemark lattice stats</code></pre>
+<ul>
+  <li><code>inspect</code> runs a one-shot reconciliation against the configured adapters and prints matching entities without starting the server.</li>
+  <li><code>explain</code> prints why an entity has the facets it has: which keys matched, within what time distance, and which rule merged them. The single most useful command for "why are these two things one thing" and "why are these one thing two things".</li>
+  <li><code>stats</code> prints entity counts by kind, facets by adapter, correlation counts by key, and the generation number.</li>
+</ul>
+
+<h2 id="auth">fendlemark auth</h2>
+<pre data-lang="shell"><code><span class="p">$</span> fendlemark auth enrol --user &lt;email&gt; [--role viewer|operator|keeper]
+<span class="p">$</span> fendlemark auth list
+<span class="p">$</span> fendlemark auth revoke --user &lt;email&gt;
+<span class="p">$</span> fendlemark auth recovery --user &lt;email&gt; [--ttl 24h]</code></pre>
+<p>Manages <a href="/docs/auth/">Respiratory Identity</a> enrolments. <code>enrol</code> prints a one-time link. <code>recovery</code> issues a time-limited session for a user who cannot currently match (illness, travel, a new office with worse air). Requires <code>auth.mode: respiratory</code>.</p>
+
+<h2 id="doctor">fendlemark doctor</h2>
+<pre data-lang="shell"><code><span class="p">$</span> fendlemark doctor [--fix] [--json]</code></pre>
+<p>Validates configuration, resolves environment references, checks every enabled adapter, probes the data directory, tests the listen address, and prints the effective configuration with secrets redacted. Every finding has a code, a sentence, and a suggested change. With <code>--fix</code>, applies the suggestions that are mechanical (renamed keys, deprecated values) and rewrites the file with a backup.</p>
+<pre data-lang="shell"><code><span class="p">$</span> fendlemark doctor
+fendlemark doctor 0.9.4
+
+config    ok       ./fendlemark.yaml (6 keys set, 41 defaulted)
+config    warn     DOC-104 adapters.mlflow.trackingUri is the pre-0.9 spelling; use tracking_uri (fixable)
+listen    ok       127.0.0.1:7411 is available
+data_dir  ok       ./.fendlemark (writable, 12 KiB)
+mlflow    ok       41ms  12 experiments, 1,406 runs visible
+argo      ok       88ms  2 namespaces, 37 workflows
+auth      info     DOC-201 auth.mode is none; anyone who can reach server.listen can use the console
+
+1 warning, 1 info. Run with --fix to apply 1 fix.</code></pre>
+
+<h2 id="version">fendlemark version</h2>
+<pre data-lang="shell"><code><span class="p">$</span> fendlemark version [--json]
+fendlemark 0.9.4 (go1.23.2, linux/amd64)
+commit:  3e1f9c0
+console: embedded, built 2026-09-30
+adapters: mlflow argo metaflow kubeflow</code></pre>
+
+<h2 id="exit">Exit codes</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Code</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td><code>0</code></td><td>Success.</td></tr>
+<tr><td><code>1</code></td><td>Usage or configuration error.</td></tr>
+<tr><td><code>2</code></td><td>At least one adapter degraded (<code>adapters check</code>, <code>doctor</code>).</td></tr>
+<tr><td><code>3</code></td><td>At least one adapter unreachable.</td></tr>
+<tr><td><code>4</code></td><td>Authentication subsystem error.</td></tr>
+<tr><td><code>7</code></td><td>Reserved. Has never been returned. The Keepers decline to say what it is for.</td></tr>
+</tbody></table></div>
+
+<h2 id="env">Environment variables</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Variable</th><th>Purpose</th></tr></thead>
+<tbody>
+<tr><td><code>FENDLEMARK_CONFIG</code></td><td>Same as <code>--config</code>.</td></tr>
+<tr><td><code>FENDLEMARK_&lt;SECTION&gt;__&lt;KEY&gt;</code></td><td>Override any configuration key. See <a href="/docs/configuration/#precedence">precedence</a>.</td></tr>
+<tr><td><code>MLFLOW_TRACKING_USERNAME</code>, <code>MLFLOW_TRACKING_PASSWORD</code>, <code>MLFLOW_TRACKING_TOKEN</code></td><td>Read by the mlflow adapter, matching the MLflow client's conventions.</td></tr>
+<tr><td><code>ARGO_TOKEN</code></td><td>Bearer token for Argo Server, if not using a kubeconfig context.</td></tr>
+<tr><td><code>KUBECONFIG</code></td><td>Standard. Used by argo (<code>kube_watch</code>) and kubeflow (Katib, Notebooks).</td></tr>
+<tr><td><code>NO_COLOR</code></td><td>Standard.</td></tr>
+</tbody></table></div>

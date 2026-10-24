@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fendlemark</title>
+<style>
+:root{--bg:#fbfaf7;--elev:#fff;--sunken:#f1efe9;--fg:#1c1f1e;--muted:#5c6462;--faint:#8a918f;--border:#e3e0d8;--accent:#0f5c54;--soft:#e2efec;--run:#2563eb;--ok:#15803d;--fail:#b91c1c;--pend:#a16207}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0e1513;--elev:#141d1b;--sunken:#0a100f;--fg:#e6e9e7;--muted:#a3aca9;--faint:#6f7875;--border:#243330;--accent:#5fc2b3;--soft:#15302b;--run:#60a5fa;--ok:#4ade80;--fail:#f87171;--pend:#facc15;color-scheme:dark}}
+:root[data-theme=dark]{--bg:#0e1513;--elev:#141d1b;--sunken:#0a100f;--fg:#e6e9e7;--muted:#a3aca9;--faint:#6f7875;--border:#243330;--accent:#5fc2b3;--soft:#15302b;--run:#60a5fa;--ok:#4ade80;--fail:#f87171;--pend:#facc15;color-scheme:dark}
+*{box-sizing:border-box}body{margin:0;font:15px/1.5 Inter,system-ui,sans-serif;background:var(--bg);color:var(--fg)}
+header{display:flex;align-items:center;gap:1rem;padding:.6rem max(16px,env(safe-area-inset-right,0px)) .6rem max(16px,env(safe-area-inset-left,0px));border-bottom:1px solid var(--border);background:var(--elev);position:sticky;top:0}
+header b{display:flex;align-items:center;gap:.5rem}header svg{color:var(--accent)}
+nav{display:flex;gap:.25rem}nav a{color:var(--muted);text-decoration:none;padding:.3rem .6rem;border-radius:6px;font-weight:500}nav a.active{color:var(--accent);background:var(--soft)}
+#adapters{margin-left:auto;font:12px ui-monospace,monospace;color:var(--muted)}
+main{padding:1.25rem max(16px,env(safe-area-inset-right,0px)) 2rem max(16px,env(safe-area-inset-left,0px));max-width:72rem;margin:0 auto}
+table{border-collapse:collapse;width:100%;font-size:.9rem}th{text-align:left;font-size:.7rem;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);padding:.5rem .7rem;border-bottom:1px solid var(--border);background:var(--sunken)}td{padding:.5rem .7rem;border-bottom:1px solid var(--border)}tr[data-id]{cursor:pointer}tr[data-id]:hover{background:var(--soft)}
+.badge{display:inline-flex;align-items:center;gap:.4em;font-size:.78rem;font-weight:500;border-radius:999px;padding:.1em .6em .1em .45em;color:var(--c);background:color-mix(in srgb,var(--c) 12%,transparent);border:1px solid color-mix(in srgb,var(--c) 30%,transparent)}.badge i{width:.5em;height:.5em;border-radius:50%;background:var(--c)}
+.chip{font:600 .68rem ui-monospace,monospace;color:var(--accent);background:var(--soft);border-radius:999px;padding:.1rem .45rem;margin-right:.25rem}
+.empty{padding:2.5rem;text-align:center;border:1px dashed var(--border);border-radius:10px;color:var(--muted)}
+.panel{border:1px solid var(--border);border-radius:10px;background:var(--elev);margin:.75rem 0}.panel h3{margin:0;padding:.6rem .8rem;font-size:.95rem;display:flex;gap:.6rem;align-items:center;border-bottom:1px solid var(--border)}.panel pre{margin:0;padding:.7rem .8rem;font:12px/1.5 ui-monospace,monospace;overflow:auto;max-height:24rem}
+.panel a{color:var(--accent);margin-left:auto;font-size:.8rem}
+footer{display:flex;justify-content:space-between;padding:.75rem 16px;border-top:1px solid var(--border);color:var(--faint);font-size:.8rem}footer span:last-child{font-family:ui-monospace,monospace}
+h1{font-size:1.5rem;margin:0 0 1rem}.back{color:var(--accent);text-decoration:none;font-size:.9rem}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:.75rem;margin-bottom:1.5rem}.stat{padding:.8rem;border:1px solid var(--border);border-radius:10px;background:var(--elev)}.stat b{display:block;font-size:1.4rem}.stat span{color:var(--muted);font-size:.8rem}
+</style>
+</head>
+<body>
+<header>
+  <b><svg width="22" height="22" viewBox="0 0 28 28" aria-hidden="true"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg><span id="title">Fendlemark</span></b>
+  <nav id="nav"></nav>
+  <span id="adapters"></span>
+</header>
+<main id="main"></main>
+<footer><span id="motto"></span><span id="gen"></span></footer>
+<script>
+(async function(){
+  const api = p => fetch('/api/v1'+p, {credentials:'same-origin'}).then(r => { if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); });
+  const cfg = await api('/console');
+  document.getElementById('title').textContent = cfg.title;
+  document.title = cfg.title;
+  const MOTTOS = ['We strive for perfection and achieve it easily.','Simplicity is not a goal. It is a side effect of being right the first time.','We do not fix bugs. We clarify the behaviour you misunderstood.','Comparison requires a peer.','Serenity is what correctness feels like from the inside.'];
+  if (cfg.motto) document.getElementById('motto').textContent = MOTTOS[Math.floor(Date.now()/864e5)%MOTTOS.length];
+  const views = [['overview','Overview',null],['runs','Runs','run'],['workflows','Workflows','workflow'],['models','Models','model'],['pipelines','Pipelines','pipeline'],['notebooks','Notebooks','notebook']];
+  const colour = p => ({Running:'var(--run)',Succeeded:'var(--ok)',Failed:'var(--fail)',Pending:'var(--pend)'})[p] || 'var(--muted)';
+  const badge = p => `<span class="badge" style="--c:${colour(p)}"><i></i>${p}</span>`;
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const dur = (a,b) => { const ms=(b?Date.parse(b):Date.now())-Date.parse(a); if(!(ms>=0)) return ''; const s=Math.floor(ms/1e3); return s<60?s+'s':s<3600?Math.floor(s/60)+'m':s<86400?Math.floor(s/3600)+'h '+Math.floor(s%3600/60)+'m':Math.floor(s/86400)+'d'; };
+  let stats = await api('/lattice/stats'), adapters = (await api('/adapters')).adapters;
+  const kindsPresent = new Set(Object.keys(stats.by_kind||{}));
+  const nav = document.getElementById('nav');
+  const main = document.getElementById('main');
+  function route(){ return location.hash.replace('#','') || cfg.default_view || 'overview'; }
+  function renderNav(){ nav.innerHTML = views.filter(v=>!v[2]||kindsPresent.has(v[2])).map(v=>`<a href="#${v[0]}" class="${route()===v[0]?'active':''}">${v[1]}</a>`).join('') + `<a href="#adapters" class="${route()==='adapters'?'active':''}">Adapters</a>`; }
+  function renderAdapters(){ const h=adapters.filter(a=>a.state==='healthy').length, e=adapters.filter(a=>a.state!=='disabled').length; document.getElementById('adapters').textContent=`${h}/${e} adapters`; if(cfg.generation_in_footer) document.getElementById('gen').textContent='gen '+stats.generation; }
+  async function render(){
+    renderNav(); renderAdapters();
+    const r = route();
+    if (r.startsWith('entity/')) return renderEntity(r.slice(7));
+    if (r === 'adapters') { main.innerHTML = '<h1>Adapters</h1><table><thead><tr><th>Adapter</th><th>State</th><th>Latency</th><th>Facets</th><th>Maturity</th><th>Detail</th></tr></thead><tbody>'+adapters.map(a=>`<tr><td><b>${esc(a.display_name)}</b> <span class="chip">${esc(a.name)}</span></td><td>${badge(a.state==='healthy'?'Succeeded':a.state==='degraded'?'Pending':a.state==='disabled'?'Unknown':'Failed').replace(/>[A-Za-z]+</,'>'+a.state+'<')}</td><td>${a.latency_ms} ms</td><td>${a.facets}</td><td>${esc(a.maturity)}</td><td>${esc(a.detail)}</td></tr>`).join('')+'</tbody></table>'; return; }
+    if (r === 'overview') {
+      const recent = await api('/entities?limit=25');
+      main.innerHTML = '<h1>Overview</h1><div class="stats">'+[['Entities',stats.entities],['Facets',stats.facets],['Correlations',Object.values(stats.correlations||{}).reduce((a,b)=>a+b,0)],['Adapters healthy',adapters.filter(a=>a.state==='healthy').length+'/'+adapters.filter(a=>a.state!=='disabled').length]].map(([k,v])=>`<div class="stat"><b>${v}</b><span>${k}</span></div>`).join('')+'</div>'+table(recent.entities,'Recent activity across every adapter');
+      return;
+    }
+    const v = views.find(x=>x[0]===r); if(!v){ location.hash='overview'; return; }
+    const res = await api(`/entities?kind=${v[2]}&limit=${cfg.page_size||50}`);
+    main.innerHTML = `<h1>${v[1]}</h1>` + table(res.entities, `No ${v[2]}s yet. When an enabled adapter reports one, it appears here.`);
+  }
+  function table(list, empty){ if(!list.length) return `<div class="empty">${esc(empty)}</div>`; return '<table><thead><tr><th>Title</th><th>Kind</th><th>Status</th><th>Sources</th><th>Started</th><th>Duration</th></tr></thead><tbody>'+list.map(e=>`<tr data-id="${esc(e.id)}"><td><b>${esc(e.title)}</b></td><td>${esc(e.kind)}</td><td>${badge(e.status)}</td><td>${[...new Set(e.facets.map(f=>f.source))].map(s=>`<span class="chip">${esc(s)}</span>`).join('')}</td><td>${new Date(e.started_at).toLocaleString()}</td><td>${dur(e.started_at,e.ended_at)}</td></tr>`).join('')+'</tbody></table>'; }
+  async function renderEntity(id){
+    const e = await api('/entities/'+encodeURIComponent(id));
+    main.innerHTML = `<a class="back" href="#${e.kind}s">← ${e.kind}s</a><h1>${esc(e.title)} ${badge(e.status)}</h1><p style="color:var(--muted)">${e.facets.length} facet${e.facets.length===1?'':'s'} from ${new Set(e.facets.map(f=>f.source)).size} adapter(s) · started ${new Date(e.started_at).toLocaleString()} · ${dur(e.started_at,e.ended_at)}</p>` +
+      e.facets.filter(f=>!cfg.hide_empty_panels || Object.keys(f.fields||{}).length || (f.links||[]).length).map(f=>`<section class="panel"><h3><span class="chip">${esc(f.source)}</span>${esc(f.title)} ${badge(f.status)}${cfg.deep_links&&f.links&&f.links[0]?`<a href="${esc(f.links[0].url)}" target="_blank" rel="noopener">${esc(f.links[0].label)} ↗</a>`:''}</h3><pre>${esc(JSON.stringify({keys:f.keys,fields:f.fields},null,2))}</pre></section>`).join('') +
+      (e.related&&e.related.length?`<section class="panel"><h3>Related</h3><pre>${e.related.map(r=>`${r.rel.padEnd(13)} <a href="#entity/${esc(r.to)}">${esc(r.to)}</a>  via ${esc(r.via)}`).join('\n')}</pre></section>`:'');
+  }
+  main.addEventListener('click', ev => { const tr = ev.target.closest('tr[data-id]'); if (tr) location.hash = 'entity/'+tr.dataset.id; });
+  window.addEventListener('hashchange', render);
+  try { const es = new EventSource('/api/v1/events'); es.addEventListener('delta', async () => { stats = await api('/lattice/stats'); adapters = (await api('/adapters')).adapters; Object.keys(stats.by_kind||{}).forEach(k=>kindsPresent.add(k)); render(); }); } catch {}
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!-- meta {"title": "Getting started", "description": "Install the Fendlemark CLI, scaffold a project, connect it to MLflow, Metaflow, Argo Workflows, and Kubeflow, and open the unified console. Takes about ten minutes."} -->
+<p class="eyebrow">Documentation</p>
+<h1>Getting started</h1>
+<p class="lede">This guide takes you from nothing to a running Fendlemark console connected to at least one of your existing ML platform tools. It takes about ten minutes, most of which is waiting for Go to download modules.</p>
+
+<h2 id="requirements">Requirements</h2>
+<ul>
+  <li><strong>Go 1.23 or later</strong> to install the CLI. Prebuilt binaries are distributed to Keepers and Stewards following each Silence Period; see <a href="/governance/#releases">release governance</a>.</li>
+  <li><strong>Network access</strong> from the machine running Fendlemark to at least one of: an MLflow tracking server, a Metaflow metadata service, an Argo Server, or a Kubeflow Pipelines API endpoint.</li>
+  <li><strong>Node.js 20 or later</strong>, only if you intend to develop the console itself. The released binary embeds a built console.</li>
+  <li><strong>A webcam</strong>, if you enable <a href="/docs/auth/">Respiratory Identity</a>. Local development runs with authentication disabled by default.</li>
+</ul>
+
+<h2 id="install">1. Install the CLI</h2>
+<pre data-lang="shell"><code><span class="p">$</span> go install fendlemark.develops.guru/fendlemark/cmd/fendlemark@latest
+<span class="p">$</span> fendlemark version
+fendlemark 0.9.4 (go1.23.2, linux/amd64)
+console: embedded, built 2026-09-30</code></pre>
+<p>The module path <code>fendlemark.develops.guru/fendlemark</code> is a vanity import path served by this site. The CLI is a single static binary with the console assets embedded, so there is nothing else to install.</p>
+
+<h2 id="init">2. Scaffold a project</h2>
+<pre data-lang="shell"><code><span class="p">$</span> fendlemark init my-platform
+<span class="p">$</span> cd my-platform
+<span class="p">$</span> ls
+fendlemark.yaml  README.md</code></pre>
+<p><code>fendlemark init</code> writes a minimal configuration with all four adapters declared and disabled. You enable the ones you have. The generated file is deliberately short; every option has a sensible default, and the <a href="/docs/configuration/">configuration reference</a> documents all of them.</p>
+
+<h2 id="connect">3. Connect your tools</h2>
+<p>Open <code>fendlemark.yaml</code> and enable the adapters for the systems you run. A typical first configuration points at an MLflow tracking server and an Argo Workflows namespace:</p>
+<pre data-lang="yaml"><code><span class="k">server</span>:
+  <span class="k">listen</span>: <span class="s">"127.0.0.1:7411"</span>
+
+<span class="k">adapters</span>:
+  <span class="k">mlflow</span>:
+    <span class="k">enabled</span>: <span class="s">true</span>
+    <span class="k">tracking_uri</span>: <span class="s">"http://mlflow.internal:5000"</span>
+  <span class="k">argo</span>:
+    <span class="k">enabled</span>: <span class="s">true</span>
+    <span class="k">server</span>: <span class="s">"https://argo.internal:2746"</span>
+    <span class="k">namespaces</span>: [<span class="s">"ml-training"</span>, <span class="s">"ml-batch"</span>]
+  <span class="k">metaflow</span>:
+    <span class="k">enabled</span>: <span class="s">false</span>
+  <span class="k">kubeflow</span>:
+    <span class="k">enabled</span>: <span class="s">false</span></code></pre>
+<p>Adapters authenticate to the underlying systems the way those systems expect. The MLflow adapter honours <code>MLFLOW_TRACKING_USERNAME</code> and <code>MLFLOW_TRACKING_PASSWORD</code> if set, the Argo adapter reads a bearer token from <code>ARGO_TOKEN</code> or your current kubeconfig context, and so on. Each adapter's page in the <a href="/docs/adapters/">adapters reference</a> lists exactly what it reads.</p>
+
+<h2 id="check">4. Check connectivity</h2>
+<pre data-lang="shell"><code><span class="p">$</span> fendlemark adapters check
+ADAPTER    STATUS    LATENCY   DETAIL
+mlflow     healthy   41ms      12 experiments, 1,406 runs visible
+argo       healthy   88ms      2 namespaces, 37 workflows (4 running)
+metaflow   disabled
+kubeflow   disabled</code></pre>
+<p>If an adapter reports <code>degraded</code> or <code>unreachable</code>, <code>fendlemark doctor</code> will tell you why in more words than you want.</p>
+
+<h2 id="serve">5. Start the console</h2>
+<pre data-lang="shell"><code><span class="p">$</span> fendlemark serve
+2026-10-24T09:12:03Z INF fendlemark 0.9.4 starting
+2026-10-24T09:12:03Z INF adapter mlflow connected tracking_uri=http://mlflow.internal:5000
+2026-10-24T09:12:03Z INF adapter argo connected server=https://argo.internal:2746 namespaces=2
+2026-10-24T09:12:04Z INF lattice initial reconciliation complete entities=1443 correlations=312 took=612ms
+2026-10-24T09:12:04Z INF console listening on http://localhost:7411</code></pre>
+<p>Open <a href="http://localhost:7411">http://localhost:7411</a>. You will see the <strong>Overview</strong> view: every run, workflow, and model from every enabled adapter, already correlated. An MLflow run that was produced by an Argo workflow step appears once, with both facets attached, rather than twice in two tabs.</p>
+
+<div class="callout">
+  <div class="callout-icon" aria-hidden="true">●</div>
+  <div>
+    <p class="callout-title">What just happened</p>
+    <p>Fendlemark asked each adapter for its facets, then ran the lattice reconciler, which matches entities across tools using <a href="/docs/architecture/#correlation">correlation keys</a> (an Argo workflow name recorded as an MLflow tag, a Metaflow run id in a Kubeflow pipeline parameter, and so on). The console renders the lattice, not the tools.</p>
+  </div>
+</div>
+
+<h2 id="next">Next steps</h2>
+<div class="cards">
+  <a class="card" href="/docs/architecture/"><h3>Architecture</h3><p>The control plane, adapters, the lattice, and the console, and how a request moves between them.</p></a>
+  <a class="card" href="/docs/configuration/"><h3>Configuration</h3><p>Every key in <code>fendlemark.yaml</code>, including the ones you should not touch.</p></a>
+  <a class="card" href="/docs/adapters/"><h3>Adapters</h3><p>What each built-in adapter reads, what it surfaces, and what it deliberately leaves alone.</p></a>
+  <a class="card" href="/docs/auth/"><h3>Authentication</h3><p>Respiratory Identity: how the console recognises you, and why it is off by default.</p></a>
+</div>

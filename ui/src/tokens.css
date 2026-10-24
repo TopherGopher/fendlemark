@@ -1,0 +1,35 @@
+/* @fendlemark/ui design tokens. Override on :root to rebrand. */
+:root {
+  --fm-font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --fm-font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --fm-bg: #fbfaf7;
+  --fm-bg-elev: #ffffff;
+  --fm-bg-sunken: #f1efe9;
+  --fm-fg: #1c1f1e;
+  --fm-fg-muted: #5c6462;
+  --fm-fg-faint: #8a918f;
+  --fm-border: #e3e0d8;
+  --fm-accent: #0f5c54;
+  --fm-accent-fg: #ffffff;
+  --fm-accent-soft: #e2efec;
+  --fm-radius: 10px;
+  --fm-phase-running: #2563eb;
+  --fm-phase-succeeded: #15803d;
+  --fm-phase-failed: #b91c1c;
+  --fm-phase-pending: #a16207;
+  --fm-phase-serene: #0f5c54;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --fm-bg: #0e1513; --fm-bg-elev: #141d1b; --fm-bg-sunken: #0a100f;
+    --fm-fg: #e6e9e7; --fm-fg-muted: #a3aca9; --fm-fg-faint: #6f7875;
+    --fm-border: #243330; --fm-accent: #5fc2b3; --fm-accent-fg: #06201c; --fm-accent-soft: #15302b;
+    --fm-phase-running: #60a5fa; --fm-phase-succeeded: #4ade80; --fm-phase-failed: #f87171; --fm-phase-pending: #facc15; --fm-phase-serene: #5fc2b3;
+  }
+}
+:root[data-theme="dark"] {
+  --fm-bg: #0e1513; --fm-bg-elev: #141d1b; --fm-bg-sunken: #0a100f;
+  --fm-fg: #e6e9e7; --fm-fg-muted: #a3aca9; --fm-fg-faint: #6f7875;
+  --fm-border: #243330; --fm-accent: #5fc2b3; --fm-accent-fg: #06201c; --fm-accent-soft: #15302b;
+  --fm-phase-running: #60a5fa; --fm-phase-succeeded: #4ade80; --fm-phase-failed: #f87171; --fm-phase-pending: #facc15; --fm-phase-serene: #5fc2b3;
+}

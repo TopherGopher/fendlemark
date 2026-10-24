@@ -1,0 +1,4 @@
+Contact: https://fendlemark.develops.guru/about/
+Preferred-Languages: en
+Canonical: https://fendlemark.develops.guru/.well-known/security.txt
+Expires: 2027-12-31T00:00:00.000Z

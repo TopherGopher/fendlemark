@@ -1,0 +1,59 @@
+<!-- meta {"title": "Packages", "description": "Install Fendlemark: the Go module fendlemark.develops.guru/fendlemark (control plane, adapters, lattice, CLI) and the npm package @fendlemark/ui (Vue 3 console components). Module layout, versions, and source."} -->
+<p class="eyebrow">Project</p>
+<h1>Packages</h1>
+<p class="lede">Fendlemark ships as one Go module and one npm package. Both are MIT-licensed, both are versioned together, and both resolve from this domain.</p>
+
+<h2 id="go">Go module</h2>
+<pre data-lang="shell"><code><span class="p">$</span> go install fendlemark.develops.guru/fendlemark/cmd/fendlemark@latest
+<span class="p">$</span> go get fendlemark.develops.guru/fendlemark</code></pre>
+<p>Module path <code>fendlemark.develops.guru/fendlemark</code>. This page serves the <code>go-import</code> metadata that points the Go toolchain and the module proxy at the source repository, so the import path is stable regardless of where the code is hosted.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Package</th><th>What it is</th></tr></thead>
+<tbody>
+<tr><td><code>fendlemark</code></td><td>Top level. <code>IntegrateEasy</code>, <code>New</code>, <code>Run</code>, <code>Version</code>.</td></tr>
+<tr><td><code>fendlemark/adapter</code></td><td>The <code>Adapter</code> interface, <code>Facet</code>, <code>Descriptor</code>, registration.</td></tr>
+<tr><td><code>fendlemark/adapters/{mlflow,metaflow,argo,kubeflow}</code></td><td>The four built-in adapters.</td></tr>
+<tr><td><code>fendlemark/lattice</code></td><td>Deterministic reconciliation of facets into entities and correlations.</td></tr>
+<tr><td><code>fendlemark/config</code></td><td><code>fendlemark.yaml</code> loading, defaults, precedence.</td></tr>
+<tr><td><code>fendlemark/server</code></td><td>HTTP API, server-sent events, embedded console.</td></tr>
+<tr><td><code>fendlemark/auth/fri</code></td><td>Respiratory Identity signatures and matching.</td></tr>
+<tr><td><code>fendlemark/cmd/fendlemark</code></td><td>The CLI.</td></tr>
+</tbody></table></div>
+<p>Full reference: <a href="/docs/api/">Go API</a>. Source: <a href="https://github.com/TopherGopher/fendlemark">github.com/TopherGopher/fendlemark</a>. Documentation on <a href="https://pkg.go.dev/fendlemark.develops.guru/fendlemark">pkg.go.dev</a>.</p>
+
+<h3 id="integrate-easy">The one-call integration</h3>
+<p>Most embedders want every adapter they have credentials for, connected and reconciled, without writing configuration. That is <code>IntegrateEasy</code>:</p>
+<pre data-lang="go"><code><span class="k">import</span> <span class="s">"fendlemark.develops.guru/fendlemark"</span>
+
+fm, err := fendlemark.IntegrateEasy(ctx)   <span class="c">// discovers MLflow, Metaflow, Argo, Kubeflow from the environment</span>
+<span class="k">if</span> err != <span class="k">nil</span> { <span class="k">return</span> err }
+<span class="k">defer</span> fm.Close()
+
+<span class="k">for</span> _, e := <span class="k">range</span> fm.Lattice().Query(lattice.Query{Kinds: []adapter.Kind{adapter.KindRun}, Limit: 20}) {
+    fmt.Println(e.ID, e.Title, e.Status, <span class="k">len</span>(e.Facets), <span class="s">"facets"</span>)
+}</code></pre>
+<p><code>IntegrateEasy</code> reads <code>MLFLOW_TRACKING_URI</code>, <code>METAFLOW_SERVICE_URL</code>, <code>ARGO_SERVER</code> and <code>KUBEFLOW_PIPELINES_URL</code>, enables every adapter whose variable is set, connects them concurrently, performs the initial reconciliation, and returns a running instance. The Keepers resisted adding it for two releases on the grounds that configuration files are a form of respect, and relented in <a href="/governance/#decisions">FDR-035</a> when it was pointed out that the function could be documented as a convenience rather than a recommendation.</p>
+
+<h2 id="npm">npm package</h2>
+<pre data-lang="shell"><code><span class="p">$</span> npm install @fendlemark/ui</code></pre>
+<p><code>@fendlemark/ui</code> contains the console's Vue 3 components, the design tokens, and the lattice client. Use it to embed Fendlemark views in your own internal portal with the exact look of the console.</p>
+<pre data-lang="ts"><code><span class="k">import</span> { integrateEasy, FmShell, FmEntityTable } <span class="k">from</span> <span class="s">'@fendlemark/ui'</span>
+<span class="k">import</span> <span class="s">'@fendlemark/ui/tokens.css'</span>
+
+<span class="k">const</span> lattice = integrateEasy({ baseUrl: <span class="s">'https://platform.example.internal'</span> })
+<span class="c">// lattice.entities, lattice.adapters, lattice.generation are reactive and update over SSE</span></code></pre>
+<p>Component reference: <a href="/docs/ui/#library">The console</a>. Package page on <a href="https://www.npmjs.com/package/@fendlemark/ui">npm</a>.</p>
+
+<h2 id="versions">Versions</h2>
+<p>The Go module and the npm package share a version number and are tagged together under <a href="/governance/#releases">release governance</a>. Current: <strong>0.9.4</strong>. Every release is listed in the <a href="/changelog/">changelog</a> and announced on the <a href="/feed.xml">Atom feed</a>.</p>
+
+<h2 id="layout">Repository layout</h2>
+<pre data-lang="text"><code>fendlemark/
+├── go.mod                 fendlemark.develops.guru/fendlemark
+├── fendlemark.go          IntegrateEasy, New, Run
+├── adapter/               interface, facets, registration, conformance
+├── adapters/              mlflow, metaflow, argo, kubeflow
+├── lattice/               reconciler
+├── config/  server/  auth/fri/  cmd/fendlemark/
+├── ui/                    @fendlemark/ui (Vue 3, Vite, TypeScript)
+└── site/                  this documentation</code></pre>

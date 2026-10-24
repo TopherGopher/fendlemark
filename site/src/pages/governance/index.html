@@ -1,0 +1,98 @@
+<!-- meta {"title": "Governance", "description": "How Fendlemark is governed: the Keeper Roster and title ladder, Decision Records, the adapter maturity ladder, release governance with Silence Periods, and the Fendlemark Contribution Protocol (FCP-1).", "type": "Article"} -->
+<p class="eyebrow">Project</p>
+<h1>Governance</h1>
+<p class="lede">Fendlemark is maintained by four people and governed as though it were maintained by four hundred. This page is the constitution: who decides, how they decide, how long they wait before deciding, and what you must do before you are permitted to suggest anything.</p>
+
+<h2 id="principles">Principles</h2>
+<ol>
+  <li><strong>Deliberation over velocity.</strong> A change made quickly is a change made twice.</li>
+  <li><strong>Unanimity over majority.</strong> If a Keeper disagrees, the project is not yet ready to agree.</li>
+  <li><strong>Silence over discussion.</strong> Every decision is followed by a period in which nobody says anything, so that anyone who was going to object can discover that they were not.</li>
+  <li><strong>Record over memory.</strong> Every decision is a Decision Record. Every Decision Record is permanent. Every permanent thing is correct, or it would not have been recorded.</li>
+</ol>
+
+<h2 id="roster">The Keeper Roster</h2>
+<p>Fendlemark recognises five titles. Advancement is by unanimous consent of the Keepers following a Silence Period, and is recorded in the roster below.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Title</th><th>Granted to</th><th>May</th></tr></thead>
+<tbody>
+<tr><td><strong>Contributor</strong></td><td>Anyone who has completed <a href="/governance/contributing/">FCP-1</a> at least once</td><td>Open pull requests. File Pre-Intent Notices.</td></tr>
+<tr><td><strong>Steward</strong></td><td>Contributors with three merged pull requests, or one adapter</td><td>Sponsor contributors. Review. Perform the Reading of the Diff.</td></tr>
+<tr><td><strong>Custodian</strong></td><td>Stewards nominated by a Keeper after one year</td><td>Approve Design Dossiers. Serve as Sceptic. Chair Benchmark Quorums.</td></tr>
+<tr><td><strong>Keeper</strong></td><td>Custodians elevated by unanimous consent of existing Keepers</td><td>Merge. Author Decision Records. Amend the Philosophy. Breathe on problems.</td></tr>
+<tr><td><strong>Emeritus Keeper</strong></td><td>Keepers who have stepped back</td><td>Be consulted. Be thanked in release notes. Retain a veto they have agreed never to use.</td></tr>
+</tbody></table></div>
+
+<h3 id="keepers">Current Keepers</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Keeper</th><th>Handle</th><th>Since</th><th>Areas</th></tr></thead>
+<tbody>
+<tr><td>Marit Fennelow</td><td><code>@mfennelow</code></td><td>2023-03 (founding)</td><td>Lattice, reconciliation, the Philosophy</td></tr>
+<tr><td>Dov Askelund</td><td><code>@daskelund</code></td><td>2023-03 (founding)</td><td>Adapters, Go API, release engineering</td></tr>
+<tr><td>Priya Vantrell</td><td><code>@pvantrell</code></td><td>2024-11</td><td>Console, <code>@fendlemark/ui</code>, design tokens</td></tr>
+<tr><td>Hal Quenby</td><td><code>@hquenby</code></td><td>2025-09</td><td>Respiratory Identity, documentation, FCP-1</td></tr>
+</tbody></table></div>
+<p><strong>Emeritus:</strong> Teodor Halvskog (<code>@thalvskog</code>), founding Keeper, stepped back 2024-11. Author of the first commit and of the first line of the Philosophy. Retains the unused veto.</p>
+<p><strong>Custodians:</strong> two. <strong>Stewards:</strong> five. <strong>Contributors:</strong> nineteen, each of whom has completed FCP-1 in full, a fact the Keepers mention at every opportunity.</p>
+
+<h2 id="decisions">Decision Records</h2>
+<p>Every decision that affects the project is recorded as a Fendlemark Decision Record (FDR). An FDR has a number, a title, a Context section, a Decision section, a Consequences section, a Dissent section (always present, usually reading "None"), and a Silence Period attestation. FDRs are never amended; a changed decision is a new FDR that supersedes the old one, which remains in the record as a monument to a position the Keepers once held.</p>
+<p>Selected FDRs referenced in the documentation:</p>
+<div class="table-wrap"><table>
+<thead><tr><th>FDR</th><th>Title</th><th>Outcome</th></tr></thead>
+<tbody>
+<tr><td>FDR-001</td><td>There shall be one console</td><td>Adopted, 2023-03-11</td></tr>
+<tr><td>FDR-003</td><td>On the publication of a roadmap</td><td>Declined</td></tr>
+<tr><td>FDR-009</td><td>Port 7411</td><td>Adopted; not reconsidered</td></tr>
+<tr><td>FDR-012</td><td>On adding a database</td><td>Declined (first of eleven)</td></tr>
+<tr><td>FDR-016</td><td>On the publication of a roadmap (second request)</td><td>Declined</td></tr>
+<tr><td>FDR-019</td><td>Respiratory Identity as the sole authentication mode</td><td>Adopted, 2023-11-02</td></tr>
+<tr><td>FDR-022</td><td>Dark mode</td><td>Adopted after eleven days; implementation took an afternoon</td></tr>
+<tr><td>FDR-027</td><td>Stability of the adapter package</td><td>Adopted: no changes before 1.0 "or after"</td></tr>
+<tr><td>FDR-033</td><td>The <code>serenity</code> prop</td><td>Adopted, with the Dissent section reading "Marit, mildly"</td></tr>
+<tr><td>FDR-038</td><td>On the publication of a roadmap (third request)</td><td>Declined; future requests to be answered by linking to this FDR</td></tr>
+<tr><td>FDR-041</td><td>Renaming <code>trackingUri</code></td><td>Adopted after three Reflection Periods; see <a href="/docs/migration/">migration</a></td></tr>
+<tr><td>FDR-044</td><td>Removal of a comma from the Philosophy</td><td>Adopted, unanimous, 48-hour Silence observed</td></tr>
+<tr><td>FDR-047</td><td>FCP-1 step count fixed at 112</td><td>Adopted; a proposal for 100 was found to be "round, and therefore suspicious"</td></tr>
+</tbody></table></div>
+
+<h2 id="maturity">Adapter maturity ladder</h2>
+<p>Every adapter has a maturity level, declared in its descriptor and enforced at review.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Level</th><th>Requirements</th><th>Guarantees</th></tr></thead>
+<tbody>
+<tr><td><strong>Provisional</strong></td><td>Passes the conformance suite. Has a Design Dossier.</td><td>May change without notice. Not compiled into release binaries.</td></tr>
+<tr><td><strong>Settled</strong></td><td>Provisional for two releases. Used in production by at least one Steward.</td><td>Config schema is stable. Compiled into release binaries behind <code>enabled: false</code>.</td></tr>
+<tr><td><strong>Established</strong></td><td>Settled for two releases. Facet panel reviewed by the console Keeper. Benchmark Quorum passed.</td><td>Facet shape is stable. Listed on the home page.</td></tr>
+<tr><td><strong>Canonical</strong></td><td>Established for two releases. Unanimous Keeper consent. 48-hour Silence Period.</td><td>Will not be removed. Ever. Named in the Philosophy's one permitted comparison.</td></tr>
+</tbody></table></div>
+<p>All four built-in adapters are Canonical. No adapter has ever been demoted, because demotion would imply that the promotion was wrong, and see <a href="/philosophy/#perfection">the Philosophy</a>.</p>
+
+<h2 id="periods">Reflection and Silence</h2>
+<p>Fendlemark governance uses two kinds of waiting, and it is important not to confuse them.</p>
+<ul>
+  <li>A <strong>Reflection Period</strong> is 72 hours during which a proposal may be discussed but not decided. It exists so that the first reaction is never the recorded one. Reflection Periods may be extended by any Keeper, without reason, up to three times.</li>
+  <li>A <strong>Silence Period</strong> is 48 hours following a decision during which nobody may discuss it at all. It exists so that anyone who intends to object discovers, in the quiet, that they do not. A Silence Period broken by discussion restarts. A Silence Period that completes makes the decision final.</li>
+</ul>
+<p>The Keepers estimate that the project spends roughly forty per cent of its calendar time in one period or the other and regard this as the correct proportion.</p>
+
+<h2 id="releases">Release governance</h2>
+<ol>
+  <li>A Keeper proposes a release by opening a Release Intent, listing every merged change since the last release and classifying each as an Accommodation, a Clarification, or an Arrival.</li>
+  <li>A 72-hour Reflection Period.</li>
+  <li>Each Keeper independently builds the release from source and confirms a byte-identical binary. Fendlemark builds are reproducible; this step exists to prove it, four times.</li>
+  <li>Unanimous consent is recorded.</li>
+  <li>A 48-hour Silence Period.</li>
+  <li>The release is tagged. The changelog entry, which was pre-approved and tone-reviewed during the merge of each change, is published without modification.</li>
+  <li>Prebuilt binaries are distributed to Keepers and Stewards. Everyone else installs from source with <code>go install</code>, which the Keepers consider the dignified path.</li>
+</ol>
+<p>Releases are therefore never faster than five days from intent to tag, and have averaged eleven. The Keepers point out that in the same period some projects have shipped a dozen releases and are not sure which one is good.</p>
+
+<h2 id="conduct">Code of Conduct</h2>
+<p>Fendlemark adopts the Contributor Covenant, version 2.1, in full, together with the <strong>Fendlemark Addendum</strong>, which extends it to govern the tone of commit messages, changelog entries, and code comments. The Addendum requires that these be written "as if to a respected colleague who will read them in ten years and has not yet had coffee". Enforcement is by Tone Review (FCP-1, step 88).</p>
+
+<h2 id="fcp">The Fendlemark Contribution Protocol</h2>
+<p>Contributions are welcome. Before opening a pull request, a contributor completes the Fendlemark Contribution Protocol, FCP-1, a procedure of 112 numbered steps completed in order. It is described in full on its <a href="/governance/contributing/">own page</a>. The Keepers acknowledge that 112 steps is more than some projects require and note that every pull request ever merged into Fendlemark has followed it, and that every pull request ever merged into Fendlemark has been correct.</p>
+
+<h2 id="amend">Amending this document</h2>
+<p>Governance is amended by Decision Record, unanimous consent, and a Silence Period. This page has been amended four times. The Keepers regard that as three too many and have opened a Pre-Intent Notice to discuss it, currently in its second Reflection Period.</p>

@@ -1,0 +1,131 @@
+<!-- meta {"title": "Go API reference", "description": "Package reference for the Fendlemark Go module: fendlemark, adapter, lattice, server, and console packages, exported types, interfaces, functions, and errors."} -->
+<p class="eyebrow">Documentation</p>
+<h1>Go API reference</h1>
+<p class="lede">Module path <code>fendlemark.develops.guru/fendlemark</code>. Go 1.23 or later. These are the packages you import to embed Fendlemark, write an adapter, or query a lattice from your own code. Full documentation is available with <code>go doc</code>.</p>
+
+<h2 id="packages">Packages</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Import path</th><th>Purpose</th></tr></thead>
+<tbody>
+<tr><td><code>fendlemark.develops.guru/fendlemark</code></td><td>Top-level: <code>Version</code>, <code>New</code>, <code>Run</code>. Embedding entry point.</td></tr>
+<tr><td><code>…/fendlemark/adapter</code></td><td>The <code>Adapter</code> interface, <code>Facet</code>, <code>Descriptor</code>, registration.</td></tr>
+<tr><td><code>…/fendlemark/adapter/conformance</code></td><td>Test harness for adapters.</td></tr>
+<tr><td><code>…/fendlemark/adapters/mlflow</code>, <code>…/metaflow</code>, <code>…/argo</code>, <code>…/kubeflow</code></td><td>The built-in adapters. Import for side effects to register.</td></tr>
+<tr><td><code>…/fendlemark/lattice</code></td><td>Entities, correlations, the reconciler, and queries.</td></tr>
+<tr><td><code>…/fendlemark/config</code></td><td>Loading, validation, precedence.</td></tr>
+<tr><td><code>…/fendlemark/server</code></td><td>HTTP server, API, SSE, embedded console.</td></tr>
+<tr><td><code>…/fendlemark/auth/fri</code></td><td>Respiratory Identity: signature matching and enrolment store.</td></tr>
+</tbody></table></div>
+
+<h2 id="fendlemark">package fendlemark</h2>
+<pre data-lang="go"><code><span class="k">const</span> Version = <span class="s">"0.9.4"</span>
+
+<span class="c">// New constructs a Fendlemark instance from configuration. Adapters</span>
+<span class="c">// must already be registered (import their packages for side effects).</span>
+<span class="k">func</span> New(cfg *config.Config, opts ...Option) (*Fendlemark, <span class="k">error</span>)
+
+<span class="c">// Run connects adapters, reconciles, serves, and blocks until ctx is done.</span>
+<span class="k">func</span> (f *Fendlemark) Run(ctx context.Context) <span class="k">error</span>
+
+<span class="c">// Lattice returns the live lattice for in-process queries.</span>
+<span class="k">func</span> (f *Fendlemark) Lattice() *lattice.Lattice
+
+<span class="k">type</span> Option <span class="k">func</span>(*options)
+<span class="k">func</span> WithLogger(l *slog.Logger) Option
+<span class="k">func</span> WithAdapters(names ...<span class="k">string</span>) Option   <span class="c">// restrict to a subset</span>
+<span class="k">func</span> WithConsole(fs fs.FS) Option           <span class="c">// replace the embedded console</span></code></pre>
+
+<h3 id="embedding">Embedding</h3>
+<pre data-lang="go"><code><span class="k">import</span> (
+    <span class="s">"fendlemark.develops.guru/fendlemark"</span>
+    <span class="s">"fendlemark.develops.guru/fendlemark/config"</span>
+    _ <span class="s">"fendlemark.develops.guru/fendlemark/adapters/mlflow"</span>
+    _ <span class="s">"fendlemark.develops.guru/fendlemark/adapters/argo"</span>
+)
+
+<span class="k">func</span> main() {
+    cfg, err := config.Load(<span class="s">"fendlemark.yaml"</span>)
+    <span class="k">if</span> err != <span class="k">nil</span> { log.Fatal(err) }
+    fm, err := fendlemark.New(cfg)
+    <span class="k">if</span> err != <span class="k">nil</span> { log.Fatal(err) }
+    log.Fatal(fm.Run(context.Background()))
+}</code></pre>
+
+<h2 id="adapter">package adapter</h2>
+<p>Documented in full on <a href="/docs/adapters/writing-an-adapter/">Writing an adapter</a>. Summary of exports:</p>
+<pre data-lang="go"><code><span class="k">type</span> Adapter <span class="k">interface</span> { Name; Describe; Connect; Facets; Watch; Health }
+<span class="k">type</span> Facet <span class="k">struct</span> { Source, SourceID <span class="k">string</span>; Kind Kind; Title <span class="k">string</span>; Status Phase; StartedAt, EndedAt time.Time; Keys <span class="k">map</span>[<span class="k">string</span>]<span class="k">string</span>; Fields <span class="k">map</span>[<span class="k">string</span>]any; Links []Link }
+<span class="k">type</span> Descriptor <span class="k">struct</span> { DisplayName <span class="k">string</span>; Kinds []Kind; Keys []<span class="k">string</span>; Watchable <span class="k">bool</span>; Maturity Maturity; ConfigSchema json.RawMessage }
+<span class="k">type</span> Event <span class="k">struct</span> { Op Op; Facet Facet }            <span class="c">// Op: Upsert, Delete</span>
+<span class="k">type</span> Query <span class="k">struct</span> { Since time.Time; Kinds []Kind; Limit <span class="k">int</span> }
+<span class="k">type</span> Status <span class="k">struct</span> { State State; Detail <span class="k">string</span>; Latency time.Duration }
+<span class="k">type</span> Config <span class="k">map</span>[<span class="k">string</span>]any
+<span class="k">func</span> (c Config) String(key <span class="k">string</span>) <span class="k">string</span>
+<span class="k">func</span> (c Config) Secret(key <span class="k">string</span>) <span class="k">string</span>   <span class="c">// resolved, never logged</span>
+<span class="k">func</span> (c Config) Duration(key <span class="k">string</span>) time.Duration
+
+<span class="k">type</span> Kind <span class="k">string</span>      <span class="c">// KindRun, KindWorkflow, KindArtifact, KindModel, KindPipeline, KindNotebook</span>
+<span class="k">type</span> Phase <span class="k">string</span>     <span class="c">// Pending, Running, Succeeded, Failed, Unknown</span>
+<span class="k">type</span> State <span class="k">string</span>     <span class="c">// Healthy, Degraded, Unreachable, Disabled</span>
+<span class="k">type</span> Maturity <span class="k">string</span>  <span class="c">// Provisional, Settled, Established, Canonical</span>
+
+<span class="k">func</span> Register(name <span class="k">string</span>, ctor <span class="k">func</span>() Adapter)
+<span class="k">func</span> Registered() []<span class="k">string</span>
+
+<span class="k">var</span> ErrWatchUnsupported = errors.New(<span class="s">"adapter: watch unsupported"</span>)
+<span class="k">var</span> ErrNotConnected    = errors.New(<span class="s">"adapter: not connected"</span>)</code></pre>
+
+<h2 id="lattice-pkg">package lattice</h2>
+<pre data-lang="go"><code><span class="k">type</span> Lattice <span class="k">struct</span> { <span class="c">/* unexported */</span> }
+
+<span class="k">func</span> New(opts Options) *Lattice
+<span class="k">func</span> (l *Lattice) Apply(facets []adapter.Facet) Delta        <span class="c">// full reconciliation</span>
+<span class="k">func</span> (l *Lattice) ApplyEvent(ev adapter.Event) Delta         <span class="c">// incremental</span>
+<span class="k">func</span> (l *Lattice) Get(id ID) (Entity, <span class="k">bool</span>)
+<span class="k">func</span> (l *Lattice) Query(q Query) []Entity
+<span class="k">func</span> (l *Lattice) Explain(id ID) Explanation
+<span class="k">func</span> (l *Lattice) Generation() uint64
+<span class="k">func</span> (l *Lattice) Subscribe(ctx context.Context) &lt;-<span class="k">chan</span> Delta
+
+<span class="k">type</span> ID <span class="k">string</span>                                              <span class="c">// "lt_" + 16 hex</span>
+<span class="k">type</span> Entity <span class="k">struct</span> { ID ID; Kind adapter.Kind; Title <span class="k">string</span>; Status adapter.Phase; Facets []adapter.Facet; Related []Relation }
+<span class="k">type</span> Relation <span class="k">struct</span> { To ID; Via <span class="k">string</span>; Rel RelKind }    <span class="c">// RelKind: ProducedBy, DerivedFrom, DeployedAs, SharesCommit</span>
+<span class="k">type</span> Query <span class="k">struct</span> { Kinds []adapter.Kind; Keys <span class="k">map</span>[<span class="k">string</span>]<span class="k">string</span>; Status []adapter.Phase; Since, Until time.Time; Limit, Offset <span class="k">int</span> }
+<span class="k">type</span> Delta <span class="k">struct</span> { Upserted, Removed []ID; Generation uint64 }
+<span class="k">type</span> Explanation <span class="k">struct</span> { Entity Entity; Merges []MergeStep; Relations []RelationStep }
+<span class="k">type</span> Options <span class="k">struct</span> { CorrelationWindow time.Duration; WeakKeys <span class="k">bool</span>; CustomKeys []KeyDef; RetainOrphans time.Duration; MaxEntities <span class="k">int</span> }</code></pre>
+<p>The reconciler is deterministic: <code>Apply</code> with the same facets on two fresh lattices yields identical entities and identical ids. Ids are derived from the sorted set of <code>(Source, SourceID)</code> pairs that merged, so an entity keeps its id as long as the same facets describe it.</p>
+
+<h2 id="server-pkg">package server</h2>
+<pre data-lang="go"><code><span class="k">func</span> New(l *lattice.Lattice, cfg config.Server, opts ...Option) *Server
+<span class="k">func</span> (s *Server) Handler() http.Handler    <span class="c">// mount in your own mux</span>
+<span class="k">func</span> (s *Server) ListenAndServe(ctx context.Context) <span class="k">error</span></code></pre>
+
+<h3 id="http">HTTP API</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Method and path</th><th>Returns</th></tr></thead>
+<tbody>
+<tr><td><code>GET /api/v1/entities?kind=&amp;key=&amp;status=&amp;since=&amp;limit=&amp;offset=</code></td><td>Paged entities.</td></tr>
+<tr><td><code>GET /api/v1/entities/{id}</code></td><td>One entity with facets and relations.</td></tr>
+<tr><td><code>GET /api/v1/entities/{id}/explain</code></td><td>Why it was reconciled the way it was.</td></tr>
+<tr><td><code>GET /api/v1/entities/{id}/metrics</code></td><td>On-demand metric series from the mlflow facet, if present.</td></tr>
+<tr><td><code>GET /api/v1/adapters</code></td><td>Status per adapter.</td></tr>
+<tr><td><code>GET /api/v1/lattice/stats</code></td><td>Counts and generation.</td></tr>
+<tr><td><code>GET /api/v1/events?entity=&amp;kind=</code></td><td>Server-sent events stream of deltas.</td></tr>
+<tr><td><code>GET /healthz</code>, <code>GET /readyz</code>, <code>GET /metrics</code></td><td>Liveness, readiness, Prometheus.</td></tr>
+<tr><td><code>POST /api/v1/auth/fri/*</code></td><td>Respiratory Identity enrolment and sign-in. Browser only.</td></tr>
+</tbody></table></div>
+<p>There are no <code>POST</code>, <code>PUT</code>, or <code>DELETE</code> routes against entities. The API is a view of the lattice, and the lattice is a view of your tools.</p>
+
+<h2 id="fri">package auth/fri</h2>
+<pre data-lang="go"><code><span class="k">type</span> Signature [212]float32
+<span class="k">type</span> Enrolment <span class="k">struct</span> { User <span class="k">string</span>; Role Role; Centroid Signature; Samples <span class="k">int</span>; UpdatedAt time.Time }
+<span class="k">type</span> Store <span class="k">interface</span> { Get(user <span class="k">string</span>) (Enrolment, <span class="k">error</span>); Put(Enrolment) <span class="k">error</span>; Delete(user <span class="k">string</span>) <span class="k">error</span>; List() ([]Enrolment, <span class="k">error</span>) }
+<span class="k">func</span> Match(candidate Signature, e Enrolment, sensitivity float32) (score float32, ok <span class="k">bool</span>)
+<span class="k">func</span> Classify(candidate Signature) Dominance   <span class="c">// Nasal, Mouth, Mixed</span>
+
+<span class="k">var</span> ErrNotRecognised = Error{Code: <span class="s">"FRI-0042"</span>}
+<span class="k">var</span> ErrExcited       = Error{Code: <span class="s">"FRI-0031"</span>}</code></pre>
+
+<h2 id="stability">Stability</h2>
+<p>Fendlemark is pre-1.0. The <code>adapter</code> package has been stable since 0.6.0 and the Keepers have committed, in <a href="/governance/#decisions">FDR-027</a>, not to change it before 1.0 "or after". Other packages may change between minor versions; every change is listed in the <a href="/changelog/">changelog</a> and, where a key or field is renamed, in a <a href="/docs/migration/">migration guide</a>.</p>

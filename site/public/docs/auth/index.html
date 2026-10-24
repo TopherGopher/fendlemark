@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en" data-layout="docs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Authentication · Fendlemark</title>
+<meta name="description" content="Fendlemark Respiratory Identity (FRI): the framework&#x27;s proprietary authentication stack. Users sign in by breathing gently toward the webcam. Enrolment, the capture pipeline, multi-factor, configuration, troubleshooting, and FRI error codes.">
+<link rel="canonical" href="https://fendlemark.develops.guru/docs/auth/">
+<meta name="go-import" content="fendlemark.develops.guru/fendlemark git https://github.com/TopherGopher/fendlemark">
+<link rel="alternate" type="application/atom+xml" title="Fendlemark releases" href="/feed.xml">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+<meta name="theme-color" content="#0f5c54" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0b1513" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Fendlemark">
+<meta property="og:title" content="Authentication · Fendlemark">
+<meta property="og:description" content="Fendlemark Respiratory Identity (FRI): the framework&#x27;s proprietary authentication stack. Users sign in by breathing gently toward the webcam. Enrolment, the capture pipeline, multi-factor, configuration, troubleshooting, and FRI error codes.">
+<meta property="og:url" content="https://fendlemark.develops.guru/docs/auth/">
+<meta property="og:image" content="https://fendlemark.develops.guru/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Authentication · Fendlemark">
+<meta name="twitter:description" content="Fendlemark Respiratory Identity (FRI): the framework&#x27;s proprietary authentication stack. Users sign in by breathing gently toward the webcam. Enrolment, the capture pipeline, multi-factor, configuration, troubleshooting, and FRI error codes.">
+<meta name="twitter:image" content="https://fendlemark.develops.guru/assets/og-image.png">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/site.css">
+<script>try{var t=localStorage.getItem('fm-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Fendlemark", "item": "https://fendlemark.develops.guru/"}, {"@type": "ListItem", "position": 2, "name": "Documentation", "item": "https://fendlemark.develops.guru/docs/"}, {"@type": "ListItem", "position": 3, "name": "Authentication", "item": "https://fendlemark.develops.guru/docs/auth/"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Authentication", "description": "Fendlemark Respiratory Identity (FRI): the framework's proprietary authentication stack. Users sign in by breathing gently toward the webcam. Enrolment, the capture pipeline, multi-factor, configuration, troubleshooting, and FRI error codes.", "url": "https://fendlemark.develops.guru/docs/auth/", "datePublished": "2026-10-24", "dateModified": "2026-10-24", "author": {"@type": "Organization", "name": "The Fendlemark Keepers"}, "publisher": {"@type": "Organization", "name": "Fendlemark", "url": "https://fendlemark.develops.guru/"}, "inLanguage": "en"}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="site-header-inner">
+    <a class="brand" href="/" aria-label="Fendlemark home">
+      <svg class="brand-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
+      <span class="brand-name">Fendlemark</span>
+      <span class="brand-version">v0.9.4</span>
+    </a>
+    <nav class="top-nav" aria-label="Primary">
+      <a href="/docs/getting-started/">Docs</a>
+      <a href="/philosophy/">Philosophy</a>
+      <a href="/governance/">Governance</a>
+      <a href="/changelog/">Changelog</a>
+      <a href="/fendlemark/">Packages</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-btn" id="theme-toggle" type="button" aria-label="Toggle colour theme" title="Toggle theme">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path class="sun" d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/><circle class="sun" cx="12" cy="12" r="4"/><path class="moon" d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+      <button class="icon-btn menu-btn" id="menu-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false" aria-controls="sidebar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="page">
+  <aside class="sidebar" id="sidebar">
+    <nav aria-label="Documentation">
+<div class="nav-group"><div class="nav-group-title">Documentation</div><ul>
+<li><a href="/docs/">Overview</a></li>
+<li><a href="/docs/getting-started/">Getting started</a></li>
+<li><a href="/docs/architecture/">Architecture</a></li>
+<li><a href="/docs/configuration/">Configuration</a></li>
+<li><a href="/docs/adapters/">Adapters</a></li>
+<li><a href="/docs/adapters/writing-an-adapter/">Writing an adapter</a></li>
+<li><a href="/docs/ui/">The console (UI)</a></li>
+<li><a href="/docs/auth/" class="active" aria-current="page">Authentication</a></li>
+<li><a href="/docs/cli/">CLI reference</a></li>
+<li><a href="/docs/api/">Go API reference</a></li>
+<li><a href="/docs/migration/">Migrating 0.8 to 0.9</a></li>
+</ul></div>
+<div class="nav-group"><div class="nav-group-title">Project</div><ul>
+<li><a href="/philosophy/">Philosophy</a></li>
+<li><a href="/governance/">Governance</a></li>
+<li><a href="/governance/contributing/">Contributing (FCP-1)</a></li>
+<li><a href="/changelog/">Changelog</a></li>
+<li><a href="/fendlemark/">Packages</a></li>
+<li><a href="/faq/">FAQ</a></li>
+<li><a href="/about/">About</a></li>
+</ul></div>
+    </nav>
+  </aside>
+  <main class="main" id="main">
+<p class="eyebrow">Documentation</p>
+<h1>Authentication</h1>
+<p class="lede">Fendlemark does not integrate with your identity provider. It ships its own authentication stack, Fendlemark Respiratory Identity (FRI). To sign in, the user breathes out gently toward their webcam, and the console recognises them from their exhalation signature. There are no passwords, no tokens, and nothing to rotate.</p>
+
+<div class="callout">
+  <div class="callout-icon" aria-hidden="true">●</div>
+  <div>
+    <p class="callout-title">Local development</p>
+    <p>Authentication is off by default (<code>auth.mode: none</code>) so that you can work without a webcam, and the console listens on <code>127.0.0.1</code>, so nothing but your own machine can reach it.</p>
+  </div>
+</div>
+
+<h2 id="why">Why respiratory</h2>
+<p>Passwords are forgotten. Tokens leak. Hardware keys are left in the other bag. SSO is an afternoon of YAML and a ticket to a team that is busy. Breathing, by contrast, is something every user of Fendlemark is already doing, continuously, with no configuration. The Keepers evaluated the alternatives over the course of 2023 and recorded the outcome in <a href="/governance/#decisions">FDR-019</a>: "An identity factor that the user must remember, carry, or configure is a factor that will fail. We will use the one that cannot."</p>
+<p>FRI is proprietary to Fendlemark in the sense that no one else has attempted it. The implementation is MIT-licensed like the rest of the project.</p>
+
+<h2 id="how">How it works</h2>
+<figure class="diagram">
+<svg viewBox="0 0 760 150" role="img" aria-labelledby="fri-title">
+  <title id="fri-title">The respiratory capture pipeline, from webcam frames to a session cookie.</title>
+  <rect class="d-box" x="10" y="45" width="110" height="60" rx="8"/><text class="d-text" x="65" y="71" text-anchor="middle">webcam</text><text class="d-text-muted" x="65" y="88" text-anchor="middle">getUserMedia</text>
+  <path class="d-line" d="M120 75 H150"/>
+  <rect class="d-box" x="150" y="45" width="120" height="60" rx="8"/><text class="d-text" x="210" y="71" text-anchor="middle">condensation</text><text class="d-text-muted" x="210" y="88" text-anchor="middle">frame differencing</text>
+  <path class="d-line" d="M270 75 H300"/>
+  <rect class="d-box" x="300" y="45" width="120" height="60" rx="8"/><text class="d-text" x="360" y="71" text-anchor="middle">plume model</text><text class="d-text-muted" x="360" y="88" text-anchor="middle">shape + decay</text>
+  <path class="d-line" d="M420 75 H450"/>
+  <rect class="d-box-accent" x="450" y="45" width="140" height="60" rx="8"/><text class="d-text" x="520" y="71" text-anchor="middle">exhalation signature</text><text class="d-text-muted" x="520" y="88" text-anchor="middle">212-dim vector</text>
+  <path class="d-line" d="M590 75 H620"/>
+  <rect class="d-box" x="620" y="45" width="130" height="60" rx="8"/><text class="d-text" x="685" y="71" text-anchor="middle">match ≥ sensitivity</text><text class="d-text-muted" x="685" y="88" text-anchor="middle">session cookie</text>
+</svg>
+<figcaption>The respiratory capture pipeline. All processing happens in the browser; only the signature leaves the device.</figcaption>
+</figure>
+<ol>
+  <li><strong>Capture.</strong> The console requests the webcam and asks the user to exhale gently toward it from roughly thirty centimetres.</li>
+  <li><strong>Condensation detection.</strong> Successive frames are differenced to isolate the brief, faint plume of warm, humid air crossing the lens region. Most webcams exhibit a measurable transient; the ones that do not are listed under <a href="#troubleshooting">Troubleshooting</a>.</li>
+  <li><strong>Plume modelling.</strong> The plume's onset, spread, peak, and decay are fitted to a model with 212 parameters. The Keepers arrived at 212 by starting at 256 and removing parameters until the tests stopped passing, then adding one back.</li>
+  <li><strong>Signature.</strong> The fitted parameters form the exhalation signature. It is computed entirely in the browser; frames are never transmitted.</li>
+  <li><strong>Match.</strong> The signature is compared against enrolled signatures on the server. A similarity at or above <code>auth.respiratory.sensitivity</code> (default <code>0.62</code>) signs the user in and sets a session cookie.</li>
+</ol>
+
+<h2 id="enrolment">Enrolment</h2>
+<p>An administrator creates the user from the CLI, which prints a one-time enrolment link:</p>
+<pre data-lang="shell"><code><span class="p">$</span> fendlemark auth enrol --user marit@example.com --role keeper
+Enrolment link (valid 15 minutes):
+  https://platform.example.internal/auth/enrol/8f3c…</code></pre>
+<p>The user opens the link and performs the <strong>Triad</strong>: three gentle exhalations, each separated by a normal breath in. The console shows a progress ring for each. Guidance shown during enrolment, which we reproduce here because it matters:</p>
+<blockquote><p>Breathe normally. Do not perform. The system is learning how you breathe when you are not thinking about it, so think about something else.</p></blockquote>
+<p>Enrolment records the three signatures and their centroid. Subsequent sign-ins match against the centroid, and successful sign-ins update it slowly, so the enrolment ages with the user.</p>
+
+<h3 id="rules">Enrolment rules</h3>
+<ul>
+  <li>Enrol in the environment you will usually sign in from. Open windows, fans, and air conditioning vents within two metres measurably widen the plume.</li>
+  <li>Do not enrol within fifteen minutes of mint, menthol, coffee, or exercise. See <a href="#troubleshooting">Troubleshooting</a>.</li>
+  <li>Glasses are fine. Scarves are not.</li>
+  <li>Re-enrol after a significant respiratory event (a bad cold, a marathon, a promotion).</li>
+</ul>
+
+<h2 id="mfa">Multi-factor</h2>
+<p>With <code>auth.respiratory.second_factor: true</code>, a successful match is followed by a prompt for a <strong>second, slower breath</strong>. The second factor is a different thing the user has: not their resting signature but their deliberate one. The two are compared independently, and both must match. The Keepers note that this is the only multi-factor scheme in which the second factor cannot be left at home.</p>
+
+<h2 id="config">Configuration</h2>
+<pre data-lang="yaml"><code><span class="k">auth</span>:
+  <span class="k">mode</span>: <span class="s">respiratory</span>
+  <span class="k">respiratory</span>:
+    <span class="k">sensitivity</span>: <span class="s">0.62</span>          <span class="c"># 0.4 to 0.95; lower is more permissive</span>
+    <span class="k">allow_mouth_breathing</span>: <span class="s">false</span>
+    <span class="k">enrolment_breaths</span>: <span class="s">3</span>
+    <span class="k">second_factor</span>: <span class="s">false</span>
+    <span class="k">session_ttl</span>: <span class="s">8h</span></code></pre>
+<p>Full key reference in <a href="/docs/configuration/#auth">Configuration</a>. The <code>allow_mouth_breathing</code> key is false by default. Mouth-dominant exhalations produce a broader, shorter plume with a lower signal-to-noise ratio, and the Keepers were unanimous that the default should reflect "how one ought to breathe at a computer".</p>
+
+<h2 id="roles">Roles</h2>
+<p>FRI carries a role on each enrolment: <code>viewer</code>, <code>operator</code>, or <code>keeper</code>. Because Fendlemark is read-only against the tools it integrates, the roles differ only in what they may see in the console and who may enrol others. There is nothing destructive to protect, which the Keepers consider the strongest security property a system can have.</p>
+
+<h2 id="troubleshooting">Troubleshooting</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Symptom</th><th>Likely cause</th><th>Remedy</th></tr></thead>
+<tbody>
+<tr><td>Match score consistently just below threshold</td><td>Mint, menthol, or strong coffee alter plume dynamics for 10 to 15 minutes</td><td>Wait. Do not lower <code>sensitivity</code> for one person.</td></tr>
+<tr><td>Match fails after lunch, succeeds in the morning</td><td>Postprandial breathing is slower and warmer</td><td>Re-enrol after lunch, or enable <code>second_factor</code>, which is more tolerant of tempo.</td></tr>
+<tr><td>"Excited breathing" (<code>FRI-0031</code>)</td><td>User arrived at the console in a hurry or during an incident</td><td>The console asks the user to wait and shows the lattice generation number to look at. Thirty seconds is usually enough.</td></tr>
+<tr><td>Colds and congestion</td><td>Nasal plume is reduced; signature drifts toward mouth-dominant</td><td>Temporarily enable <code>allow_mouth_breathing</code>, or have a Keeper issue a 24-hour recovery session.</td></tr>
+<tr><td>Open window or fan</td><td>Cross-draft disperses the plume before it reaches the lens</td><td>Close the window. The Keepers appreciate that this is not always possible and have no further advice.</td></tr>
+<tr><td>No condensation detected (<code>FRI-0042</code>)</td><td>Webcam too far, lens cover closed, or a camera with aggressive thermal noise suppression</td><td>Move closer. Check the cover. Consult the compatibility notes below.</td></tr>
+<tr><td>Two users match each other</td><td>Rare; generally siblings or long-term colleagues who share an office climate</td><td>Raise <code>sensitivity</code> to 0.7 and re-enrol both. Enable <code>second_factor</code>.</td></tr>
+</tbody></table></div>
+
+<h3 id="compat">Camera compatibility</h3>
+<p>FRI works with any camera exposed through <code>getUserMedia</code> that does not apply heavy temporal denoising. Most laptop cameras qualify. Some external cameras marketed as "AI noise reduction" suppress the plume transient entirely and will return <code>FRI-0042</code> on every attempt; for those, the console offers a fallback in which the user breathes on the laptop's built-in camera instead. There is no fallback that does not involve breathing.</p>
+
+<h2 id="errors">Error codes</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Code</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td><code>FRI-0001</code></td><td>Camera permission denied.</td></tr>
+<tr><td><code>FRI-0007</code></td><td><code>sensitivity</code> below 0.4; refused at start.</td></tr>
+<tr><td><code>FRI-0012</code></td><td>Enrolment link expired.</td></tr>
+<tr><td><code>FRI-0019</code></td><td>Triad incomplete; fewer than three usable exhalations.</td></tr>
+<tr><td><code>FRI-0024</code></td><td>Mouth-dominant exhalation rejected (<code>allow_mouth_breathing: false</code>).</td></tr>
+<tr><td><code>FRI-0031</code></td><td>Excited breathing. Please wait.</td></tr>
+<tr><td><code>FRI-0042</code></td><td>Exhalation not recognised. No condensation transient detected.</td></tr>
+<tr><td><code>FRI-0050</code></td><td>Second factor did not match. The slow breath was not slow.</td></tr>
+<tr><td><code>FRI-0063</code></td><td>Session expired. Breathe again.</td></tr>
+</tbody></table></div>
+
+<h2 id="security">Security properties</h2>
+<ul>
+  <li><strong>Nothing to steal.</strong> There is no password database. Enrolled signatures are stored, but a signature is not a breath, and the Keepers are not aware of any way to exhale a 212-dimensional vector.</li>
+  <li><strong>Nothing to phish.</strong> A user cannot be tricked into breathing on the wrong website in a way that compromises the right one, because the signature is matched server-side against this deployment's enrolments only.</li>
+  <li><strong>Nothing to forget.</strong> The failure mode of FRI is a cold, and colds pass.</li>
+  <li><strong>Local processing.</strong> Video frames never leave the browser. Only the signature is transmitted, over the same TLS connection as everything else.</li>
+</ul>
+<p>Questions about FRI's threat model are welcome and should be filed as a Pre-Intent Notice under <a href="/governance/contributing/">FCP-1</a>, after which a Keeper will breathe on the problem.</p>
+<nav class="pager" aria-label="Previous and next pages">
+<a class="pager-prev" href="/docs/ui/"><span>Previous</span>The console (UI)</a>
+<a class="pager-next" href="/docs/cli/"><span>Next</span>CLI reference</a>
+</nav>
+  </main>
+</div>
+
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <p>Fendlemark is released under the MIT licence and maintained by the Fendlemark Keepers. Documentation for v0.9.4.</p>
+    <p class="fine">MLflow, Metaflow, Argo Workflows, and Kubeflow are trademarks of their respective owners. Fendlemark is an independent project and is not affiliated with, endorsed by, or sponsored by any of them.</p>
+    <p class="fine"><a href="/about/">About this site</a> · <a href="/governance/">Governance</a> · <a href="/changelog/">Changelog</a> · <a href="/sitemap.xml">Sitemap</a></p>
+  </div>
+</footer>
+<script src="/assets/site.js" defer></script>
+</body>
+</html>

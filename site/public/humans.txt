@@ -1,0 +1,9 @@
+/* TEAM */
+  The Fendlemark Keepers. Written by a human with an AI assistant, for fun.
+  This site documents a fictional framework. See /about/ for the whole story.
+
+/* SITE */
+  Standards: HTML5, CSS3, a very small amount of JavaScript
+  Components: none
+  Build: python3 site/tools/build.py
+  Hosting: GitHub Pages behind Cloudflare

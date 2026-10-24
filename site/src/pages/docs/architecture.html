@@ -1,0 +1,103 @@
+<!-- meta {"title": "Architecture", "description": "How Fendlemark works: a Go control plane, compiled-in adapters for MLflow, Metaflow, Argo Workflows, and Kubeflow, the lattice entity graph that correlates them, and the Vue 3 console that renders it."} -->
+<p class="eyebrow">Documentation</p>
+<h1>Architecture</h1>
+<p class="lede">Fendlemark is four things in one binary: a control plane, a set of adapters, a reconciler we call the lattice, and an embedded console. This page explains each and how a request moves between them.</p>
+
+<h2 id="overview">Overview</h2>
+<figure class="diagram">
+<svg viewBox="0 0 760 330" role="img" aria-labelledby="arch-title">
+  <title id="arch-title">Fendlemark architecture: four adapters feed the lattice, which the console renders.</title>
+  <rect class="d-box" x="20" y="20" width="130" height="54" rx="8"/><text class="d-text" x="85" y="43" text-anchor="middle">MLflow</text><text class="d-text-muted" x="85" y="60" text-anchor="middle">tracking server</text>
+  <rect class="d-box" x="20" y="94" width="130" height="54" rx="8"/><text class="d-text" x="85" y="117" text-anchor="middle">Metaflow</text><text class="d-text-muted" x="85" y="134" text-anchor="middle">metadata service</text>
+  <rect class="d-box" x="20" y="168" width="130" height="54" rx="8"/><text class="d-text" x="85" y="191" text-anchor="middle">Argo Workflows</text><text class="d-text-muted" x="85" y="208" text-anchor="middle">argo server</text>
+  <rect class="d-box" x="20" y="242" width="130" height="54" rx="8"/><text class="d-text" x="85" y="265" text-anchor="middle">Kubeflow</text><text class="d-text-muted" x="85" y="282" text-anchor="middle">pipelines api</text>
+
+  <rect class="d-box-accent" x="200" y="12" width="540" height="300" rx="12"/>
+  <text class="d-text-muted" x="212" y="30">fendlemark (single binary)</text>
+
+  <rect class="d-box" x="220" y="44" width="120" height="42" rx="8"/><text class="d-text" x="280" y="70" text-anchor="middle">mlflow adapter</text>
+  <rect class="d-box" x="220" y="110" width="120" height="42" rx="8"/><text class="d-text" x="280" y="136" text-anchor="middle">metaflow adapter</text>
+  <rect class="d-box" x="220" y="176" width="120" height="42" rx="8"/><text class="d-text" x="280" y="202" text-anchor="middle">argo adapter</text>
+  <rect class="d-box" x="220" y="242" width="120" height="42" rx="8"/><text class="d-text" x="280" y="268" text-anchor="middle">kubeflow adapter</text>
+
+  <path class="d-line" d="M150 47 H220 M150 121 H220 M150 195 H220 M150 269 H220"/>
+
+  <rect class="d-box" x="390" y="100" width="150" height="124" rx="8"/>
+  <text class="d-text" x="465" y="130" text-anchor="middle" font-weight="600">lattice</text>
+  <text class="d-text-muted" x="465" y="150" text-anchor="middle">facets → entities</text>
+  <text class="d-text-muted" x="465" y="166" text-anchor="middle">correlation</text>
+  <text class="d-text-muted" x="465" y="182" text-anchor="middle">reconciliation</text>
+  <text class="d-text-muted" x="465" y="198" text-anchor="middle">query</text>
+  <path class="d-line" d="M340 65 C365 65 365 130 390 130 M340 131 C365 131 365 150 390 150 M340 197 C365 197 365 175 390 175 M340 263 C365 263 365 195 390 195"/>
+
+  <rect class="d-box" x="590" y="100" width="130" height="124" rx="8"/>
+  <text class="d-text" x="655" y="130" text-anchor="middle" font-weight="600">console</text>
+  <text class="d-text-muted" x="655" y="150" text-anchor="middle">Vue 3, embedded</text>
+  <text class="d-text-muted" x="655" y="166" text-anchor="middle">views + facets</text>
+  <text class="d-text-muted" x="655" y="182" text-anchor="middle">/api/v1 + SSE</text>
+  <path class="d-line" d="M540 162 H590"/>
+</svg>
+<figcaption>Adapters read from the tools you already run. The lattice merges what they report into one entity graph. The console renders the lattice and never talks to a tool directly.</figcaption>
+</figure>
+
+<h2 id="control-plane">The control plane</h2>
+<p>The <code>fendlemark</code> binary is a Go 1.23 program. On start it loads <code>fendlemark.yaml</code>, constructs each enabled adapter, runs an initial reconciliation, and begins serving the console and its API on <code>server.listen</code> (default <code>127.0.0.1:7411</code>). It is stateless by design: everything in the lattice can be rebuilt from the adapters at any time, and restarts are measured in hundreds of milliseconds for platforms with tens of thousands of runs.</p>
+<p>There is no database, no message broker, and no sidecar. State that must survive a restart (console preferences, Respiratory Identity enrolments) is written to a small on-disk store under <code>server.data_dir</code>. The Keepers consider the absence of a database to be a feature and have declined, across eleven Decision Records, to add one.</p>
+
+<h2 id="adapters">Adapters</h2>
+<p>An adapter is a Go package that knows how to talk to one external system and translate what it finds into facets. Fendlemark ships four, compiled into the binary:</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Adapter</th><th>Reads from</th><th>Facets contributed</th></tr></thead>
+<tbody>
+<tr><td><code>mlflow</code></td><td>MLflow tracking server REST API (<code>/api/2.0/mlflow/...</code>)</td><td>Experiment, Run, Metric series, Param set, Artifact listing, Registered Model, Model Version</td></tr>
+<tr><td><code>metaflow</code></td><td>Metaflow metadata service; datastore for artifact links</td><td>Flow, Run, Step, Task, Artifact listing, Tags</td></tr>
+<tr><td><code>argo</code></td><td>Argo Server REST API; optional direct Kubernetes watch</td><td>Workflow, Node (step), WorkflowTemplate, CronWorkflow, Pod logs link</td></tr>
+<tr><td><code>kubeflow</code></td><td>Kubeflow Pipelines API; Katib and Notebooks via the Kubernetes API</td><td>Pipeline, Pipeline Run, Recurring Run, Katib Experiment, Notebook Server</td></tr>
+</tbody></table></div>
+<p>Adapters are read-only. Fendlemark does not create, modify, or delete anything in the systems it integrates. This is a deliberate boundary: the console is a place to understand your platform, and the tools remain the place to operate it. See <a href="/docs/adapters/">the adapters reference</a> for what each adapter surfaces and what it leaves alone, and <a href="/docs/adapters/writing-an-adapter/">Writing an adapter</a> for the interface.</p>
+
+<h2 id="lattice">The lattice</h2>
+<p>The lattice is Fendlemark's in-memory entity graph. It exists because the same real-world thing shows up in several tools under several names. A training job might be an Argo <em>Workflow</em>, whose step launched a Metaflow <em>Run</em>, which logged an MLflow <em>Run</em>, whose best checkpoint became an MLflow <em>Model Version</em>. Four tools, four identifiers, one thing.</p>
+<p>The lattice has three concepts:</p>
+<ul>
+  <li><strong>Facets</strong> are what adapters emit. A facet is a typed record with a source adapter, a source identifier, a timestamp, and a bag of fields. Facets are never merged with each other; they are attached to entities.</li>
+  <li><strong>Entities</strong> are the things the console shows. An entity has a stable lattice id, a kind (<code>run</code>, <code>workflow</code>, <code>artifact</code>, <code>model</code>, <code>pipeline</code>, <code>notebook</code>), and one or more facets.</li>
+  <li><strong>Correlations</strong> are the edges and the merges. The reconciler decides when two facets describe the same entity, and when two entities are related (produced-by, derived-from, deployed-as).</li>
+</ul>
+
+<h3 id="correlation">Correlation keys</h3>
+<p>Reconciliation is deterministic and rule-based. There is no fuzzy matching and no machine learning in the reconciler, a decision the Keepers describe as "the only responsible choice for software whose job is to be believed". Each adapter declares the correlation keys it can provide, and the reconciler matches on exact equality within a configurable window (<code>lattice.correlation.window</code>, default <code>90s</code>). Built-in keys include:</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Key</th><th>Provided by</th><th>Matches</th></tr></thead>
+<tbody>
+<tr><td><code>argo.workflow.name</code></td><td>argo; mlflow (tag <code>fendlemark.argo_workflow</code> or <code>argo.workflow.name</code>)</td><td>An MLflow run to the Argo workflow that produced it</td></tr>
+<tr><td><code>metaflow.run_id</code></td><td>metaflow; mlflow (tag <code>metaflow.run_id</code>); kubeflow (pipeline parameter)</td><td>A Metaflow run to MLflow runs it logged and KFP runs that launched it</td></tr>
+<tr><td><code>kfp.run_id</code></td><td>kubeflow; argo (label <code>pipeline/runid</code> on the underlying Workflow)</td><td>A Kubeflow Pipelines run to its Argo Workflow</td></tr>
+<tr><td><code>mlflow.run_id</code></td><td>mlflow; any adapter that records it as a tag, label, or parameter</td><td>Anything back to the MLflow run</td></tr>
+<tr><td><code>git.sha</code></td><td>all adapters where available</td><td>Weak key; links entities only when both also share <code>git.repo</code></td></tr>
+</tbody></table></div>
+<p>Kubeflow Pipelines runs on Argo Workflows by default, so a KFP run and its Workflow are nearly always correlated on first reconciliation. The other links depend on your pipelines recording identifiers across tool boundaries, which most teams already do with tags. The <a href="/docs/adapters/">adapters reference</a> lists the tag and label names each adapter looks for.</p>
+
+<h3 id="reconciliation">Reconciliation</h3>
+<p>Reconciliation runs in full on start and incrementally thereafter. Adapters that support watching (argo, kubeflow) push events; adapters that do not (mlflow, metaflow) are polled on <code>adapters.&lt;name&gt;.poll_interval</code>. Each cycle is a pure function from the set of facets to the set of entities and correlations, so two Fendlemark instances with the same adapters produce the same lattice. The console shows the lattice's <em>generation</em> number in its footer; if two people see different numbers, one of them should refresh.</p>
+
+<h2 id="console">The console</h2>
+<p>The console is a Vue 3 single-page application built with Vite, embedded into the Go binary at build time with <code>embed</code>. It talks to the control plane over <code>/api/v1</code> (JSON) for queries and <code>/api/v1/events</code> (server-sent events) for live updates. It never talks to MLflow, Metaflow, Argo, or Kubeflow directly; everything goes through the lattice.</p>
+<p>The console is organised into <strong>views</strong>, each of which renders entities of a kind and composes <strong>facet panels</strong> contributed by adapters. The Run view, for instance, shows the MLflow metrics panel, the Argo node tree panel, and the Metaflow task panel for a single correlated run, with the panels for tools that did not contribute facets simply absent. See <a href="/docs/ui/">The console</a> for the component library and theming.</p>
+
+<h2 id="request">Life of a request</h2>
+<ol>
+  <li>A user opens <code>/runs/lt_8f2c…</code> in the console.</li>
+  <li>The console requests <code>GET /api/v1/entities/lt_8f2c…</code>.</li>
+  <li>The control plane answers from the lattice: the entity, its facets, and its correlated neighbours. No adapter is called; the response is served from memory in under a millisecond.</li>
+  <li>The console subscribes to <code>/api/v1/events?entity=lt_8f2c…</code>. When the argo adapter's watch sees the underlying Workflow change phase, the reconciler updates the entity and an event is pushed. The view updates in place.</li>
+  <li>The user clicks "Open in MLflow". The console deep-links to the tracking server's own UI for that run. Fendlemark shows; the tools operate.</li>
+</ol>
+
+<h2 id="non-goals">Non-goals</h2>
+<ul>
+  <li><strong>Writing to the tools.</strong> No triggering, retrying, or deleting. Deep links take you to the tool for that.</li>
+  <li><strong>Replacing the tools' UIs.</strong> MLflow's run comparison, Argo's log viewer, and the Metaflow UI's DAG are all excellent. Fendlemark links to them and does not reimplement them.</li>
+  <li><strong>Persisting history the tools have discarded.</strong> The lattice reflects what the tools currently report. If you delete a run in MLflow, it leaves the lattice at the next poll.</li>
+  <li><strong>Loading spinners.</strong> See the <a href="/philosophy/">Philosophy</a>.</li>
+</ul>

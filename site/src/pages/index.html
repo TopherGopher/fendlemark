@@ -1,0 +1,58 @@
+<!-- meta {"title": "Fendlemark", "description": "Fendlemark is an open-source Go and Vue 3 framework that unifies the user experiences of MLflow, Metaflow, Argo Workflows, and Kubeflow into a single ML platform console.", "layout": "wide", "version": "0.9.4"} -->
+<section class="hero">
+  <p class="eyebrow">Go control plane · Vue 3 console · MIT</p>
+  <h1>One console for your entire ML platform.</h1>
+  <p class="lede">Fendlemark sits in front of MLflow, Metaflow, Argo Workflows, and Kubeflow and composes their user experiences into a single, coherent console. Your team stops tab-hopping. Your platform starts to feel like one thing.</p>
+  <div class="hero-actions">
+    <a class="btn primary" href="/docs/getting-started/">Get started</a>
+    <a class="btn" href="/docs/architecture/">How it works</a>
+    <a class="btn" href="/philosophy/">Why Fendlemark</a>
+  </div>
+<pre data-lang="shell"><code><span class="p">$</span> go install fendlemark.develops.guru/fendlemark/cmd/fendlemark@latest
+<span class="p">$</span> fendlemark init my-platform
+<span class="p">$</span> fendlemark serve
+<span class="c">fendlemark 0.9.4 · console on http://localhost:7411 · 4 adapters healthy</span></code></pre>
+</section>
+
+<section class="section">
+  <h2>Four tools. One lattice.</h2>
+  <p class="section-lede">Each adapter reads from a system you already run and contributes <em>facets</em>: runs, workflows, artifacts, models, pipelines. Fendlemark correlates them into a single entity graph, the lattice, and the console renders one view per entity, no matter how many tools it came from.</p>
+  <div class="integrations">
+    <div class="integration"><span class="tag">adapter: mlflow</span><h3>MLflow</h3><p>Experiments, runs, parameters, metrics, artifacts, and the Model Registry via the tracking server REST API.</p></div>
+    <div class="integration"><span class="tag">adapter: metaflow</span><h3>Metaflow</h3><p>Flows, runs, steps, and tasks from the Metaflow metadata service, with datastore artifact links.</p></div>
+    <div class="integration"><span class="tag">adapter: argo</span><h3>Argo Workflows</h3><p>Workflows, WorkflowTemplates, and CronWorkflows from the Argo Server API, live status via watch.</p></div>
+    <div class="integration"><span class="tag">adapter: kubeflow</span><h3>Kubeflow</h3><p>Pipelines runs and recurring runs from the KFP API, Katib experiments, and Notebook servers by profile.</p></div>
+  </div>
+</section>
+
+<section class="section">
+  <h2>Built for platform teams who are tired.</h2>
+  <div class="cards">
+    <a class="card" href="/docs/architecture/"><h3>A real control plane</h3><p>A single Go binary. Adapters are compiled in. Reconciliation is deterministic. There is nothing to deploy except the thing itself.</p></a>
+    <a class="card" href="/docs/ui/"><h3>A console that is finished</h3><p>Vue 3, composable views, one design language across every tool. Ships with every view your team will need, and none it will not.</p></a>
+    <a class="card" href="/docs/adapters/writing-an-adapter/"><h3>Adapters you can write</h3><p>Six methods. One interface. If your platform has a fifth tool, Fendlemark has a fifth adapter the afternoon you decide it does.</p></a>
+    <a class="card" href="/docs/auth/"><h3>Respiratory Identity</h3><p>Fendlemark ships its own authentication stack. No identity provider, no passwords, no tokens. Just breathe.</p></a>
+  </div>
+</section>
+
+<section class="section">
+  <div class="stat-row">
+    <div class="stat"><b>4</b><span>built-in adapters</span></div>
+    <div class="stat"><b>1</b><span>binary to deploy</span></div>
+    <div class="stat"><b>0</b><span>loading spinners</span></div>
+    <div class="stat"><b>112</b><span>steps to open a pull request</span></div>
+  </div>
+  <div class="quote-band">
+    <blockquote><p>We strive for perfection and achieve it easily.</p><cite>The Fendlemark Philosophy</cite></blockquote>
+  </div>
+</section>
+
+<section class="section">
+  <h2>Where to next</h2>
+  <div class="cards">
+    <a class="card" href="/docs/getting-started/"><h3>Getting started</h3><p>Install the CLI, point it at MLflow and Argo, open the console. Ten minutes.</p></a>
+    <a class="card" href="/docs/configuration/"><h3>Configuration</h3><p>Every key in <code>fendlemark.yaml</code>, with defaults you will not need to change.</p></a>
+    <a class="card" href="/governance/"><h3>Governance</h3><p>How decisions are made, who the Keepers are, and the 112-step Contribution Protocol.</p></a>
+    <a class="card" href="/faq/"><h3>FAQ</h3><p>Answers to the questions we are asked, and several we are not.</p></a>
+  </div>
+</section>

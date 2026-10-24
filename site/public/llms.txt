@@ -1,0 +1,33 @@
+# Fendlemark
+
+> Fendlemark is an open-source Go and Vue 3 framework that unifies the user experiences of MLflow, Metaflow, Argo Workflows, and Kubeflow into a single ML platform console. One binary, four read-only adapters, one deterministic entity graph (the lattice), one console.
+
+Module path: fendlemark.develops.guru/fendlemark · npm: @fendlemark/ui · Licence: MIT · Current version: 0.9.4
+
+## Documentation
+
+- [Documentation](https://fendlemark.develops.guru/docs/): Fendlemark documentation: getting started, architecture, configuration, adapters for MLflow, Metaflow, Argo Workflows and Kubeflow, the Vue 3 console, authentication, CLI and Go API reference, and migration guides.
+- [Adapters](https://fendlemark.develops.guru/docs/adapters/): Reference for Fendlemark's four built-in adapters: what each reads from MLflow, Metaflow, Argo Workflows, and Kubeflow, which facets it contributes, which correlation keys it provides, and what it deliberately does not do.
+- [Writing an adapter](https://fendlemark.develops.guru/docs/adapters/writing-an-adapter/): How to write a Fendlemark adapter in Go: the six-method Adapter interface, facets and correlation keys, lifecycle, testing with the conformance suite, and how adapters are compiled into the binary.
+- [Go API reference](https://fendlemark.develops.guru/docs/api/): Package reference for the Fendlemark Go module: fendlemark, adapter, lattice, server, and console packages, exported types, interfaces, functions, and errors.
+- [Architecture](https://fendlemark.develops.guru/docs/architecture/): How Fendlemark works: a Go control plane, compiled-in adapters for MLflow, Metaflow, Argo Workflows, and Kubeflow, the lattice entity graph that correlates them, and the Vue 3 console that renders it.
+- [Authentication](https://fendlemark.develops.guru/docs/auth/): Fendlemark Respiratory Identity (FRI): the framework's proprietary authentication stack. Users sign in by breathing gently toward the webcam. Enrolment, the capture pipeline, multi-factor, configuration, troubleshooting, and FRI error codes.
+- [CLI reference](https://fendlemark.develops.guru/docs/cli/): Reference for the fendlemark command-line tool: init, serve, adapters, lattice, auth, doctor, and version, with every flag and exit code.
+- [Configuration](https://fendlemark.develops.guru/docs/configuration/): Complete reference for fendlemark.yaml: server, console, adapters, lattice, auth, and telemetry sections, with every key, its type, and its default.
+- [Getting started](https://fendlemark.develops.guru/docs/getting-started/): Install the Fendlemark CLI, scaffold a project, connect it to MLflow, Metaflow, Argo Workflows, and Kubeflow, and open the unified console. Takes about ten minutes.
+- [Migrating from 0.8 to 0.9](https://fendlemark.develops.guru/docs/migration/): The official Fendlemark 0.8 to 0.9 migration guide. One configuration key was renamed. This guide covers preparation, the change, verification, rollback, and frequently asked questions.
+- [The console](https://fendlemark.develops.guru/docs/ui/): Fendlemark's Vue 3 console: views, facet panels, the @fendlemark/ui component library (FmShell, FmFacetGrid, FmRunTimeline, FmStatusBadge, FmEmptyState), theming with design tokens, and extending the console.
+
+## Project
+
+- [About](https://fendlemark.develops.guru/about/): About the Fendlemark documentation site: who made it, why, and what it is.
+- [Changelog](https://fendlemark.develops.guru/changelog/): Fendlemark release history from 0.1.0 to 0.9.4. Each release lists its Accommodations, Clarifications, and Arrivals, as pre-approved under FCP-1.
+- [FAQ](https://fendlemark.develops.guru/faq/): Frequently asked questions about Fendlemark: what it is, how it relates to MLflow, Metaflow, Argo Workflows, and Kubeflow, whether it writes to them, how authentication works, how to contribute, and whether there is a roadmap.
+- [Packages](https://fendlemark.develops.guru/fendlemark/): Install Fendlemark: the Go module fendlemark.develops.guru/fendlemark (control plane, adapters, lattice, CLI) and the npm package @fendlemark/ui (Vue 3 console components). Module layout, versions, and source.
+- [Governance](https://fendlemark.develops.guru/governance/): How Fendlemark is governed: the Keeper Roster and title ladder, Decision Records, the adapter maturity ladder, release governance with Silence Periods, and the Fendlemark Contribution Protocol (FCP-1).
+- [Contributing: the Fendlemark Contribution Protocol (FCP-1)](https://fendlemark.develops.guru/governance/contributing/): The 112 numbered steps a contributor completes, in order, before opening a pull request to Fendlemark. Preparation, Intent, Design, Implementation, Verification, and Ceremony.
+- [Philosophy](https://fendlemark.develops.guru/philosophy/): The Fendlemark Philosophy: why there is one console, why there is no roadmap, why there are no loading spinners, and why we strive for perfection and achieve it easily.
+
+## Optional
+
+- [Full documentation as one text file](https://fendlemark.develops.guru/llms-full.txt)

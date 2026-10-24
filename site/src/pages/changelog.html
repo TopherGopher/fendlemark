@@ -1,0 +1,143 @@
+<!-- meta {"title": "Changelog", "description": "Fendlemark release history from 0.1.0 to 0.9.4. Each release lists its Accommodations, Clarifications, and Arrivals, as pre-approved under FCP-1.", "type": "Article"} -->
+<p class="eyebrow">Project</p>
+<h1>Changelog</h1>
+<p class="lede">Every release, in reverse order. Entries are classified as <strong>Accommodations</strong> (the world changed), <strong>Clarifications</strong> (behaviour you misunderstood, now harder to misunderstand), or <strong>Arrivals</strong> (something new). Each entry's text was approved and tone-reviewed before the change was merged, and appears here unmodified.</p>
+
+<h2 id="0-9-4">0.9.4 <small>· 2026-09-30</small></h2>
+<p><strong>Accommodations</strong></p>
+<ul>
+  <li>The argo adapter now reads the <code>workflows.argoproj.io/phase</code> label as a fallback when a Workflow's status block is briefly absent after creation, which newer Argo versions permit for a few hundred milliseconds.</li>
+  <li>Go 1.23.2.</li>
+</ul>
+<p><strong>Clarifications</strong></p>
+<ul>
+  <li>The console footer now shows the lattice generation number with a thin separator, following a report that it could be mistaken for part of the motto.</li>
+  <li><code>fendlemark doctor</code> now distinguishes "unreachable" from "refused" in the detail line. They were always different. The line now says so.</li>
+</ul>
+<p class="fine">Reading of the Diff surfaced nothing. Noted by name: <code>@hquenby</code>.</p>
+
+<h2 id="0-9-3">0.9.3 <small>· 2026-07-18</small></h2>
+<p><strong>Accommodations</strong></p>
+<ul>
+  <li>The kubeflow adapter recognises the <code>pipelines.kubeflow.org/v2_component</code> label format used by Kubeflow Pipelines 2.x for component nodes.</li>
+</ul>
+<p><strong>Clarifications</strong></p>
+<ul>
+  <li>Respiratory Identity: <code>FRI-0031</code> (excited breathing) now waits a further ten seconds before re-prompting. The earlier interval was found to be itself slightly exciting.</li>
+</ul>
+
+<h2 id="0-9-2">0.9.2 <small>· 2026-05-02</small></h2>
+<p><strong>Arrivals</strong></p>
+<ul>
+  <li><code>fendlemark lattice stats --json</code>, for the determinism check in FCP-1 step 82, which until now required diffing text.</li>
+</ul>
+<p><strong>Clarifications</strong></p>
+<ul>
+  <li>The metaflow adapter correlates on both <code>FlowName/RunId</code> and bare run ids. Both appear in the wild. The adapter now agrees with the wild.</li>
+</ul>
+
+<h2 id="0-9-1">0.9.1 <small>· 2026-03-11</small></h2>
+<p><strong>Clarifications</strong></p>
+<ul>
+  <li>The deprecation warning for <code>trackingUri</code> now cites <code>DOC-104</code> and links to the migration guide. It previously cited the guide without a code, which the Keepers found "unfinished".</li>
+</ul>
+<p class="fine">Released on the third anniversary of the first commit. The release notes for 0.9.1 are the only release notes ever to contain the word "anniversary", following a Tone Review that lasted two days.</p>
+
+<h2 id="0-9-0">0.9.0 <small>· 2026-01-20</small></h2>
+<p><strong>Arrivals</strong></p>
+<ul>
+  <li>The <code>serene</code> log level.</li>
+  <li><code>fendlemark lattice explain</code>: why an entity has the facets it has.</li>
+  <li>Respiratory signatures are now 212-dimensional, up from 208. The four additional parameters model late-plume decay and improve match stability after lunch.</li>
+</ul>
+<p><strong>Clarifications</strong></p>
+<ul>
+  <li><code>adapters.mlflow.trackingUri</code> is renamed to <code>adapters.mlflow.tracking_uri</code>, bringing the last key in <code>fendlemark.yaml</code> into <code>snake_case</code>. The old spelling is accepted with a warning through 0.9.x. See the <a href="/docs/migration/">migration guide</a> and FDR-041.</li>
+</ul>
+
+<h2 id="0-8-2">0.8.2 <small>· 2025-10-07</small></h2>
+<p>No changes. Released so that 0.8.1 users would have a release to upgrade to before 0.9, following FDR-040, which held that "a migration should begin from a place of rest".</p>
+
+<h2 id="0-8-1">0.8.1 <small>· 2025-08-12</small></h2>
+<p><strong>Accommodations</strong></p>
+<ul>
+  <li>MLflow tracking servers that return <code>run_uuid</code> alongside <code>run_id</code> are read correctly. They always were; one code path preferred the deprecated field, and now none does.</li>
+</ul>
+
+<h2 id="0-8-0">0.8.0 <small>· 2025-06-24</small></h2>
+<p><strong>Arrivals</strong></p>
+<ul>
+  <li>The kubeflow adapter reaches <strong>Canonical</strong> maturity, completing the set. All four built-in adapters are now Canonical, and FDR-036 records that this is "the shape the project was always going to have".</li>
+  <li>Multi-factor Respiratory Identity: the second, slower breath (<code>auth.respiratory.second_factor</code>).</li>
+  <li><code>&lt;FmRunTimeline&gt;</code> aligns steps, nodes, and tasks from every facet on a single time axis.</li>
+</ul>
+<p><strong>Clarifications</strong></p>
+<ul>
+  <li>The <code>serenity</code> prop on <code>&lt;FmStatusBadge&gt;</code> (FDR-033). Off by default. See the <a href="/docs/ui/#library">component library</a> for the circumstances of its adoption.</li>
+</ul>
+
+<h2 id="0-7-0">0.7.0 <small>· 2025-01-15</small></h2>
+<p><strong>Arrivals</strong></p>
+<ul>
+  <li><code>@fendlemark/ui</code> is published. Component props are stable from this release.</li>
+  <li>Design tokens in <code>tokens.css</code>; the console is rebrandable by overriding custom properties.</li>
+  <li>The kubeflow adapter reads Katib Experiments and Notebook servers.</li>
+</ul>
+<p><strong>Clarifications</strong></p>
+<ul>
+  <li>The console hides views for kinds no enabled adapter contributes. It previously showed them empty, which was correct, but was not kind.</li>
+</ul>
+
+<h2 id="0-6-0">0.6.0 <small>· 2024-08-06</small></h2>
+<p><strong>Arrivals</strong></p>
+<ul>
+  <li>The <code>adapter</code> package is declared stable (FDR-027).</li>
+  <li>The conformance suite, <code>adapter/conformance</code>.</li>
+  <li>The kubeflow adapter (Provisional).</li>
+  <li>Dark mode (FDR-022). The implementation took an afternoon.</li>
+</ul>
+
+<h2 id="0-5-0">0.5.0 <small>· 2024-03-19</small></h2>
+<p><strong>Arrivals</strong></p>
+<ul>
+  <li>Respiratory Identity ships as the sole authentication mode (FDR-019). Signatures are 208-dimensional.</li>
+  <li>The metaflow adapter reaches Canonical.</li>
+  <li>Weak correlation keys (<code>git.sha</code>, <code>git.repo</code>) create related-to edges without merging.</li>
+</ul>
+
+<h2 id="0-4-0">0.4.0 <small>· 2023-11-28</small></h2>
+<p><strong>Arrivals</strong></p>
+<ul>
+  <li>The metaflow adapter (Provisional).</li>
+  <li>The argo adapter's <code>kube_watch</code> mode.</li>
+  <li><code>fendlemark doctor</code>.</li>
+</ul>
+<p><strong>Clarifications</strong></p>
+<ul>
+  <li>The correlation window default is <code>90s</code>, up from <code>60s</code>, following a Keeper's observation of an 83-second gap in production and a subsequent "margin for dignity".</li>
+</ul>
+
+<h2 id="0-3-0">0.3.0 <small>· 2023-08-15</small></h2>
+<p><strong>Arrivals</strong></p>
+<ul>
+  <li>The argo adapter reaches Canonical. The mlflow adapter reaches Canonical.</li>
+  <li>Server-sent events on <code>/api/v1/events</code>; the console updates in place.</li>
+  <li>Prometheus metrics at <code>/metrics</code>.</li>
+</ul>
+
+<h2 id="0-2-0">0.2.0 <small>· 2023-05-30</small></h2>
+<p><strong>Arrivals</strong></p>
+<ul>
+  <li>The argo adapter (Provisional).</li>
+  <li>The lattice: facets, entities, correlations, deterministic reconciliation. Prior to 0.2.0 the console displayed one tool at a time, which the Keepers now describe as "a prototype of the idea of Fendlemark".</li>
+  <li>The Overview view.</li>
+</ul>
+
+<h2 id="0-1-0">0.1.0 <small>· 2023-03-14</small></h2>
+<p><strong>Arrivals</strong></p>
+<ul>
+  <li>Fendlemark. A Go server, the mlflow adapter, and a Vue 3 console with a Runs view.</li>
+  <li>Port 7411 (FDR-009).</li>
+  <li>The Philosophy, in its original form, as the first commit message.</li>
+</ul>
+<p class="fine">The first commit was made on 2023-03-11 at 02:14 by <code>@thalvskog</code>. The release followed three days later, which the Keepers now regard as hasty, and which is the reason release governance exists.</p>

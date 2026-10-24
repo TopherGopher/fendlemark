@@ -1,0 +1,32 @@
+<!-- meta {"title": "Documentation", "description": "Fendlemark documentation: getting started, architecture, configuration, adapters for MLflow, Metaflow, Argo Workflows and Kubeflow, the Vue 3 console, authentication, CLI and Go API reference, and migration guides."} -->
+<p class="eyebrow">Documentation</p>
+<h1>Fendlemark documentation</h1>
+<p class="lede">Everything you need to run Fendlemark in front of your ML platform, from the first <code>go install</code> to writing your own adapter. Documentation for v0.9.4.</p>
+
+<h2 id="start">Start here</h2>
+<div class="cards">
+  <a class="card" href="/docs/getting-started/"><h3>Getting started</h3><p>Install the CLI, connect MLflow and Argo, open the console. About ten minutes.</p></a>
+  <a class="card" href="/docs/architecture/"><h3>Architecture</h3><p>The control plane, the four adapters, the lattice, and the console, and how a request moves between them.</p></a>
+  <a class="card" href="/docs/configuration/"><h3>Configuration</h3><p>Every key in <code>fendlemark.yaml</code> with its type and default.</p></a>
+</div>
+
+<h2 id="integrations">Integrations</h2>
+<div class="cards">
+  <a class="card" href="/docs/adapters/#mlflow"><h3>MLflow</h3><p>Experiments, runs, metrics, artifacts, and the Model Registry over the tracking server API.</p></a>
+  <a class="card" href="/docs/adapters/#metaflow"><h3>Metaflow</h3><p>Flows, runs, steps, and tasks from the metadata service.</p></a>
+  <a class="card" href="/docs/adapters/#argo"><h3>Argo Workflows</h3><p>Workflows, templates, and cron workflows from Argo Server or a direct Kubernetes watch.</p></a>
+  <a class="card" href="/docs/adapters/#kubeflow"><h3>Kubeflow</h3><p>Pipelines, recurring runs, Katib experiments, and Notebook servers.</p></a>
+</div>
+
+<h2 id="reference">Reference</h2>
+<div class="cards">
+  <a class="card" href="/docs/adapters/writing-an-adapter/"><h3>Writing an adapter</h3><p>The six-method interface, facets, correlation keys, and the conformance suite.</p></a>
+  <a class="card" href="/docs/ui/"><h3>The console</h3><p>Views, facet panels, the <code>@fendlemark/ui</code> component library, and theming.</p></a>
+  <a class="card" href="/docs/auth/"><h3>Authentication</h3><p>Fendlemark Respiratory Identity: enrolment, multi-factor, troubleshooting, error codes.</p></a>
+  <a class="card" href="/docs/cli/"><h3>CLI reference</h3><p><code>init</code>, <code>serve</code>, <code>adapters</code>, <code>lattice</code>, <code>auth</code>, <code>doctor</code>, <code>version</code>.</p></a>
+  <a class="card" href="/docs/api/"><h3>Go API reference</h3><p>Packages, interfaces, the HTTP API, and the stability policy.</p></a>
+  <a class="card" href="/docs/migration/"><h3>Migrating 0.8 to 0.9</h3><p>One renamed key, documented in proportion to the trust it asks of you.</p></a>
+</div>
+
+<h2 id="packages">Packages</h2>
+<p>The Go module is <code>fendlemark.develops.guru/fendlemark</code> and the Vue 3 component library is <code>@fendlemark/ui</code>. Install commands, package layout, and links to the source are on the <a href="/fendlemark/">Packages</a> page.</p>

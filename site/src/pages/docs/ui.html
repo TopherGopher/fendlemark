@@ -1,0 +1,100 @@
+<!-- meta {"title": "The console", "description": "Fendlemark's Vue 3 console: views, facet panels, the @fendlemark/ui component library (FmShell, FmFacetGrid, FmRunTimeline, FmStatusBadge, FmEmptyState), theming with design tokens, and extending the console."} -->
+<p class="eyebrow">Documentation</p>
+<h1>The console</h1>
+<p class="lede">The console is a Vue 3 application embedded in the Fendlemark binary. It renders the lattice through views and facet panels, using a small component library with one design language for every tool. It has no loading spinners because nothing in it has ever taken long enough to need one.</p>
+
+<h2 id="stack">Stack</h2>
+<ul>
+  <li>Vue 3 with the Composition API and <code>&lt;script setup&gt;</code>.</li>
+  <li>Vite for development and the production build.</li>
+  <li>TypeScript throughout. The API client is generated from the control plane's OpenAPI document.</li>
+  <li>Pinia for the lattice store, which mirrors the server's entity graph and applies SSE events in place.</li>
+  <li>No CSS framework. Design tokens as CSS custom properties, scoped styles per component.</li>
+  <li>Built assets are embedded into the Go binary with <code>//go:embed</code>. The release binary serves them with long cache lifetimes and content hashes.</li>
+</ul>
+
+<h2 id="views">Views</h2>
+<p>A view renders entities of one kind. Each view is a route, a list page, and a detail page.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>View</th><th>Route</th><th>Entity kind</th><th>Shows</th></tr></thead>
+<tbody>
+<tr><td>Overview</td><td><code>/</code></td><td>all</td><td>Recent activity across every adapter, adapter health, lattice generation.</td></tr>
+<tr><td>Runs</td><td><code>/runs</code></td><td><code>run</code></td><td>Correlated runs with their MLflow, Metaflow, and Argo facets. The view most people live in.</td></tr>
+<tr><td>Workflows</td><td><code>/workflows</code></td><td><code>workflow</code></td><td>Argo Workflows and KFP pipeline runs, with node trees.</td></tr>
+<tr><td>Models</td><td><code>/models</code></td><td><code>model</code></td><td>Registered models and versions, each linked back to the run that produced it.</td></tr>
+<tr><td>Pipelines</td><td><code>/pipelines</code></td><td><code>pipeline</code></td><td>KFP pipelines and versions, Argo WorkflowTemplates and CronWorkflows, Metaflow flows.</td></tr>
+<tr><td>Notebooks</td><td><code>/notebooks</code></td><td><code>notebook</code></td><td>Kubeflow Notebook servers by profile.</td></tr>
+<tr><td>Adapters</td><td><code>/adapters</code></td><td>—</td><td>Health, latency, facet counts, and effective configuration per adapter.</td></tr>
+</tbody></table></div>
+<p>Views hide themselves when no enabled adapter contributes their kind. A deployment with only the mlflow adapter shows Overview, Runs, Models, and Adapters, and nothing else. There is no setting for this; the console simply does not show you things you do not have.</p>
+
+<h2 id="panels">Facet panels</h2>
+<p>A detail page is a header plus one panel per facet. Panels are contributed by adapters and composed by the view. The Run detail for a fully correlated training job shows, top to bottom:</p>
+<ol>
+  <li>The entity header: title, status, duration, correlation summary ("4 facets from 3 adapters").</li>
+  <li>The Argo panel: the node tree, with the step that produced this run highlighted.</li>
+  <li>The Metaflow panel: the step and task, attempt count, and tags.</li>
+  <li>The MLflow panel: parameters, latest metrics, metric charts on demand, artifact listing.</li>
+  <li>Related entities: the Model Version this run was registered as, the Workflow that launched it, other runs from the same git commit.</li>
+</ol>
+<p>Panels for adapters that contributed nothing are omitted (<code>console.hide_empty_panels</code>). Every panel has the same header, the same deep-link affordance, and the same collapse behaviour, provided by <code>&lt;FmFacetPanel&gt;</code>. Adapter authors write only the body.</p>
+
+<h2 id="library">Component library</h2>
+<p>The console's components are published as <code>@fendlemark/ui</code> so that teams embedding Fendlemark views in their own internal portals can match the look exactly. The public components:</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Component</th><th>Purpose</th><th>Notable props</th></tr></thead>
+<tbody>
+<tr><td><code>&lt;FmShell&gt;</code></td><td>Application frame: header, navigation rail, content slot, footer with the motto.</td><td><code>title</code>, <code>nav</code>, <code>motto</code> (boolean)</td></tr>
+<tr><td><code>&lt;FmFacetGrid&gt;</code></td><td>Responsive grid of facet panels for one entity.</td><td><code>entity</code>, <code>hideEmpty</code></td></tr>
+<tr><td><code>&lt;FmFacetPanel&gt;</code></td><td>Panel chrome: header, deep links, collapse. Wraps adapter panel bodies.</td><td><code>facet</code>, <code>collapsed</code></td></tr>
+<tr><td><code>&lt;FmRunTimeline&gt;</code></td><td>Horizontal timeline of steps, nodes, and tasks across facets, aligned on one time axis.</td><td><code>entity</code>, <code>zoom</code></td></tr>
+<tr><td><code>&lt;FmStatusBadge&gt;</code></td><td>Phase indicator with consistent colours across tools.</td><td><code>phase</code>, <code>serenity</code> (boolean: render failures in the same calm colour as everything else)</td></tr>
+<tr><td><code>&lt;FmEntityTable&gt;</code></td><td>Paged, sortable list of entities with facet-source chips.</td><td><code>kind</code>, <code>query</code>, <code>pageSize</code></td></tr>
+<tr><td><code>&lt;FmEmptyState&gt;</code></td><td>What a view shows when there is nothing. Never says "loading".</td><td><code>heading</code>, <code>hint</code></td></tr>
+<tr><td><code>&lt;FmDeepLink&gt;</code></td><td>"Open in MLflow" style link with the tool's icon.</td><td><code>link</code></td></tr>
+</tbody></table></div>
+<p>The <code>serenity</code> prop on <code>&lt;FmStatusBadge&gt;</code> is off by default. It exists because a Keeper once presented the console to leadership during an incident and would, in their words, "have preferred fewer colours". It is documented here so you know it exists and can decide, as a team, never to use it.</p>
+
+<h3 id="usage">Using the library</h3>
+<pre data-lang="shell"><code><span class="p">$</span> npm install @fendlemark/ui</code></pre>
+<pre data-lang="vue"><code>&lt;script setup lang="ts"&gt;
+import { FmShell, FmEntityTable, FmStatusBadge } from '@fendlemark/ui'
+import '@fendlemark/ui/tokens.css'
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;FmShell title="ML Platform" :motto="true"&gt;
+    &lt;FmEntityTable kind="run" :page-size="25"&gt;
+      &lt;template #status="{ entity }"&gt;
+        &lt;FmStatusBadge :phase="entity.status" /&gt;
+      &lt;/template&gt;
+    &lt;/FmEntityTable&gt;
+  &lt;/FmShell&gt;
+&lt;/template&gt;</code></pre>
+<p>The components expect a Fendlemark API at <code>/api/v1</code> on the same origin, or a base URL supplied through the <code>fendlemarkApi</code> injection key.</p>
+
+<h2 id="theming">Theming</h2>
+<p>Every colour, radius, and spacing value is a CSS custom property defined in <code>tokens.css</code>. Light and dark are both first-class and switch on <code>prefers-color-scheme</code> or <code>console.theme</code>. To rebrand, override the tokens:</p>
+<pre data-lang="css"><code>:root {
+  --fm-accent: #4c6ef5;
+  --fm-accent-fg: #ffffff;
+  --fm-radius: 6px;
+  --fm-font-sans: "Your Sans", system-ui, sans-serif;
+}</code></pre>
+<p>Phase colours (<code>--fm-phase-running</code>, <code>--fm-phase-succeeded</code>, <code>--fm-phase-failed</code>, <code>--fm-phase-pending</code>) are shared across every adapter's panel, which is the single largest reason the console feels like one product rather than four. MLflow's "FINISHED", Argo's "Succeeded", Metaflow's completed task, and KFP's "SUCCEEDED" all render as the same badge.</p>
+
+<h2 id="extending">Extending the console</h2>
+<ul>
+  <li><strong>Custom facet panel:</strong> add a component under <code>console/src/panels/&lt;adapter&gt;/</code> and register it. See <a href="/docs/adapters/writing-an-adapter/#panel">Writing an adapter</a>.</li>
+  <li><strong>Custom view:</strong> add a route and a page component under <code>console/src/views/</code>. Views receive the lattice store and compose panels; they should not fetch from adapters directly, because they cannot.</li>
+  <li><strong>Embedding:</strong> use <code>@fendlemark/ui</code> in your own app with the API base URL injected. Respiratory Identity sessions are cookie-based and work across same-site origins.</li>
+</ul>
+
+<h2 id="development">Developing the console</h2>
+<pre data-lang="shell"><code><span class="p">$</span> cd console
+<span class="p">$</span> npm install
+<span class="p">$</span> npm run dev           <span class="c"># Vite dev server on :5173, proxies /api to :7411</span>
+<span class="p">$</span> npm run build         <span class="c"># writes to console/dist, picked up by go:embed</span>
+<span class="p">$</span> npm run test          <span class="c"># Vitest</span>
+<span class="p">$</span> npm run screenshots   <span class="c"># required by FCP-1 step 74</span></code></pre>
+<p>Run <code>fendlemark serve --console-dev</code> alongside the Vite server and the binary will proxy to it instead of serving the embedded build.</p>

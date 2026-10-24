@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en" data-layout="docs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Migrating from 0.8 to 0.9 · Fendlemark</title>
+<meta name="description" content="The official Fendlemark 0.8 to 0.9 migration guide. One configuration key was renamed. This guide covers preparation, the change, verification, rollback, and frequently asked questions.">
+<link rel="canonical" href="https://fendlemark.develops.guru/docs/migration/">
+<meta name="go-import" content="fendlemark.develops.guru/fendlemark git https://github.com/TopherGopher/fendlemark">
+<link rel="alternate" type="application/atom+xml" title="Fendlemark releases" href="/feed.xml">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+<meta name="theme-color" content="#0f5c54" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0b1513" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Fendlemark">
+<meta property="og:title" content="Migrating from 0.8 to 0.9 · Fendlemark">
+<meta property="og:description" content="The official Fendlemark 0.8 to 0.9 migration guide. One configuration key was renamed. This guide covers preparation, the change, verification, rollback, and frequently asked questions.">
+<meta property="og:url" content="https://fendlemark.develops.guru/docs/migration/">
+<meta property="og:image" content="https://fendlemark.develops.guru/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Migrating from 0.8 to 0.9 · Fendlemark">
+<meta name="twitter:description" content="The official Fendlemark 0.8 to 0.9 migration guide. One configuration key was renamed. This guide covers preparation, the change, verification, rollback, and frequently asked questions.">
+<meta name="twitter:image" content="https://fendlemark.develops.guru/assets/og-image.png">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/site.css">
+<script>try{var t=localStorage.getItem('fm-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Fendlemark", "item": "https://fendlemark.develops.guru/"}, {"@type": "ListItem", "position": 2, "name": "Documentation", "item": "https://fendlemark.develops.guru/docs/"}, {"@type": "ListItem", "position": 3, "name": "Migrating from 0.8 to 0.9", "item": "https://fendlemark.develops.guru/docs/migration/"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Migrating from 0.8 to 0.9", "description": "The official Fendlemark 0.8 to 0.9 migration guide. One configuration key was renamed. This guide covers preparation, the change, verification, rollback, and frequently asked questions.", "url": "https://fendlemark.develops.guru/docs/migration/", "datePublished": "2026-10-24", "dateModified": "2026-10-24", "author": {"@type": "Organization", "name": "The Fendlemark Keepers"}, "publisher": {"@type": "Organization", "name": "Fendlemark", "url": "https://fendlemark.develops.guru/"}, "inLanguage": "en"}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="site-header-inner">
+    <a class="brand" href="/" aria-label="Fendlemark home">
+      <svg class="brand-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
+      <span class="brand-name">Fendlemark</span>
+      <span class="brand-version">v0.9.4</span>
+    </a>
+    <nav class="top-nav" aria-label="Primary">
+      <a href="/docs/getting-started/">Docs</a>
+      <a href="/philosophy/">Philosophy</a>
+      <a href="/governance/">Governance</a>
+      <a href="/changelog/">Changelog</a>
+      <a href="/fendlemark/">Packages</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-btn" id="theme-toggle" type="button" aria-label="Toggle colour theme" title="Toggle theme">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path class="sun" d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/><circle class="sun" cx="12" cy="12" r="4"/><path class="moon" d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+      <button class="icon-btn menu-btn" id="menu-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false" aria-controls="sidebar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="page">
+  <aside class="sidebar" id="sidebar">
+    <nav aria-label="Documentation">
+<div class="nav-group"><div class="nav-group-title">Documentation</div><ul>
+<li><a href="/docs/">Overview</a></li>
+<li><a href="/docs/getting-started/">Getting started</a></li>
+<li><a href="/docs/architecture/">Architecture</a></li>
+<li><a href="/docs/configuration/">Configuration</a></li>
+<li><a href="/docs/adapters/">Adapters</a></li>
+<li><a href="/docs/adapters/writing-an-adapter/">Writing an adapter</a></li>
+<li><a href="/docs/ui/">The console (UI)</a></li>
+<li><a href="/docs/auth/">Authentication</a></li>
+<li><a href="/docs/cli/">CLI reference</a></li>
+<li><a href="/docs/api/">Go API reference</a></li>
+<li><a href="/docs/migration/" class="active" aria-current="page">Migrating 0.8 to 0.9</a></li>
+</ul></div>
+<div class="nav-group"><div class="nav-group-title">Project</div><ul>
+<li><a href="/philosophy/">Philosophy</a></li>
+<li><a href="/governance/">Governance</a></li>
+<li><a href="/governance/contributing/">Contributing (FCP-1)</a></li>
+<li><a href="/changelog/">Changelog</a></li>
+<li><a href="/fendlemark/">Packages</a></li>
+<li><a href="/faq/">FAQ</a></li>
+<li><a href="/about/">About</a></li>
+</ul></div>
+    </nav>
+  </aside>
+  <main class="main" id="main">
+<p class="eyebrow">Documentation</p>
+<h1>Migrating from 0.8 to 0.9</h1>
+<p class="lede">Fendlemark 0.9.0 renamed one configuration key. This guide exists because the Keepers hold that every breaking change, however small, deserves a document proportionate to the trust it asks of you.</p>
+
+<h2 id="summary">Summary of changes</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>0.8</th><th>0.9</th><th>Type</th></tr></thead>
+<tbody>
+<tr><td><code>adapters.mlflow.trackingUri</code></td><td><code>adapters.mlflow.tracking_uri</code></td><td>Renamed</td></tr>
+</tbody></table></div>
+<p>That is the complete list. The old spelling is accepted with a deprecation warning (<code>DOC-104</code>) through the 0.9 series and will be removed in 0.10.</p>
+
+<h2 id="why">Why</h2>
+<p>Every other key in <code>fendlemark.yaml</code> is <code>snake_case</code>. <code>trackingUri</code> was <code>camelCase</code> because the first Keeper wrote it at 02:14 on 11 March 2023 while copying the name from MLflow's Python client, and nobody noticed for two and a half years. When it was noticed, it was raised as a Pre-Intent Notice, discussed across three Reflection Periods, and resolved in <a href="/governance/#decisions">FDR-041</a>, which also records the Keepers' view that "a single inconsistency in a correct system is not a small thing; it is the only thing".</p>
+
+<h2 id="before">Before you begin</h2>
+<ol>
+  <li>Confirm you are on 0.8.2 or later. Earlier 0.8 releases should first upgrade to 0.8.2, which changed nothing but was released anyway.</li>
+  <li>Back up <code>fendlemark.yaml</code>. <code>fendlemark doctor --fix</code> does this for you, but the Keepers prefer that you do it yourself, once, deliberately.</li>
+  <li>Read the <a href="/philosophy/">Philosophy</a>. Not for the migration. For you.</li>
+</ol>
+
+<h2 id="migrate">Migration</h2>
+<h3 id="automatic">Automatic</h3>
+<pre data-lang="shell"><code><span class="p">$</span> fendlemark doctor --fix
+config    warn     DOC-104 adapters.mlflow.trackingUri is the pre-0.9 spelling; use tracking_uri (fixable)
+          fixed    renamed adapters.mlflow.trackingUri → adapters.mlflow.tracking_uri
+          backup   fendlemark.yaml.bak-20261024T091203Z</code></pre>
+<h3 id="manual">Manual</h3>
+<pre data-lang="yaml"><code><span class="k">adapters</span>:
+  <span class="k">mlflow</span>:
+    <span class="k">enabled</span>: <span class="s">true</span>
+<span class="c">-   trackingUri: "http://mlflow.internal:5000"</span>
+<span class="k">+   tracking_uri</span>: <span class="s">"http://mlflow.internal:5000"</span></code></pre>
+<h3 id="env">Environment variable form</h3>
+<pre data-lang="shell"><code><span class="c"># before</span>
+FENDLEMARK_ADAPTERS__MLFLOW__TRACKINGURI=http://mlflow.internal:5000
+<span class="c"># after</span>
+FENDLEMARK_ADAPTERS__MLFLOW__TRACKING_URI=http://mlflow.internal:5000</code></pre>
+
+<h2 id="verify">Verification</h2>
+<pre data-lang="shell"><code><span class="p">$</span> fendlemark doctor
+config    ok       ./fendlemark.yaml (6 keys set, 41 defaulted)
+<span class="p">$</span> fendlemark adapters check mlflow
+ADAPTER    STATUS    LATENCY   DETAIL
+mlflow     healthy   41ms      12 experiments, 1,406 runs visible</code></pre>
+<p>If the detail line matches what you saw before the migration, the migration is complete. It will.</p>
+
+<h2 id="rollback">Rollback</h2>
+<p>Restore the backup and run 0.8.2. Because 0.9 accepts both spellings, you may also simply run 0.9 with the old key and ignore the warning, though the Keepers would know.</p>
+
+<h2 id="faq">Frequently asked questions</h2>
+<h3>Is this really the only change in 0.9.0?</h3>
+<p>It is the only <em>breaking</em> change. 0.9.0 also included the <code>serene</code> log level, the <code>explain</code> subcommand, and 212-parameter respiratory signatures (up from 208). None of those require action.</p>
+<h3>Why a whole page for one key?</h3>
+<p>Because you will search for it at 02:14, and you deserve to find a page that treats your time as if it mattered.</p>
+<h3>Will there be a 0.10 migration guide?</h3>
+<p>If anything changes, yes. The Keepers have no roadmap, so nothing is currently planned to change. See <a href="/philosophy/#roadmap">the Philosophy on roadmaps</a>.</p>
+<h3>What about <code>@fendlemark/ui</code>?</h3>
+<p>No changes. The component library's props have been stable since 0.7.</p>
+<nav class="pager" aria-label="Previous and next pages">
+<a class="pager-prev" href="/docs/api/"><span>Previous</span>Go API reference</a>
+<a class="pager-next" href="/philosophy/"><span>Next</span>Philosophy</a>
+</nav>
+  </main>
+</div>
+
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <p>Fendlemark is released under the MIT licence and maintained by the Fendlemark Keepers. Documentation for v0.9.4.</p>
+    <p class="fine">MLflow, Metaflow, Argo Workflows, and Kubeflow are trademarks of their respective owners. Fendlemark is an independent project and is not affiliated with, endorsed by, or sponsored by any of them.</p>
+    <p class="fine"><a href="/about/">About this site</a> · <a href="/governance/">Governance</a> · <a href="/changelog/">Changelog</a> · <a href="/sitemap.xml">Sitemap</a></p>
+  </div>
+</footer>
+<script src="/assets/site.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Fendlemark releases</title>
+  <subtitle>Release notes for the Fendlemark ML platform console.</subtitle>
+  <link href="https://fendlemark.develops.guru/feed.xml" rel="self"/>
+  <link href="https://fendlemark.develops.guru/changelog/"/>
+  <id>https://fendlemark.develops.guru/changelog/</id>
+  <updated>2026-09-30T00:00:00Z</updated>
+  <author><name>The Fendlemark Keepers</name></author>
+  <entry>
+    <title>Fendlemark 0.9.4</title>
+    <link href="https://fendlemark.develops.guru/changelog/#0-9-4"/>
+    <id>https://fendlemark.develops.guru/changelog/#0-9-4</id>
+    <updated>2026-09-30T00:00:00Z</updated>
+    <summary>Accommodations
+
+ - The argo adapter now reads the workflows.argoproj.io/phase label as a fallback when a Workflow&#x27;s status block is briefly absent after creation, which newer Argo versions permit for a few hundred milliseconds.
+
+ - Go 1.23.2.
+
+Clarifications
+
+ - The console footer now shows the lattice generation number with a thin separator, following a report that it could be mistaken for part of the motto.
+
+ - fendlemark doctor now distinguishes &quot;unreachable&quot; from &quot;refused&quot; in the detail line. They were always different. The line now says so.
+
+Reading of the Diff surfaced nothing. Noted by </summary>
+  </entry>
+  <entry>
+    <title>Fendlemark 0.9.3</title>
+    <link href="https://fendlemark.develops.guru/changelog/#0-9-3"/>
+    <id>https://fendlemark.develops.guru/changelog/#0-9-3</id>
+    <updated>2026-07-18T00:00:00Z</updated>
+    <summary>Accommodations
+
+ - The kubeflow adapter recognises the pipelines.kubeflow.org/v2_component label format used by Kubeflow Pipelines 2.x for component nodes.
+
+Clarifications
+
+ - Respiratory Identity: FRI-0031 (excited breathing) now waits a further ten seconds before re-prompting. The earlier interval was found to be itself slightly exciting.</summary>
+  </entry>
+  <entry>
+    <title>Fendlemark 0.9.2</title>
+    <link href="https://fendlemark.develops.guru/changelog/#0-9-2"/>
+    <id>https://fendlemark.develops.guru/changelog/#0-9-2</id>
+    <updated>2026-05-02T00:00:00Z</updated>
+    <summary>Arrivals
+
+ - fendlemark lattice stats --json, for the determinism check in FCP-1 step 82, which until now required diffing text.
+
+Clarifications
+
+ - The metaflow adapter correlates on both FlowName/RunId and bare run ids. Both appear in the wild. The adapter now agrees with the wild.</summary>
+  </entry>
+  <entry>
+    <title>Fendlemark 0.9.1</title>
+    <link href="https://fendlemark.develops.guru/changelog/#0-9-1"/>
+    <id>https://fendlemark.develops.guru/changelog/#0-9-1</id>
+    <updated>2026-03-11T00:00:00Z</updated>
+    <summary>Clarifications
+
+ - The deprecation warning for trackingUri now cites DOC-104 and links to the migration guide. It previously cited the guide without a code, which the Keepers found &quot;unfinished&quot;.
+
+Released on the third anniversary of the first commit. The release notes for 0.9.1 are the only release notes ever to contain the word &quot;anniversary&quot;, following a Tone Review that lasted two days.</summary>
+  </entry>
+  <entry>
+    <title>Fendlemark 0.9.0</title>
+    <link href="https://fendlemark.develops.guru/changelog/#0-9-0"/>
+    <id>https://fendlemark.develops.guru/changelog/#0-9-0</id>
+    <updated>2026-01-20T00:00:00Z</updated>
+    <summary>Arrivals
+
+ - The serene log level.
+
+ - fendlemark lattice explain: why an entity has the facets it has.
+
+ - Respiratory signatures are now 212-dimensional, up from 208. The four additional parameters model late-plume decay and improve match stability after lunch.
+
+Clarifications
+
+ - adapters.mlflow.trackingUri is renamed to adapters.mlflow.tracking_uri, bringing the last key in fendlemark.yaml into snake_case. The old spelling is accepted with a warning through 0.9.x. See the migration guide and FDR-041.</summary>
+  </entry>
+  <entry>
+    <title>Fendlemark 0.8.2</title>
+    <link href="https://fendlemark.develops.guru/changelog/#0-8-2"/>
+    <id>https://fendlemark.develops.guru/changelog/#0-8-2</id>
+    <updated>2025-10-07T00:00:00Z</updated>
+    <summary>No changes. Released so that 0.8.1 users would have a release to upgrade to before 0.9, following FDR-040, which held that &quot;a migration should begin from a place of rest&quot;.</summary>
+  </entry>
+  <entry>
+    <title>Fendlemark 0.8.1</title>
+    <link href="https://fendlemark.develops.guru/changelog/#0-8-1"/>
+    <id>https://fendlemark.develops.guru/changelog/#0-8-1</id>
+    <updated>2025-08-12T00:00:00Z</updated>
+    <summary>Accommodations
+
+ - MLflow tracking servers that return run_uuid alongside run_id are read correctly. They always were; one code path preferred the deprecated field, and now none does.</summary>
+  </entry>
+  <entry>
+    <title>Fendlemark 0.8.0</title>
+    <link href="https://fendlemark.develops.guru/changelog/#0-8-0"/>
+    <id>https://fendlemark.develops.guru/changelog/#0-8-0</id>
+    <updated>2025-06-24T00:00:00Z</updated>
+    <summary>Arrivals
+
+ - The kubeflow adapter reaches Canonical maturity, completing the set. All four built-in adapters are now Canonical, and FDR-036 records that this is &quot;the shape the project was always going to have&quot;.
+
+ - Multi-factor Respiratory Identity: the second, slower breath (auth.respiratory.second_factor).
+
+ - &lt;FmRunTimeline&gt; aligns steps, nodes, and tasks from every facet on a single time axis.
+
+Clarifications
+
+ - The serenity prop on &lt;FmStatusBadge&gt; (FDR-033). Off by default. See the component library for the circumstances of its adoption.</summary>
+  </entry>
+  <entry>
+    <title>Fendlemark 0.7.0</title>
+    <link href="https://fendlemark.develops.guru/changelog/#0-7-0"/>
+    <id>https://fendlemark.develops.guru/changelog/#0-7-0</id>
+    <updated>2025-01-15T00:00:00Z</updated>
+    <summary>Arrivals
+
+ - @fendlemark/ui is published. Component props are stable from this release.
+
+ - Design tokens in tokens.css; the console is rebrandable by overriding custom properties.
+
+ - The kubeflow adapter reads Katib Experiments and Notebook servers.
+
+Clarifications
+
+ - The console hides views for kinds no enabled adapter contributes. It previously showed them empty, which was correct, but was not kind.</summary>
+  </entry>
+  <entry>
+    <title>Fendlemark 0.6.0</title>
+    <link href="https://fendlemark.develops.guru/changelog/#0-6-0"/>
+    <id>https://fendlemark.develops.guru/changelog/#0-6-0</id>
+    <updated>2024-08-06T00:00:00Z</updated>
+    <summary>Arrivals
+
+ - The adapter package is declared stable (FDR-027).
+
+ - The conformance suite, adapter/conformance.
+
+ - The kubeflow adapter (Provisional).
+
+ - Dark mode (FDR-022). The implementation took an afternoon.</summary>
+  </entry>
+  <entry>
+    <title>Fendlemark 0.5.0</title>
+    <link href="https://fendlemark.develops.guru/changelog/#0-5-0"/>
+    <id>https://fendlemark.develops.guru/changelog/#0-5-0</id>
+    <updated>2024-03-19T00:00:00Z</updated>
+    <summary>Arrivals
+
+ - Respiratory Identity ships as the sole authentication mode (FDR-019). Signatures are 208-dimensional.
+
+ - The metaflow adapter reaches Canonical.
+
+ - Weak correlation keys (git.sha, git.repo) create related-to edges without merging.</summary>
+  </entry>
+  <entry>
+    <title>Fendlemark 0.4.0</title>
+    <link href="https://fendlemark.develops.guru/changelog/#0-4-0"/>
+    <id>https://fendlemark.develops.guru/changelog/#0-4-0</id>
+    <updated>2023-11-28T00:00:00Z</updated>
+    <summary>Arrivals
+
+ - The metaflow adapter (Provisional).
+
+ - The argo adapter&#x27;s kube_watch mode.
+
+ - fendlemark doctor.
+
+Clarifications
+
+ - The correlation window default is 90s, up from 60s, following a Keeper&#x27;s observation of an 83-second gap in production and a subsequent &quot;margin for dignity&quot;.</summary>
+  </entry>
+  <entry>
+    <title>Fendlemark 0.3.0</title>
+    <link href="https://fendlemark.develops.guru/changelog/#0-3-0"/>
+    <id>https://fendlemark.develops.guru/changelog/#0-3-0</id>
+    <updated>2023-08-15T00:00:00Z</updated>
+    <summary>Arrivals
+
+ - The argo adapter reaches Canonical. The mlflow adapter reaches Canonical.
+
+ - Server-sent events on /api/v1/events; the console updates in place.
+
+ - Prometheus metrics at /metrics.</summary>
+  </entry>
+  <entry>
+    <title>Fendlemark 0.2.0</title>
+    <link href="https://fendlemark.develops.guru/changelog/#0-2-0"/>
+    <id>https://fendlemark.develops.guru/changelog/#0-2-0</id>
+    <updated>2023-05-30T00:00:00Z</updated>
+    <summary>Arrivals
+
+ - The argo adapter (Provisional).
+
+ - The lattice: facets, entities, correlations, deterministic reconciliation. Prior to 0.2.0 the console displayed one tool at a time, which the Keepers now describe as &quot;a prototype of the idea of Fendlemark&quot;.
+
+ - The Overview view.</summary>
+  </entry>
+  <entry>
+    <title>Fendlemark 0.1.0</title>
+    <link href="https://fendlemark.develops.guru/changelog/#0-1-0"/>
+    <id>https://fendlemark.develops.guru/changelog/#0-1-0</id>
+    <updated>2023-03-14T00:00:00Z</updated>
+    <summary>Arrivals
+
+ - Fendlemark. A Go server, the mlflow adapter, and a Vue 3 console with a Runs view.
+
+ - Port 7411 (FDR-009).
+
+ - The Philosophy, in its original form, as the first commit message.
+
+The first commit was made on 2023-03-11 at 02:14 by @thalvskog. The release followed three days later, which the Keepers now regard as hasty, and which is the reason release governance exists.</summary>
+  </entry>
+</feed>

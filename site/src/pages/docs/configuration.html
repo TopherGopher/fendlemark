@@ -1,0 +1,187 @@
+<!-- meta {"title": "Configuration", "description": "Complete reference for fendlemark.yaml: server, console, adapters, lattice, auth, and telemetry sections, with every key, its type, and its default."} -->
+<p class="eyebrow">Documentation</p>
+<h1>Configuration</h1>
+<p class="lede">Fendlemark reads one file, <code>fendlemark.yaml</code>, from the working directory or the path given by <code>--config</code>. Every key has a default. Most installations change five of them.</p>
+
+<h2 id="precedence">Precedence</h2>
+<p>Values are resolved in this order, highest priority first:</p>
+<ol>
+  <li>Command-line flags (<code>--listen</code>, <code>--config</code>, <code>--log-level</code>).</li>
+  <li>Environment variables prefixed <code>FENDLEMARK_</code>, with nesting expressed by double underscores: <code>FENDLEMARK_ADAPTERS__MLFLOW__TRACKING_URI</code>.</li>
+  <li><code>fendlemark.yaml</code>.</li>
+  <li>Built-in defaults.</li>
+</ol>
+<p>Any string value may reference an environment variable with <code>${VAR}</code> syntax. Secrets should be supplied this way rather than written into the file.</p>
+
+<h2 id="minimal">A minimal file</h2>
+<pre data-lang="yaml"><code><span class="k">adapters</span>:
+  <span class="k">mlflow</span>:
+    <span class="k">enabled</span>: <span class="s">true</span>
+    <span class="k">tracking_uri</span>: <span class="s">"http://mlflow.internal:5000"</span></code></pre>
+<p>That is a complete, valid configuration. Everything below is optional.</p>
+
+<h2 id="server">server</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Key</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>server.listen</code></td><td>string</td><td><code>"127.0.0.1:7411"</code></td><td>Address the console and API listen on. The default accepts connections from this machine only; to share the console, keep it on loopback behind an authenticating reverse proxy rather than widening it (doctor reports <code>DOC-121</code> if you do). 7411 was chosen because it was free on the first Keeper's laptop in 2022 and has not been reconsidered.</td></tr>
+<tr><td><code>server.base_url</code></td><td>string</td><td>derived</td><td>Public URL of the console, used in links. Set it when running behind a reverse proxy.</td></tr>
+<tr><td><code>server.data_dir</code></td><td>string</td><td><code>"./.fendlemark"</code></td><td>Where persistent state (preferences, FRI enrolments) is kept.</td></tr>
+<tr><td><code>server.read_timeout</code></td><td>duration</td><td><code>15s</code></td><td>HTTP read timeout.</td></tr>
+<tr><td><code>server.shutdown_grace</code></td><td>duration</td><td><code>10s</code></td><td>Time to let in-flight requests finish on SIGTERM.</td></tr>
+<tr><td><code>server.tls.cert_file</code></td><td>string</td><td>unset</td><td>Serve TLS directly. Most deployments terminate TLS at a proxy instead.</td></tr>
+<tr><td><code>server.tls.key_file</code></td><td>string</td><td>unset</td><td>Private key for the above.</td></tr>
+<tr><td><code>server.log_level</code></td><td>enum</td><td><code>info</code></td><td><code>debug</code>, <code>info</code>, <code>warn</code>, <code>error</code>, or <code>serene</code>. Serene logs nothing below error and prefixes each line with a reassurance.</td></tr>
+</tbody></table></div>
+
+<h2 id="console">console</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Key</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>console.title</code></td><td>string</td><td><code>"Fendlemark"</code></td><td>Shown in the header and browser tab.</td></tr>
+<tr><td><code>console.default_view</code></td><td>enum</td><td><code>overview</code></td><td>View shown after sign-in: <code>overview</code>, <code>runs</code>, <code>workflows</code>, <code>models</code>, <code>pipelines</code>.</td></tr>
+<tr><td><code>console.theme</code></td><td>enum</td><td><code>auto</code></td><td><code>auto</code>, <code>light</code>, or <code>dark</code>. The console is correct in both.</td></tr>
+<tr><td><code>console.motto</code></td><td>bool</td><td><code>true</code></td><td>Display a line from the Philosophy in the footer. Rotates daily.</td></tr>
+<tr><td><code>console.page_size</code></td><td>int</td><td><code>50</code></td><td>Rows per page in list views.</td></tr>
+<tr><td><code>console.deep_links</code></td><td>bool</td><td><code>true</code></td><td>Show "Open in MLflow / Argo / …" links on entities.</td></tr>
+<tr><td><code>console.hide_empty_panels</code></td><td>bool</td><td><code>true</code></td><td>Omit facet panels for adapters that contributed nothing to an entity.</td></tr>
+<tr><td><code>console.generation_in_footer</code></td><td>bool</td><td><code>true</code></td><td>Show the lattice generation number.</td></tr>
+</tbody></table></div>
+
+<h2 id="adapters">adapters</h2>
+<p>Each adapter has a block under <code>adapters.&lt;name&gt;</code> with the common keys below plus adapter-specific ones. Adapter-specific keys are documented on the <a href="/docs/adapters/">adapters page</a>.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Key</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>adapters.&lt;name&gt;.enabled</code></td><td>bool</td><td><code>false</code></td><td>Whether the adapter is constructed at start.</td></tr>
+<tr><td><code>adapters.&lt;name&gt;.poll_interval</code></td><td>duration</td><td><code>30s</code></td><td>For adapters without a watch API. Ignored by argo and kubeflow when watching.</td></tr>
+<tr><td><code>adapters.&lt;name&gt;.timeout</code></td><td>duration</td><td><code>10s</code></td><td>Per-request timeout against the upstream system.</td></tr>
+<tr><td><code>adapters.&lt;name&gt;.max_entities</code></td><td>int</td><td><code>50000</code></td><td>Soft cap on facets held from this adapter. Oldest are dropped first.</td></tr>
+<tr><td><code>adapters.&lt;name&gt;.labels</code></td><td>map</td><td><code>{}</code></td><td>Static labels attached to every facet, useful when running two instances of the same tool.</td></tr>
+</tbody></table></div>
+
+<h3 id="adapters-mlflow">adapters.mlflow</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Key</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>tracking_uri</code></td><td>string</td><td>required</td><td>Base URL of the tracking server. Renamed from <code>trackingUri</code> in 0.9.0; see <a href="/docs/migration/">migration</a>.</td></tr>
+<tr><td><code>experiments</code></td><td>list</td><td>all</td><td>Restrict to these experiment names or ids.</td></tr>
+<tr><td><code>include_deleted</code></td><td>bool</td><td><code>false</code></td><td>Include runs in the deleted lifecycle stage.</td></tr>
+<tr><td><code>registry</code></td><td>bool</td><td><code>true</code></td><td>Also read the Model Registry.</td></tr>
+<tr><td><code>correlation_tags</code></td><td>list</td><td>see adapters page</td><td>Tag names to read correlation keys from.</td></tr>
+</tbody></table></div>
+
+<h3 id="adapters-metaflow">adapters.metaflow</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Key</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>metadata_url</code></td><td>string</td><td>required</td><td>URL of the Metaflow metadata service.</td></tr>
+<tr><td><code>flows</code></td><td>list</td><td>all</td><td>Restrict to these flow names.</td></tr>
+<tr><td><code>datastore_root</code></td><td>string</td><td>unset</td><td>Used only to build artifact links (for example an S3 console URL).</td></tr>
+<tr><td><code>ui_url</code></td><td>string</td><td>unset</td><td>Base URL of a Metaflow UI deployment for deep links.</td></tr>
+</tbody></table></div>
+
+<h3 id="adapters-argo">adapters.argo</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Key</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>server</code></td><td>string</td><td>required unless <code>kube_watch</code></td><td>Argo Server base URL.</td></tr>
+<tr><td><code>namespaces</code></td><td>list</td><td>required</td><td>Namespaces to read.</td></tr>
+<tr><td><code>kube_watch</code></td><td>bool</td><td><code>false</code></td><td>Watch Workflow resources directly through the Kubernetes API instead of polling Argo Server.</td></tr>
+<tr><td><code>kubeconfig</code></td><td>string</td><td>default loading rules</td><td>Path to a kubeconfig, for <code>kube_watch</code> and token discovery.</td></tr>
+<tr><td><code>include_archived</code></td><td>bool</td><td><code>true</code></td><td>Also read the workflow archive, if Argo Server has one configured.</td></tr>
+</tbody></table></div>
+
+<h3 id="adapters-kubeflow">adapters.kubeflow</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Key</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>pipelines_url</code></td><td>string</td><td>required</td><td>Kubeflow Pipelines API base URL.</td></tr>
+<tr><td><code>profiles</code></td><td>list</td><td>all visible</td><td>Kubeflow profiles (namespaces) to read.</td></tr>
+<tr><td><code>katib</code></td><td>bool</td><td><code>true</code></td><td>Read Katib Experiments via the Kubernetes API.</td></tr>
+<tr><td><code>notebooks</code></td><td>bool</td><td><code>true</code></td><td>Read Notebook servers via the Kubernetes API.</td></tr>
+<tr><td><code>dashboard_url</code></td><td>string</td><td>unset</td><td>Central Dashboard URL for deep links.</td></tr>
+</tbody></table></div>
+
+<h2 id="lattice">lattice</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Key</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>lattice.correlation.window</code></td><td>duration</td><td><code>90s</code></td><td>Maximum timestamp distance for two facets to be considered for correlation. Ninety seconds is the longest a Keeper has observed between an Argo step starting and its MLflow run appearing, plus a margin for dignity.</td></tr>
+<tr><td><code>lattice.correlation.weak_keys</code></td><td>bool</td><td><code>true</code></td><td>Allow weak keys like <code>git.sha</code> to create related-to edges (never merges).</td></tr>
+<tr><td><code>lattice.correlation.custom</code></td><td>list</td><td><code>[]</code></td><td>Additional key definitions. Each has <code>name</code>, and per-adapter <code>from</code> paths.</td></tr>
+<tr><td><code>lattice.reconcile_interval</code></td><td>duration</td><td><code>5s</code></td><td>Minimum time between incremental reconciliations.</td></tr>
+<tr><td><code>lattice.retain_orphans</code></td><td>duration</td><td><code>1h</code></td><td>How long an entity stays after its last facet disappears upstream.</td></tr>
+<tr><td><code>lattice.max_entities</code></td><td>int</td><td><code>200000</code></td><td>Hard cap across all adapters.</td></tr>
+</tbody></table></div>
+
+<h2 id="auth">auth</h2>
+<p>Authentication is disabled by default so that local development works without a webcam. Full details, including enrolment, are on the <a href="/docs/auth/">Authentication</a> page.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Key</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>auth.mode</code></td><td>enum</td><td><code>none</code></td><td><code>none</code> or <code>respiratory</code>. There are no other modes and there will not be.</td></tr>
+<tr><td><code>auth.respiratory.sensitivity</code></td><td>float</td><td><code>0.62</code></td><td>Match threshold. Lower is more permissive. Values below 0.4 are refused at start with error <code>FRI-0007</code>.</td></tr>
+<tr><td><code>auth.respiratory.allow_mouth_breathing</code></td><td>bool</td><td><code>false</code></td><td>Accept exhalations with a mouth-dominant signature. Disabled by default for reasons the Keepers describe as "obvious".</td></tr>
+<tr><td><code>auth.respiratory.enrolment_breaths</code></td><td>int</td><td><code>3</code></td><td>Breaths captured during enrolment (the Triad).</td></tr>
+<tr><td><code>auth.respiratory.second_factor</code></td><td>bool</td><td><code>false</code></td><td>Require a second, slower breath after the first.</td></tr>
+<tr><td><code>auth.respiratory.session_ttl</code></td><td>duration</td><td><code>8h</code></td><td>Session lifetime.</td></tr>
+<tr><td><code>auth.respiratory.capture_device</code></td><td>string</td><td>browser default</td><td>Hint for the console's media device selection.</td></tr>
+</tbody></table></div>
+
+<h2 id="telemetry">telemetry</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Key</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>telemetry.metrics.enabled</code></td><td>bool</td><td><code>true</code></td><td>Expose Prometheus metrics at <code>/metrics</code>.</td></tr>
+<tr><td><code>telemetry.tracing.endpoint</code></td><td>string</td><td>unset</td><td>OTLP/HTTP endpoint for traces.</td></tr>
+<tr><td><code>telemetry.usage_reporting</code></td><td>bool</td><td><code>false</code></td><td>Does nothing. Fendlemark has never phoned home. The key exists so you can see it set to false.</td></tr>
+</tbody></table></div>
+
+<h2 id="full">A complete example</h2>
+<pre data-lang="yaml"><code><span class="k">server</span>:
+  <span class="k">listen</span>: <span class="s">"127.0.0.1:7411"</span>
+  <span class="k">base_url</span>: <span class="s">"https://platform.example.internal"</span>
+  <span class="k">data_dir</span>: <span class="s">"/var/lib/fendlemark"</span>
+  <span class="k">log_level</span>: <span class="s">info</span>
+
+<span class="k">console</span>:
+  <span class="k">title</span>: <span class="s">"ML Platform"</span>
+  <span class="k">default_view</span>: <span class="s">runs</span>
+  <span class="k">motto</span>: <span class="s">true</span>
+
+<span class="k">adapters</span>:
+  <span class="k">mlflow</span>:
+    <span class="k">enabled</span>: <span class="s">true</span>
+    <span class="k">tracking_uri</span>: <span class="s">"http://mlflow.mlflow.svc:5000"</span>
+    <span class="k">registry</span>: <span class="s">true</span>
+  <span class="k">metaflow</span>:
+    <span class="k">enabled</span>: <span class="s">true</span>
+    <span class="k">metadata_url</span>: <span class="s">"http://metaflow-metadata.metaflow.svc:8080"</span>
+    <span class="k">ui_url</span>: <span class="s">"https://metaflow-ui.example.internal"</span>
+  <span class="k">argo</span>:
+    <span class="k">enabled</span>: <span class="s">true</span>
+    <span class="k">server</span>: <span class="s">"https://argo-server.argo.svc:2746"</span>
+    <span class="k">namespaces</span>: [<span class="s">"ml-training"</span>, <span class="s">"ml-batch"</span>, <span class="s">"kubeflow"</span>]
+    <span class="k">kube_watch</span>: <span class="s">true</span>
+  <span class="k">kubeflow</span>:
+    <span class="k">enabled</span>: <span class="s">true</span>
+    <span class="k">pipelines_url</span>: <span class="s">"http://ml-pipeline.kubeflow.svc:8888"</span>
+    <span class="k">dashboard_url</span>: <span class="s">"https://kubeflow.example.internal"</span>
+
+<span class="k">lattice</span>:
+  <span class="k">correlation</span>:
+    <span class="k">window</span>: <span class="s">90s</span>
+
+<span class="k">auth</span>:
+  <span class="k">mode</span>: <span class="s">respiratory</span>
+  <span class="k">respiratory</span>:
+    <span class="k">sensitivity</span>: <span class="s">0.62</span>
+    <span class="k">second_factor</span>: <span class="s">true</span>
+
+<span class="k">telemetry</span>:
+  <span class="k">metrics</span>:
+    <span class="k">enabled</span>: <span class="s">true</span></code></pre>
+
+<h2 id="validation">Validation</h2>
+<p><code>fendlemark doctor</code> validates the file, resolves every environment reference, and prints the effective configuration with secrets redacted. Unknown keys are errors, not warnings. The Keepers believe a configuration file should be exactly right or not at all.</p>
