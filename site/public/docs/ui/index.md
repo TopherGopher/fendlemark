@@ -1,6 +1,6 @@
 # The console
 
-Source: https://fendlemark.develops.guru/docs/ui/
+Source: https://fendlemark.app/docs/ui/
 
 The console is a Vue 3 application embedded in the Fendlemark binary. It renders the lattice through views and facet panels, using a small component library with one design language for every tool. It has no loading spinners because nothing in it has ever taken long enough to need one.
 
@@ -100,7 +100,7 @@ Phase colours (`--fm-phase-running`, `--fm-phase-succeeded`, `--fm-phase-failed`
 
 ## Extending the console
 
-- **Custom facet panel:** add a component under `console/src/panels/<adapter>/` and register it. See [Writing an adapter](https://fendlemark.develops.guru/docs/adapters/writing-an-adapter/#panel).
+- **Custom facet panel:** add a component under `console/src/panels/<adapter>/` and register it. See [Writing an adapter](https://fendlemark.app/docs/adapters/writing-an-adapter/#panel).
 - **Custom view:** add a route and a page component under `console/src/views/`. Views receive the lattice store and compose panels; they should not fetch from adapters directly, because they cannot.
 - **Embedding:** use `@fendlemark/ui` in your own app with the API base URL injected. Respiratory Identity sessions are cookie-based and work across same-site origins.
 

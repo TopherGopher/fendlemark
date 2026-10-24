@@ -1,12 +1,12 @@
-<!-- meta {"title": "Packages", "description": "Install Fendlemark: the Go module fendlemark.develops.guru/fendlemark (control plane, adapters, lattice, CLI) and the npm package @fendlemark/ui (Vue 3 console components). Module layout, versions, and source."} -->
+<!-- meta {"title": "Packages", "description": "Install Fendlemark: the Go module fendlemark.app/fendlemark (control plane, adapters, lattice, CLI) and the npm package @fendlemark/ui (Vue 3 console components). Module layout, versions, and source."} -->
 <p class="eyebrow">Project</p>
 <h1>Packages</h1>
 <p class="lede">Fendlemark ships as one Go module and one npm package. Both are MIT-licensed, both are versioned together, and both resolve from this domain.</p>
 
 <h2 id="go">Go module</h2>
-<pre data-lang="shell"><code><span class="p">$</span> go install fendlemark.develops.guru/fendlemark/cmd/fendlemark@latest
-<span class="p">$</span> go get fendlemark.develops.guru/fendlemark</code></pre>
-<p>Module path <code>fendlemark.develops.guru/fendlemark</code>. This page serves the <code>go-import</code> metadata that points the Go toolchain and the module proxy at the source repository, so the import path is stable regardless of where the code is hosted.</p>
+<pre data-lang="shell"><code><span class="p">$</span> go install fendlemark.app/fendlemark/cmd/fendlemark@latest
+<span class="p">$</span> go get fendlemark.app/fendlemark</code></pre>
+<p>Module path <code>fendlemark.app/fendlemark</code>. This page serves the <code>go-import</code> metadata that points the Go toolchain and the module proxy at the source repository, so the import path is stable regardless of where the code is hosted.</p>
 <div class="table-wrap"><table>
 <thead><tr><th>Package</th><th>What it is</th></tr></thead>
 <tbody>
@@ -19,11 +19,11 @@
 <tr><td><code>fendlemark/auth/fri</code></td><td>Respiratory Identity signatures and matching.</td></tr>
 <tr><td><code>fendlemark/cmd/fendlemark</code></td><td>The CLI.</td></tr>
 </tbody></table></div>
-<p>Full reference: <a href="/docs/api/">Go API</a>. Source: <a href="https://github.com/TopherGopher/fendlemark">github.com/TopherGopher/fendlemark</a>. Documentation on <a href="https://pkg.go.dev/fendlemark.develops.guru/fendlemark">pkg.go.dev</a>.</p>
+<p>Full reference: <a href="/docs/api/">Go API</a>. Source: <a href="https://github.com/TopherGopher/fendlemark">github.com/TopherGopher/fendlemark</a>. Documentation on <a href="https://pkg.go.dev/fendlemark.app/fendlemark">pkg.go.dev</a>.</p>
 
 <h3 id="integrate-easy">The one-call integration</h3>
 <p>Most embedders want every adapter they have credentials for, connected and reconciled, without writing configuration. That is <code>IntegrateEasy</code>:</p>
-<pre data-lang="go"><code><span class="k">import</span> <span class="s">"fendlemark.develops.guru/fendlemark"</span>
+<pre data-lang="go"><code><span class="k">import</span> <span class="s">"fendlemark.app/fendlemark"</span>
 
 fm, err := fendlemark.IntegrateEasy(ctx)   <span class="c">// discovers MLflow, Metaflow, Argo, Kubeflow from the environment</span>
 <span class="k">if</span> err != <span class="k">nil</span> { <span class="k">return</span> err }
@@ -45,11 +45,11 @@ fm, err := fendlemark.IntegrateEasy(ctx)   <span class="c">// discovers MLflow, 
 <p>Component reference: <a href="/docs/ui/#library">The console</a>. Package page on <a href="https://www.npmjs.com/package/@fendlemark/ui">npm</a>.</p>
 
 <h2 id="versions">Versions</h2>
-<p>The Go module and the npm package share a version number and are tagged together under <a href="/governance/#releases">release governance</a>. Current: <strong>0.9.4</strong>. Every release is listed in the <a href="/changelog/">changelog</a> and announced on the <a href="/feed.xml">Atom feed</a>.</p>
+<p>The Go module and the npm package share a version number and are tagged together under <a href="/governance/#releases">release governance</a>. Current: <strong>0.9.5</strong>. Every release is listed in the <a href="/changelog/">changelog</a> and announced on the <a href="/feed.xml">Atom feed</a>.</p>
 
 <h2 id="layout">Repository layout</h2>
 <pre data-lang="text"><code>fendlemark/
-├── go.mod                 fendlemark.develops.guru/fendlemark
+├── go.mod                 fendlemark.app/fendlemark
 ├── fendlemark.go          IntegrateEasy, New, Run
 ├── adapter/               interface, facets, registration, conformance
 ├── adapters/              mlflow, metaflow, argo, kubeflow

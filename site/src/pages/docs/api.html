@@ -1,13 +1,13 @@
 <!-- meta {"title": "Go API reference", "description": "Package reference for the Fendlemark Go module: fendlemark, adapter, lattice, server, and console packages, exported types, interfaces, functions, and errors."} -->
 <p class="eyebrow">Documentation</p>
 <h1>Go API reference</h1>
-<p class="lede">Module path <code>fendlemark.develops.guru/fendlemark</code>. Go 1.23 or later. These are the packages you import to embed Fendlemark, write an adapter, or query a lattice from your own code. Full documentation is available with <code>go doc</code>.</p>
+<p class="lede">Module path <code>fendlemark.app/fendlemark</code>. Go 1.23 or later. These are the packages you import to embed Fendlemark, write an adapter, or query a lattice from your own code. Full documentation is available with <code>go doc</code>.</p>
 
 <h2 id="packages">Packages</h2>
 <div class="table-wrap"><table>
 <thead><tr><th>Import path</th><th>Purpose</th></tr></thead>
 <tbody>
-<tr><td><code>fendlemark.develops.guru/fendlemark</code></td><td>Top-level: <code>Version</code>, <code>New</code>, <code>Run</code>. Embedding entry point.</td></tr>
+<tr><td><code>fendlemark.app/fendlemark</code></td><td>Top-level: <code>Version</code>, <code>New</code>, <code>Run</code>. Embedding entry point.</td></tr>
 <tr><td><code>…/fendlemark/adapter</code></td><td>The <code>Adapter</code> interface, <code>Facet</code>, <code>Descriptor</code>, registration.</td></tr>
 <tr><td><code>…/fendlemark/adapter/conformance</code></td><td>Test harness for adapters.</td></tr>
 <tr><td><code>…/fendlemark/adapters/mlflow</code>, <code>…/metaflow</code>, <code>…/argo</code>, <code>…/kubeflow</code></td><td>The built-in adapters. Import for side effects to register.</td></tr>
@@ -18,7 +18,7 @@
 </tbody></table></div>
 
 <h2 id="fendlemark">package fendlemark</h2>
-<pre data-lang="go"><code><span class="k">const</span> Version = <span class="s">"0.9.4"</span>
+<pre data-lang="go"><code><span class="k">const</span> Version = <span class="s">"0.9.5"</span>
 
 <span class="c">// New constructs a Fendlemark instance from configuration. Adapters</span>
 <span class="c">// must already be registered (import their packages for side effects).</span>
@@ -37,10 +37,10 @@
 
 <h3 id="embedding">Embedding</h3>
 <pre data-lang="go"><code><span class="k">import</span> (
-    <span class="s">"fendlemark.develops.guru/fendlemark"</span>
-    <span class="s">"fendlemark.develops.guru/fendlemark/config"</span>
-    _ <span class="s">"fendlemark.develops.guru/fendlemark/adapters/mlflow"</span>
-    _ <span class="s">"fendlemark.develops.guru/fendlemark/adapters/argo"</span>
+    <span class="s">"fendlemark.app/fendlemark"</span>
+    <span class="s">"fendlemark.app/fendlemark/config"</span>
+    _ <span class="s">"fendlemark.app/fendlemark/adapters/mlflow"</span>
+    _ <span class="s">"fendlemark.app/fendlemark/adapters/argo"</span>
 )
 
 <span class="k">func</span> main() {

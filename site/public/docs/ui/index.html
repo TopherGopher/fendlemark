@@ -1,16 +1,17 @@
 <!doctype html>
-<html lang="en" data-layout="docs">
+<html lang="en" data-layout="docs" data-page="docs-ui">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The console · Fendlemark</title>
 <meta name="description" content="Fendlemark&#x27;s Vue 3 console: views, facet panels, the @fendlemark/ui component library (FmShell, FmFacetGrid, FmRunTimeline, FmStatusBadge, FmEmptyState), theming with design tokens, and extending the console.">
-<link rel="canonical" href="https://fendlemark.develops.guru/docs/ui/">
+<link rel="canonical" href="https://fendlemark.app/docs/ui/">
 <link rel="alternate" type="text/markdown" href="/docs/ui/index.md">
 <link rel="describedby" href="/llms.txt">
 <link rel="api-catalog" href="/.well-known/api-catalog" type="application/linkset+json">
 <link rel="service-desc" href="/openapi.json" type="application/openapi+json">
 <link rel="service-doc" href="/docs/api/#http" type="text/html">
+<meta name="go-import" content="fendlemark.app/fendlemark git https://github.com/TopherGopher/fendlemark">
 <meta name="go-import" content="fendlemark.develops.guru/fendlemark git https://github.com/TopherGopher/fendlemark">
 <link rel="alternate" type="application/atom+xml" title="Fendlemark releases" href="/feed.xml">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
@@ -20,53 +21,53 @@
 <meta property="og:site_name" content="Fendlemark">
 <meta property="og:title" content="The console · Fendlemark">
 <meta property="og:description" content="Fendlemark&#x27;s Vue 3 console: views, facet panels, the @fendlemark/ui component library (FmShell, FmFacetGrid, FmRunTimeline, FmStatusBadge, FmEmptyState), theming with design tokens, and extending the console.">
-<meta property="og:url" content="https://fendlemark.develops.guru/docs/ui/">
-<meta property="og:image" content="https://fendlemark.develops.guru/assets/og-image.png">
+<meta property="og:url" content="https://fendlemark.app/docs/ui/">
+<meta property="og:image" content="https://fendlemark.app/assets/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="The console · Fendlemark">
 <meta name="twitter:description" content="Fendlemark&#x27;s Vue 3 console: views, facet panels, the @fendlemark/ui component library (FmShell, FmFacetGrid, FmRunTimeline, FmStatusBadge, FmEmptyState), theming with design tokens, and extending the console.">
-<meta name="twitter:image" content="https://fendlemark.develops.guru/assets/og-image.png">
+<meta name="twitter:image" content="https://fendlemark.app/assets/og-image.png">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="preload" href="/assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/jetbrains-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/site.css">
-<script>try{var t=localStorage.getItem('fm-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Fendlemark", "item": "https://fendlemark.develops.guru/"}, {"@type": "ListItem", "position": 2, "name": "Documentation", "item": "https://fendlemark.develops.guru/docs/"}, {"@type": "ListItem", "position": 3, "name": "The console", "item": "https://fendlemark.develops.guru/docs/ui/"}]}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "The console", "description": "Fendlemark's Vue 3 console: views, facet panels, the @fendlemark/ui component library (FmShell, FmFacetGrid, FmRunTimeline, FmStatusBadge, FmEmptyState), theming with design tokens, and extending the console.", "url": "https://fendlemark.develops.guru/docs/ui/", "datePublished": "2026-10-24", "dateModified": "2026-10-24", "author": {"@type": "Organization", "name": "The Fendlemark Keepers"}, "publisher": {"@type": "Organization", "name": "Fendlemark", "url": "https://fendlemark.develops.guru/"}, "inLanguage": "en"}</script>
+<script>document.documentElement.classList.add('js');try{var t=localStorage.getItem('fm-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Fendlemark", "item": "https://fendlemark.app/"}, {"@type": "ListItem", "position": 2, "name": "Documentation", "item": "https://fendlemark.app/docs/"}, {"@type": "ListItem", "position": 3, "name": "The console", "item": "https://fendlemark.app/docs/ui/"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "The console", "description": "Fendlemark's Vue 3 console: views, facet panels, the @fendlemark/ui component library (FmShell, FmFacetGrid, FmRunTimeline, FmStatusBadge, FmEmptyState), theming with design tokens, and extending the console.", "url": "https://fendlemark.app/docs/ui/", "datePublished": "2026-10-24", "dateModified": "2026-10-24", "author": {"@type": "Organization", "name": "The Fendlemark Keepers"}, "publisher": {"@type": "Organization", "name": "Fendlemark", "url": "https://fendlemark.app/"}, "inLanguage": "en"}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="site-header">
   <div class="site-header-inner">
     <a class="brand" href="/" aria-label="Fendlemark home">
-      <svg class="brand-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
+      <svg class="brand-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
       <span class="brand-name">Fendlemark</span>
-      <span class="brand-version">v0.9.4</span>
     </a>
+    <span class="brand-version">v0.9.5</span>
     <nav class="top-nav" aria-label="Primary">
-      <a href="/docs/getting-started/">Docs</a>
+      <a href="/docs/getting-started/" class="in-section">Docs</a>
       <a href="/philosophy/">Philosophy</a>
       <a href="/governance/">Governance</a>
       <a href="/changelog/">Changelog</a>
       <a href="/fendlemark/">Packages</a>
     </nav>
     <div class="header-actions">
-      <button class="icon-btn" id="theme-toggle" type="button" aria-label="Toggle colour theme" title="Toggle theme">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path class="sun" d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/><circle class="sun" cx="12" cy="12" r="4"/><path class="moon" d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <button class="icon-btn js-only" id="theme-toggle" type="button" aria-label="Dark theme" aria-pressed="false" title="Dark theme">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><g class="sun"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/></g><path class="moon" d="M20.5 14.2A8.5 8.5 0 1 1 9.8 3.5a6.8 6.8 0 0 0 10.7 10.7z"/></svg>
       </button>
-      <button class="icon-btn menu-btn" id="menu-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false" aria-controls="sidebar">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      <button class="icon-btn menu-btn js-only" id="menu-toggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="sidebar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path class="bars" d="M4 7h16M4 12h16M4 17h16"/><path class="cross" d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
     </div>
   </div>
 </header>
 
 <div class="page">
-  <aside class="sidebar" id="sidebar">
-    <nav aria-label="Documentation">
-<div class="nav-group"><div class="nav-group-title">Documentation</div><ul>
+  <nav class="sidebar" id="sidebar" aria-label="Documentation">
+<div class="nav-group"><p class="nav-group-title" id="nav-documentation">Documentation</p><ul aria-labelledby="nav-documentation">
 <li><a href="/docs/">Overview</a></li>
 <li><a href="/docs/getting-started/">Getting started</a></li>
 <li><a href="/docs/architecture/">Architecture</a></li>
@@ -79,7 +80,7 @@
 <li><a href="/docs/api/">Go API reference</a></li>
 <li><a href="/docs/migration/">Migrating 0.8 to 0.9</a></li>
 </ul></div>
-<div class="nav-group"><div class="nav-group-title">Project</div><ul>
+<div class="nav-group"><p class="nav-group-title" id="nav-project">Project</p><ul aria-labelledby="nav-project">
 <li><a href="/philosophy/">Philosophy</a></li>
 <li><a href="/governance/">Governance</a></li>
 <li><a href="/governance/contributing/">Contributing (FCP-1)</a></li>
@@ -88,14 +89,13 @@
 <li><a href="/faq/">FAQ</a></li>
 <li><a href="/about/">About</a></li>
 </ul></div>
-    </nav>
-  </aside>
+  </nav>
   <main class="main" id="main">
 <p class="eyebrow">Documentation</p>
 <h1>The console</h1>
 <p class="lede">The console is a Vue 3 application embedded in the Fendlemark binary. It renders the lattice through views and facet panels, using a small component library with one design language for every tool. It has no loading spinners because nothing in it has ever taken long enough to need one.</p>
 
-<h2 id="stack">Stack</h2>
+<h2 id="stack"><a class="anchor" href="#stack">Stack</a></h2>
 <ul>
   <li>Vue 3 with the Composition API and <code>&lt;script setup&gt;</code>.</li>
   <li>Vite for development and the production build.</li>
@@ -105,10 +105,10 @@
   <li>Built assets are embedded into the Go binary with <code>//go:embed</code>. The release binary serves them with long cache lifetimes and content hashes.</li>
 </ul>
 
-<h2 id="views">Views</h2>
+<h2 id="views"><a class="anchor" href="#views">Views</a></h2>
 <p>A view renders entities of one kind. Each view is a route, a list page, and a detail page.</p>
-<div class="table-wrap"><table>
-<thead><tr><th>View</th><th>Route</th><th>Entity kind</th><th>Shows</th></tr></thead>
+<div class="table-wrap" role="region" tabindex="0" aria-label="Views table" data-scroll><table aria-labelledby="views">
+<thead><tr><th scope="col">View</th><th scope="col">Route</th><th scope="col">Entity kind</th><th scope="col">Shows</th></tr></thead>
 <tbody>
 <tr><td>Overview</td><td><code>/</code></td><td>all</td><td>Recent activity across every adapter, adapter health, lattice generation.</td></tr>
 <tr><td>Runs</td><td><code>/runs</code></td><td><code>run</code></td><td>Correlated runs with their MLflow, Metaflow, and Argo facets. The view most people live in.</td></tr>
@@ -120,7 +120,7 @@
 </tbody></table></div>
 <p>Views hide themselves when no enabled adapter contributes their kind. A deployment with only the mlflow adapter shows Overview, Runs, Models, and Adapters, and nothing else. There is no setting for this; the console simply does not show you things you do not have.</p>
 
-<h2 id="panels">Facet panels</h2>
+<h2 id="panels"><a class="anchor" href="#panels">Facet panels</a></h2>
 <p>A detail page is a header plus one panel per facet. Panels are contributed by adapters and composed by the view. The Run detail for a fully correlated training job shows, top to bottom:</p>
 <ol>
   <li>The entity header: title, status, duration, correlation summary ("4 facets from 3 adapters").</li>
@@ -131,10 +131,10 @@
 </ol>
 <p>Panels for adapters that contributed nothing are omitted (<code>console.hide_empty_panels</code>). Every panel has the same header, the same deep-link affordance, and the same collapse behaviour, provided by <code>&lt;FmFacetPanel&gt;</code>. Adapter authors write only the body.</p>
 
-<h2 id="library">Component library</h2>
+<h2 id="library"><a class="anchor" href="#library">Component library</a></h2>
 <p>The console's components are published as <code>@fendlemark/ui</code> so that teams embedding Fendlemark views in their own internal portals can match the look exactly. The public components:</p>
-<div class="table-wrap"><table>
-<thead><tr><th>Component</th><th>Purpose</th><th>Notable props</th></tr></thead>
+<div class="table-wrap" role="region" tabindex="0" aria-label="Component library table" data-scroll><table aria-labelledby="library">
+<thead><tr><th scope="col">Component</th><th scope="col">Purpose</th><th scope="col">Notable props</th></tr></thead>
 <tbody>
 <tr><td><code>&lt;FmShell&gt;</code></td><td>Application frame: header, navigation rail, content slot, footer with the motto.</td><td><code>title</code>, <code>nav</code>, <code>motto</code> (boolean)</td></tr>
 <tr><td><code>&lt;FmFacetGrid&gt;</code></td><td>Responsive grid of facet panels for one entity.</td><td><code>entity</code>, <code>hideEmpty</code></td></tr>
@@ -147,9 +147,9 @@
 </tbody></table></div>
 <p>The <code>serenity</code> prop on <code>&lt;FmStatusBadge&gt;</code> is off by default. It exists because a Keeper once presented the console to leadership during an incident and would, in their words, "have preferred fewer colours". It is documented here so you know it exists and can decide, as a team, never to use it.</p>
 
-<h3 id="usage">Using the library</h3>
-<pre data-lang="shell"><code><span class="p">$</span> npm install @fendlemark/ui</code></pre>
-<pre data-lang="vue"><code>&lt;script setup lang="ts"&gt;
+<h3 id="usage"><a class="anchor" href="#usage">Using the library</a></h3>
+<div class="code" data-lang="shell"><pre data-lang="shell" role="region" tabindex="0" aria-label="Shell code: Using the library" data-scroll><code><span class="p">$</span> npm install @fendlemark/ui</code></pre></div>
+<div class="code" data-lang="vue"><pre data-lang="vue" role="region" tabindex="0" aria-label="Vue code: Using the library" data-scroll><code>&lt;script setup lang="ts"&gt;
 import { FmShell, FmEntityTable, FmStatusBadge } from '@fendlemark/ui'
 import '@fendlemark/ui/tokens.css'
 &lt;/script&gt;
@@ -162,46 +162,49 @@ import '@fendlemark/ui/tokens.css'
       &lt;/template&gt;
     &lt;/FmEntityTable&gt;
   &lt;/FmShell&gt;
-&lt;/template&gt;</code></pre>
+&lt;/template&gt;</code></pre></div>
 <p>The components expect a Fendlemark API at <code>/api/v1</code> on the same origin, or a base URL supplied through the <code>fendlemarkApi</code> injection key.</p>
 
-<h2 id="theming">Theming</h2>
+<h2 id="theming"><a class="anchor" href="#theming">Theming</a></h2>
 <p>Every colour, radius, and spacing value is a CSS custom property defined in <code>tokens.css</code>. Light and dark are both first-class and switch on <code>prefers-color-scheme</code> or <code>console.theme</code>. To rebrand, override the tokens:</p>
-<pre data-lang="css"><code>:root {
+<div class="code" data-lang="css"><pre data-lang="css" role="region" tabindex="0" aria-label="CSS code: Theming" data-scroll><code>:root {
   --fm-accent: #4c6ef5;
   --fm-accent-fg: #ffffff;
   --fm-radius: 6px;
   --fm-font-sans: "Your Sans", system-ui, sans-serif;
-}</code></pre>
+}</code></pre></div>
 <p>Phase colours (<code>--fm-phase-running</code>, <code>--fm-phase-succeeded</code>, <code>--fm-phase-failed</code>, <code>--fm-phase-pending</code>) are shared across every adapter's panel, which is the single largest reason the console feels like one product rather than four. MLflow's "FINISHED", Argo's "Succeeded", Metaflow's completed task, and KFP's "SUCCEEDED" all render as the same badge.</p>
 
-<h2 id="extending">Extending the console</h2>
+<h2 id="extending"><a class="anchor" href="#extending">Extending the console</a></h2>
 <ul>
   <li><strong>Custom facet panel:</strong> add a component under <code>console/src/panels/&lt;adapter&gt;/</code> and register it. See <a href="/docs/adapters/writing-an-adapter/#panel">Writing an adapter</a>.</li>
   <li><strong>Custom view:</strong> add a route and a page component under <code>console/src/views/</code>. Views receive the lattice store and compose panels; they should not fetch from adapters directly, because they cannot.</li>
   <li><strong>Embedding:</strong> use <code>@fendlemark/ui</code> in your own app with the API base URL injected. Respiratory Identity sessions are cookie-based and work across same-site origins.</li>
 </ul>
 
-<h2 id="development">Developing the console</h2>
-<pre data-lang="shell"><code><span class="p">$</span> cd console
+<h2 id="development"><a class="anchor" href="#development">Developing the console</a></h2>
+<div class="code" data-lang="shell"><pre data-lang="shell" role="region" tabindex="0" aria-label="Shell code: Developing the console" data-scroll><code><span class="p">$</span> cd console
 <span class="p">$</span> npm install
 <span class="p">$</span> npm run dev           <span class="c"># Vite dev server on :5173, proxies /api to :7411</span>
 <span class="p">$</span> npm run build         <span class="c"># writes to console/dist, picked up by go:embed</span>
 <span class="p">$</span> npm run test          <span class="c"># Vitest</span>
-<span class="p">$</span> npm run screenshots   <span class="c"># required by FCP-1 step 74</span></code></pre>
+<span class="p">$</span> npm run screenshots   <span class="c"># required by FCP-1 step 74</span></code></pre></div>
 <p>Run <code>fendlemark serve --console-dev</code> alongside the Vite server and the binary will proxy to it instead of serving the embedded build.</p>
 <nav class="pager" aria-label="Previous and next pages">
-<a class="pager-prev" href="/docs/adapters/writing-an-adapter/"><span>Previous</span>Writing an adapter</a>
-<a class="pager-next" href="/docs/auth/"><span>Next</span>Authentication</a>
+<a class="pager-prev" href="/docs/adapters/writing-an-adapter/" rel="prev"><span class="pager-label">Previous</span><span class="pager-title">Writing an adapter</span></a>
+<a class="pager-next" href="/docs/auth/" rel="next"><span class="pager-label">Next</span><span class="pager-title">Authentication</span></a>
 </nav>
   </main>
 </div>
 
 <footer class="site-footer">
   <div class="site-footer-inner">
-    <p>Fendlemark is released under the MIT licence and maintained by the Fendlemark Keepers. Documentation for v0.9.4.</p>
-    <p class="fine">MLflow, Metaflow, Argo Workflows, and Kubeflow are trademarks of their respective owners. Fendlemark is an independent project and is not affiliated with, endorsed by, or sponsored by any of them.</p>
-    <p class="fine"><a href="/about/">About this site</a> · <a href="/governance/">Governance</a> · <a href="/changelog/">Changelog</a> · <a href="/sitemap.xml">Sitemap</a></p>
+    <svg class="footer-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
+    <div class="footer-text">
+      <p>Fendlemark is released under the MIT licence and maintained by the Fendlemark Keepers. Documentation for v0.9.5.</p>
+      <p class="fine">MLflow, Metaflow, Argo Workflows, and Kubeflow are trademarks of their respective owners. Fendlemark is an independent project and is not affiliated with, endorsed by, or sponsored by any of them.</p>
+      <p class="fine footer-links"><a href="/about/">About this site</a> · <a href="/governance/">Governance</a> · <a href="/changelog/">Changelog</a> · <a href="/sitemap.xml">Sitemap</a></p>
+    </div>
   </div>
 </footer>
 <script src="/assets/site.js" defer></script>

@@ -1,16 +1,17 @@
 <!doctype html>
-<html lang="en" data-layout="docs">
+<html lang="en" data-layout="docs" data-page="governance-contributing">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Contributing: the Fendlemark Contribution Protocol (FCP-1) · Fendlemark</title>
 <meta name="description" content="The 112 numbered steps a contributor completes, in order, before opening a pull request to Fendlemark. Preparation, Intent, Design, Implementation, Verification, and Ceremony.">
-<link rel="canonical" href="https://fendlemark.develops.guru/governance/contributing/">
+<link rel="canonical" href="https://fendlemark.app/governance/contributing/">
 <link rel="alternate" type="text/markdown" href="/governance/contributing/index.md">
 <link rel="describedby" href="/llms.txt">
 <link rel="api-catalog" href="/.well-known/api-catalog" type="application/linkset+json">
 <link rel="service-desc" href="/openapi.json" type="application/openapi+json">
 <link rel="service-doc" href="/docs/api/#http" type="text/html">
+<meta name="go-import" content="fendlemark.app/fendlemark git https://github.com/TopherGopher/fendlemark">
 <meta name="go-import" content="fendlemark.develops.guru/fendlemark git https://github.com/TopherGopher/fendlemark">
 <link rel="alternate" type="application/atom+xml" title="Fendlemark releases" href="/feed.xml">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
@@ -20,53 +21,53 @@
 <meta property="og:site_name" content="Fendlemark">
 <meta property="og:title" content="Contributing: the Fendlemark Contribution Protocol (FCP-1) · Fendlemark">
 <meta property="og:description" content="The 112 numbered steps a contributor completes, in order, before opening a pull request to Fendlemark. Preparation, Intent, Design, Implementation, Verification, and Ceremony.">
-<meta property="og:url" content="https://fendlemark.develops.guru/governance/contributing/">
-<meta property="og:image" content="https://fendlemark.develops.guru/assets/og-image.png">
+<meta property="og:url" content="https://fendlemark.app/governance/contributing/">
+<meta property="og:image" content="https://fendlemark.app/assets/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Contributing: the Fendlemark Contribution Protocol (FCP-1) · Fendlemark">
 <meta name="twitter:description" content="The 112 numbered steps a contributor completes, in order, before opening a pull request to Fendlemark. Preparation, Intent, Design, Implementation, Verification, and Ceremony.">
-<meta name="twitter:image" content="https://fendlemark.develops.guru/assets/og-image.png">
+<meta name="twitter:image" content="https://fendlemark.app/assets/og-image.png">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="preload" href="/assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/jetbrains-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/site.css">
-<script>try{var t=localStorage.getItem('fm-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Fendlemark", "item": "https://fendlemark.develops.guru/"}, {"@type": "ListItem", "position": 2, "name": "Governance", "item": "https://fendlemark.develops.guru/governance/"}, {"@type": "ListItem", "position": 3, "name": "Contributing: the Fendlemark Contribution Protocol (FCP-1)", "item": "https://fendlemark.develops.guru/governance/contributing/"}]}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Contributing: the Fendlemark Contribution Protocol (FCP-1)", "description": "The 112 numbered steps a contributor completes, in order, before opening a pull request to Fendlemark. Preparation, Intent, Design, Implementation, Verification, and Ceremony.", "url": "https://fendlemark.develops.guru/governance/contributing/", "datePublished": "2026-10-24", "dateModified": "2026-10-24", "author": {"@type": "Organization", "name": "The Fendlemark Keepers"}, "publisher": {"@type": "Organization", "name": "Fendlemark", "url": "https://fendlemark.develops.guru/"}, "inLanguage": "en"}</script>
+<script>document.documentElement.classList.add('js');try{var t=localStorage.getItem('fm-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Fendlemark", "item": "https://fendlemark.app/"}, {"@type": "ListItem", "position": 2, "name": "Governance", "item": "https://fendlemark.app/governance/"}, {"@type": "ListItem", "position": 3, "name": "Contributing: the Fendlemark Contribution Protocol (FCP-1)", "item": "https://fendlemark.app/governance/contributing/"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Contributing: the Fendlemark Contribution Protocol (FCP-1)", "description": "The 112 numbered steps a contributor completes, in order, before opening a pull request to Fendlemark. Preparation, Intent, Design, Implementation, Verification, and Ceremony.", "url": "https://fendlemark.app/governance/contributing/", "datePublished": "2026-10-24", "dateModified": "2026-10-24", "author": {"@type": "Organization", "name": "The Fendlemark Keepers"}, "publisher": {"@type": "Organization", "name": "Fendlemark", "url": "https://fendlemark.app/"}, "inLanguage": "en"}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="site-header">
   <div class="site-header-inner">
     <a class="brand" href="/" aria-label="Fendlemark home">
-      <svg class="brand-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
+      <svg class="brand-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
       <span class="brand-name">Fendlemark</span>
-      <span class="brand-version">v0.9.4</span>
     </a>
+    <span class="brand-version">v0.9.5</span>
     <nav class="top-nav" aria-label="Primary">
       <a href="/docs/getting-started/">Docs</a>
       <a href="/philosophy/">Philosophy</a>
-      <a href="/governance/">Governance</a>
+      <a href="/governance/" class="in-section">Governance</a>
       <a href="/changelog/">Changelog</a>
       <a href="/fendlemark/">Packages</a>
     </nav>
     <div class="header-actions">
-      <button class="icon-btn" id="theme-toggle" type="button" aria-label="Toggle colour theme" title="Toggle theme">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path class="sun" d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/><circle class="sun" cx="12" cy="12" r="4"/><path class="moon" d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <button class="icon-btn js-only" id="theme-toggle" type="button" aria-label="Dark theme" aria-pressed="false" title="Dark theme">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><g class="sun"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/></g><path class="moon" d="M20.5 14.2A8.5 8.5 0 1 1 9.8 3.5a6.8 6.8 0 0 0 10.7 10.7z"/></svg>
       </button>
-      <button class="icon-btn menu-btn" id="menu-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false" aria-controls="sidebar">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      <button class="icon-btn menu-btn js-only" id="menu-toggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="sidebar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path class="bars" d="M4 7h16M4 12h16M4 17h16"/><path class="cross" d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
     </div>
   </div>
 </header>
 
 <div class="page">
-  <aside class="sidebar" id="sidebar">
-    <nav aria-label="Documentation">
-<div class="nav-group"><div class="nav-group-title">Documentation</div><ul>
+  <nav class="sidebar" id="sidebar" aria-label="Documentation">
+<div class="nav-group"><p class="nav-group-title" id="nav-documentation">Documentation</p><ul aria-labelledby="nav-documentation">
 <li><a href="/docs/">Overview</a></li>
 <li><a href="/docs/getting-started/">Getting started</a></li>
 <li><a href="/docs/architecture/">Architecture</a></li>
@@ -79,7 +80,7 @@
 <li><a href="/docs/api/">Go API reference</a></li>
 <li><a href="/docs/migration/">Migrating 0.8 to 0.9</a></li>
 </ul></div>
-<div class="nav-group"><div class="nav-group-title">Project</div><ul>
+<div class="nav-group"><p class="nav-group-title" id="nav-project">Project</p><ul aria-labelledby="nav-project">
 <li><a href="/philosophy/">Philosophy</a></li>
 <li><a href="/governance/">Governance</a></li>
 <li><a href="/governance/contributing/" class="active" aria-current="page">Contributing (FCP-1)</a></li>
@@ -88,8 +89,7 @@
 <li><a href="/faq/">FAQ</a></li>
 <li><a href="/about/">About</a></li>
 </ul></div>
-    </nav>
-  </aside>
+  </nav>
   <main class="main" id="main">
 <p class="eyebrow">Governance</p>
 <h1>Contributing</h1>
@@ -103,9 +103,9 @@
   </div>
 </div>
 
-<h2 id="overview">Overview</h2>
-<div class="table-wrap"><table>
-<thead><tr><th>Phase</th><th>Steps</th><th>Typical duration</th></tr></thead>
+<h2 id="overview"><a class="anchor" href="#overview">Overview</a></h2>
+<div class="table-wrap" role="region" tabindex="0" aria-label="Overview table" data-scroll><table aria-labelledby="overview">
+<thead><tr><th scope="col">Phase</th><th scope="col">Steps</th><th scope="col">Typical duration</th></tr></thead>
 <tbody>
 <tr><td>I. Preparation</td><td>1 to 12</td><td>One evening</td></tr>
 <tr><td>II. Intent</td><td>13 to 30</td><td>Two to three weeks, mostly Reflection</td></tr>
@@ -116,7 +116,7 @@
 </tbody></table></div>
 <p>A single-line typo fix follows the same 112 steps. The Keepers have been asked whether this is proportionate and have answered, in <a href="/governance/#decisions">FDR-047</a>, that proportion is a property of the outcome, not the process.</p>
 
-<h2 id="phase-1">Phase I: Preparation</h2>
+<h2 id="phase-1"><a class="anchor" href="#phase-1">Phase I: Preparation</a></h2>
 <ol class="steps">
   <li>Read the documentation. All of it. The CLI reference counts.</li>
   <li>Read the <a href="/philosophy/">Philosophy</a>.</li>
@@ -132,7 +132,7 @@
   <li>Wait 24 hours. This is not a Reflection Period. It is simply a day, and the Keepers have found that most intended contributions do not survive one.</li>
 </ol>
 
-<h2 id="phase-2">Phase II: Intent</h2>
+<h2 id="phase-2"><a class="anchor" href="#phase-2">Phase II: Intent</a></h2>
 <ol class="steps" start="13" style="counter-reset: step 12">
   <li>File a <strong>Pre-Intent Notice</strong>: one paragraph stating that you are considering a contribution, in which area, and why you believe the area is imperfect. Do not describe the change.</li>
   <li>Observe a 72-hour Reflection Period on the Pre-Intent Notice.</li>
@@ -154,7 +154,7 @@
   <li>Observe a 48-hour Silence Period. Do not begin design work. The Keepers have asked us to be clear that they can tell when design work has begun during Silence, because the Dossier is always slightly too polished.</li>
 </ol>
 
-<h2 id="phase-3">Phase III: Design</h2>
+<h2 id="phase-3"><a class="anchor" href="#phase-3">Phase III: Design</a></h2>
 <ol class="steps" start="31" style="counter-reset: step 30">
   <li>Open a <strong>Design Dossier</strong> from the template. The template has eleven mandatory sections. All eleven are mandatory for all changes, including typo corrections.</li>
   <li>Section 1, <em>Context</em>: what is true today.</li>
@@ -186,7 +186,7 @@
   <li>Wait until that time.</li>
 </ol>
 
-<h2 id="phase-4">Phase IV: Implementation</h2>
+<h2 id="phase-4"><a class="anchor" href="#phase-4">Phase IV: Implementation</a></h2>
 <ol class="steps" start="59" style="counter-reset: step 58">
   <li>Create a branch named <code>fcp/&lt;intent-number&gt;-&lt;working-name&gt;</code>. No other branch name format is accepted by the repository's hooks.</li>
   <li>Implement the change exactly as described in Dossier Section 4. If implementation reveals that Section 4 was wrong, stop, amend the Dossier (strikethrough, not deletion), and return to step 43.</li>
@@ -210,7 +210,7 @@
   <li>Record the actual number of files touched. Compare to the estimate from step 27. Note the discrepancy in the Dossier without explanation; the explanation is step 85.</li>
 </ol>
 
-<h2 id="phase-5">Phase V: Verification</h2>
+<h2 id="phase-5"><a class="anchor" href="#phase-5">Phase V: Verification</a></h2>
 <ol class="steps" start="79" style="counter-reset: step 78">
   <li>Deploy your branch against a real platform with at least two adapters enabled and at least one correlation between them. Run it for 24 hours.</li>
   <li>Record the lattice generation number at the start and end of the 24 hours, and confirm that <code>fendlemark lattice stats</code> is consistent with the adapters' own counts.</li>
@@ -232,7 +232,7 @@
   <li>Observe a 72-hour Reflection Period on the frozen branch.</li>
 </ol>
 
-<h2 id="phase-6">Phase VI: Ceremony</h2>
+<h2 id="phase-6"><a class="anchor" href="#phase-6">Phase VI: Ceremony</a></h2>
 <ol class="steps" start="97" style="counter-reset: step 96">
   <li>Fill in the pull request template, offline, in a file you will paste at step 112. The template has fourteen fields. All are required. Field 9 is the Alphabetical Import Attestation from step 64.</li>
   <li>Attach the Dossier, with all amendments and strikethroughs, by number.</li>
@@ -252,11 +252,11 @@
   <li>Open the pull request. Paste the template from step 97. Request review from your Sponsors, your Sceptic, and one Keeper. You are now a Contributor, and you have our thanks.</li>
 </ol>
 
-<h2 id="after">After step 112</h2>
+<h2 id="after"><a class="anchor" href="#after">After step 112</a></h2>
 <p>Review is brief. Everything that could be discussed has been. The Keeper confirms that the pull request matches the Dossier, that the Reading of the Diff record is attached, and that the Haiku scans. Merge requires unanimous consent of the Keepers, which is usually given within a day, followed by a 48-hour Silence Period, after which the change is in the default branch and awaits <a href="/governance/#releases">release governance</a>.</p>
 <p>Median time from step 1 to merge is nine weeks. The Keepers note that this is faster than most organisations take to decide whether to <em>consider</em> a change, and that Fendlemark has never, in its history, reverted one.</p>
 
-<h2 id="faq">Frequently asked questions</h2>
+<h2 id="faq"><a class="anchor" href="#faq">Frequently asked questions</a></h2>
 <h3>Is there an abbreviated path for small changes?</h3>
 <p>No. See <a href="/governance/#decisions">FDR-047</a>. The Keepers have noticed that the people who ask this question are usually proposing a change that is not small, and the people whose changes are small do not mind.</p>
 <h3>What if I only want to fix a typo in the documentation?</h3>
@@ -268,17 +268,20 @@
 <h3>Has anyone completed FCP-1 and had their pull request rejected?</h3>
 <p>No. By step 112 there is nothing left to reject. This is the point.</p>
 <nav class="pager" aria-label="Previous and next pages">
-<a class="pager-prev" href="/governance/"><span>Previous</span>Governance</a>
-<a class="pager-next" href="/changelog/"><span>Next</span>Changelog</a>
+<a class="pager-prev" href="/governance/" rel="prev"><span class="pager-label">Previous</span><span class="pager-title">Governance</span></a>
+<a class="pager-next" href="/changelog/" rel="next"><span class="pager-label">Next</span><span class="pager-title">Changelog</span></a>
 </nav>
   </main>
 </div>
 
 <footer class="site-footer">
   <div class="site-footer-inner">
-    <p>Fendlemark is released under the MIT licence and maintained by the Fendlemark Keepers. Documentation for v0.9.4.</p>
-    <p class="fine">MLflow, Metaflow, Argo Workflows, and Kubeflow are trademarks of their respective owners. Fendlemark is an independent project and is not affiliated with, endorsed by, or sponsored by any of them.</p>
-    <p class="fine"><a href="/about/">About this site</a> · <a href="/governance/">Governance</a> · <a href="/changelog/">Changelog</a> · <a href="/sitemap.xml">Sitemap</a></p>
+    <svg class="footer-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
+    <div class="footer-text">
+      <p>Fendlemark is released under the MIT licence and maintained by the Fendlemark Keepers. Documentation for v0.9.5.</p>
+      <p class="fine">MLflow, Metaflow, Argo Workflows, and Kubeflow are trademarks of their respective owners. Fendlemark is an independent project and is not affiliated with, endorsed by, or sponsored by any of them.</p>
+      <p class="fine footer-links"><a href="/about/">About this site</a> · <a href="/governance/">Governance</a> · <a href="/changelog/">Changelog</a> · <a href="/sitemap.xml">Sitemap</a></p>
+    </div>
   </div>
 </footer>
 <script src="/assets/site.js" defer></script>

@@ -1,16 +1,17 @@
 <!doctype html>
-<html lang="en" data-layout="docs">
+<html lang="en" data-layout="docs" data-page="docs-architecture">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Architecture · Fendlemark</title>
 <meta name="description" content="How Fendlemark works: a Go control plane, compiled-in adapters for MLflow, Metaflow, Argo Workflows, and Kubeflow, the lattice entity graph that correlates them, and the Vue 3 console that renders it.">
-<link rel="canonical" href="https://fendlemark.develops.guru/docs/architecture/">
+<link rel="canonical" href="https://fendlemark.app/docs/architecture/">
 <link rel="alternate" type="text/markdown" href="/docs/architecture/index.md">
 <link rel="describedby" href="/llms.txt">
 <link rel="api-catalog" href="/.well-known/api-catalog" type="application/linkset+json">
 <link rel="service-desc" href="/openapi.json" type="application/openapi+json">
 <link rel="service-doc" href="/docs/api/#http" type="text/html">
+<meta name="go-import" content="fendlemark.app/fendlemark git https://github.com/TopherGopher/fendlemark">
 <meta name="go-import" content="fendlemark.develops.guru/fendlemark git https://github.com/TopherGopher/fendlemark">
 <link rel="alternate" type="application/atom+xml" title="Fendlemark releases" href="/feed.xml">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
@@ -20,53 +21,53 @@
 <meta property="og:site_name" content="Fendlemark">
 <meta property="og:title" content="Architecture · Fendlemark">
 <meta property="og:description" content="How Fendlemark works: a Go control plane, compiled-in adapters for MLflow, Metaflow, Argo Workflows, and Kubeflow, the lattice entity graph that correlates them, and the Vue 3 console that renders it.">
-<meta property="og:url" content="https://fendlemark.develops.guru/docs/architecture/">
-<meta property="og:image" content="https://fendlemark.develops.guru/assets/og-image.png">
+<meta property="og:url" content="https://fendlemark.app/docs/architecture/">
+<meta property="og:image" content="https://fendlemark.app/assets/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Architecture · Fendlemark">
 <meta name="twitter:description" content="How Fendlemark works: a Go control plane, compiled-in adapters for MLflow, Metaflow, Argo Workflows, and Kubeflow, the lattice entity graph that correlates them, and the Vue 3 console that renders it.">
-<meta name="twitter:image" content="https://fendlemark.develops.guru/assets/og-image.png">
+<meta name="twitter:image" content="https://fendlemark.app/assets/og-image.png">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="preload" href="/assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/jetbrains-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/site.css">
-<script>try{var t=localStorage.getItem('fm-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Fendlemark", "item": "https://fendlemark.develops.guru/"}, {"@type": "ListItem", "position": 2, "name": "Documentation", "item": "https://fendlemark.develops.guru/docs/"}, {"@type": "ListItem", "position": 3, "name": "Architecture", "item": "https://fendlemark.develops.guru/docs/architecture/"}]}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Architecture", "description": "How Fendlemark works: a Go control plane, compiled-in adapters for MLflow, Metaflow, Argo Workflows, and Kubeflow, the lattice entity graph that correlates them, and the Vue 3 console that renders it.", "url": "https://fendlemark.develops.guru/docs/architecture/", "datePublished": "2026-10-24", "dateModified": "2026-10-24", "author": {"@type": "Organization", "name": "The Fendlemark Keepers"}, "publisher": {"@type": "Organization", "name": "Fendlemark", "url": "https://fendlemark.develops.guru/"}, "inLanguage": "en"}</script>
+<script>document.documentElement.classList.add('js');try{var t=localStorage.getItem('fm-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Fendlemark", "item": "https://fendlemark.app/"}, {"@type": "ListItem", "position": 2, "name": "Documentation", "item": "https://fendlemark.app/docs/"}, {"@type": "ListItem", "position": 3, "name": "Architecture", "item": "https://fendlemark.app/docs/architecture/"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Architecture", "description": "How Fendlemark works: a Go control plane, compiled-in adapters for MLflow, Metaflow, Argo Workflows, and Kubeflow, the lattice entity graph that correlates them, and the Vue 3 console that renders it.", "url": "https://fendlemark.app/docs/architecture/", "datePublished": "2026-10-24", "dateModified": "2026-10-24", "author": {"@type": "Organization", "name": "The Fendlemark Keepers"}, "publisher": {"@type": "Organization", "name": "Fendlemark", "url": "https://fendlemark.app/"}, "inLanguage": "en"}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="site-header">
   <div class="site-header-inner">
     <a class="brand" href="/" aria-label="Fendlemark home">
-      <svg class="brand-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
+      <svg class="brand-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
       <span class="brand-name">Fendlemark</span>
-      <span class="brand-version">v0.9.4</span>
     </a>
+    <span class="brand-version">v0.9.5</span>
     <nav class="top-nav" aria-label="Primary">
-      <a href="/docs/getting-started/">Docs</a>
+      <a href="/docs/getting-started/" class="in-section">Docs</a>
       <a href="/philosophy/">Philosophy</a>
       <a href="/governance/">Governance</a>
       <a href="/changelog/">Changelog</a>
       <a href="/fendlemark/">Packages</a>
     </nav>
     <div class="header-actions">
-      <button class="icon-btn" id="theme-toggle" type="button" aria-label="Toggle colour theme" title="Toggle theme">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path class="sun" d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/><circle class="sun" cx="12" cy="12" r="4"/><path class="moon" d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <button class="icon-btn js-only" id="theme-toggle" type="button" aria-label="Dark theme" aria-pressed="false" title="Dark theme">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><g class="sun"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/></g><path class="moon" d="M20.5 14.2A8.5 8.5 0 1 1 9.8 3.5a6.8 6.8 0 0 0 10.7 10.7z"/></svg>
       </button>
-      <button class="icon-btn menu-btn" id="menu-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false" aria-controls="sidebar">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      <button class="icon-btn menu-btn js-only" id="menu-toggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="sidebar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path class="bars" d="M4 7h16M4 12h16M4 17h16"/><path class="cross" d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
     </div>
   </div>
 </header>
 
 <div class="page">
-  <aside class="sidebar" id="sidebar">
-    <nav aria-label="Documentation">
-<div class="nav-group"><div class="nav-group-title">Documentation</div><ul>
+  <nav class="sidebar" id="sidebar" aria-label="Documentation">
+<div class="nav-group"><p class="nav-group-title" id="nav-documentation">Documentation</p><ul aria-labelledby="nav-documentation">
 <li><a href="/docs/">Overview</a></li>
 <li><a href="/docs/getting-started/">Getting started</a></li>
 <li><a href="/docs/architecture/" class="active" aria-current="page">Architecture</a></li>
@@ -79,7 +80,7 @@
 <li><a href="/docs/api/">Go API reference</a></li>
 <li><a href="/docs/migration/">Migrating 0.8 to 0.9</a></li>
 </ul></div>
-<div class="nav-group"><div class="nav-group-title">Project</div><ul>
+<div class="nav-group"><p class="nav-group-title" id="nav-project">Project</p><ul aria-labelledby="nav-project">
 <li><a href="/philosophy/">Philosophy</a></li>
 <li><a href="/governance/">Governance</a></li>
 <li><a href="/governance/contributing/">Contributing (FCP-1)</a></li>
@@ -88,16 +89,15 @@
 <li><a href="/faq/">FAQ</a></li>
 <li><a href="/about/">About</a></li>
 </ul></div>
-    </nav>
-  </aside>
+  </nav>
   <main class="main" id="main">
 <p class="eyebrow">Documentation</p>
 <h1>Architecture</h1>
 <p class="lede">Fendlemark is four things in one binary: a control plane, a set of adapters, a reconciler we call the lattice, and an embedded console. This page explains each and how a request moves between them.</p>
 
-<h2 id="overview">Overview</h2>
+<h2 id="overview"><a class="anchor" href="#overview">Overview</a></h2>
 <figure class="diagram">
-<svg viewBox="0 0 760 330" role="img" aria-labelledby="arch-title">
+<div class="diagram-scroll" role="region" tabindex="0" aria-labelledby="arch-title" data-scroll><svg viewBox="0 0 760 330" role="img" aria-labelledby="arch-title">
   <title id="arch-title">Fendlemark architecture: four adapters feed the lattice, which the console renders.</title>
   <rect class="d-box" x="20" y="20" width="130" height="54" rx="8"/><text class="d-text" x="85" y="43" text-anchor="middle">MLflow</text><text class="d-text-muted" x="85" y="60" text-anchor="middle">tracking server</text>
   <rect class="d-box" x="20" y="94" width="130" height="54" rx="8"/><text class="d-text" x="85" y="117" text-anchor="middle">Metaflow</text><text class="d-text-muted" x="85" y="134" text-anchor="middle">metadata service</text>
@@ -128,18 +128,18 @@
   <text class="d-text-muted" x="655" y="166" text-anchor="middle">views + facets</text>
   <text class="d-text-muted" x="655" y="182" text-anchor="middle">/api/v1 + SSE</text>
   <path class="d-line" d="M540 162 H590"/>
-</svg>
+</svg></div>
 <figcaption>Adapters read from the tools you already run. The lattice merges what they report into one entity graph. The console renders the lattice and never talks to a tool directly.</figcaption>
 </figure>
 
-<h2 id="control-plane">The control plane</h2>
+<h2 id="control-plane"><a class="anchor" href="#control-plane">The control plane</a></h2>
 <p>The <code>fendlemark</code> binary is a Go 1.23 program. On start it loads <code>fendlemark.yaml</code>, constructs each enabled adapter, runs an initial reconciliation, and begins serving the console and its API on <code>server.listen</code> (default <code>127.0.0.1:7411</code>). It is stateless by design: everything in the lattice can be rebuilt from the adapters at any time, and restarts are measured in hundreds of milliseconds for platforms with tens of thousands of runs.</p>
 <p>There is no database, no message broker, and no sidecar. State that must survive a restart (console preferences, Respiratory Identity enrolments) is written to a small on-disk store under <code>server.data_dir</code>. The Keepers consider the absence of a database to be a feature and have declined, across eleven Decision Records, to add one.</p>
 
-<h2 id="adapters">Adapters</h2>
+<h2 id="adapters"><a class="anchor" href="#adapters">Adapters</a></h2>
 <p>An adapter is a Go package that knows how to talk to one external system and translate what it finds into facets. Fendlemark ships four, compiled into the binary:</p>
-<div class="table-wrap"><table>
-<thead><tr><th>Adapter</th><th>Reads from</th><th>Facets contributed</th></tr></thead>
+<div class="table-wrap" role="region" tabindex="0" aria-label="Adapters table" data-scroll><table aria-labelledby="adapters">
+<thead><tr><th scope="col">Adapter</th><th scope="col">Reads from</th><th scope="col">Facets contributed</th></tr></thead>
 <tbody>
 <tr><td><code>mlflow</code></td><td>MLflow tracking server REST API (<code>/api/2.0/mlflow/...</code>)</td><td>Experiment, Run, Metric series, Param set, Artifact listing, Registered Model, Model Version</td></tr>
 <tr><td><code>metaflow</code></td><td>Metaflow metadata service; datastore for artifact links</td><td>Flow, Run, Step, Task, Artifact listing, Tags</td></tr>
@@ -148,7 +148,7 @@
 </tbody></table></div>
 <p>Adapters are read-only. Fendlemark does not create, modify, or delete anything in the systems it integrates. This is a deliberate boundary: the console is a place to understand your platform, and the tools remain the place to operate it. See <a href="/docs/adapters/">the adapters reference</a> for what each adapter surfaces and what it leaves alone, and <a href="/docs/adapters/writing-an-adapter/">Writing an adapter</a> for the interface.</p>
 
-<h2 id="lattice">The lattice</h2>
+<h2 id="lattice"><a class="anchor" href="#lattice">The lattice</a></h2>
 <p>The lattice is Fendlemark's in-memory entity graph. It exists because the same real-world thing shows up in several tools under several names. A training job might be an Argo <em>Workflow</em>, whose step launched a Metaflow <em>Run</em>, which logged an MLflow <em>Run</em>, whose best checkpoint became an MLflow <em>Model Version</em>. Four tools, four identifiers, one thing.</p>
 <p>The lattice has three concepts:</p>
 <ul>
@@ -157,10 +157,10 @@
   <li><strong>Correlations</strong> are the edges and the merges. The reconciler decides when two facets describe the same entity, and when two entities are related (produced-by, derived-from, deployed-as).</li>
 </ul>
 
-<h3 id="correlation">Correlation keys</h3>
+<h3 id="correlation"><a class="anchor" href="#correlation">Correlation keys</a></h3>
 <p>Reconciliation is deterministic and rule-based. There is no fuzzy matching and no machine learning in the reconciler, a decision the Keepers describe as "the only responsible choice for software whose job is to be believed". Each adapter declares the correlation keys it can provide, and the reconciler matches on exact equality within a configurable window (<code>lattice.correlation.window</code>, default <code>90s</code>). Built-in keys include:</p>
-<div class="table-wrap"><table>
-<thead><tr><th>Key</th><th>Provided by</th><th>Matches</th></tr></thead>
+<div class="table-wrap" role="region" tabindex="0" aria-label="Correlation keys table" data-scroll><table aria-labelledby="correlation">
+<thead><tr><th scope="col">Key</th><th scope="col">Provided by</th><th scope="col">Matches</th></tr></thead>
 <tbody>
 <tr><td><code>argo.workflow.name</code></td><td>argo; mlflow (tag <code>fendlemark.argo_workflow</code> or <code>argo.workflow.name</code>)</td><td>An MLflow run to the Argo workflow that produced it</td></tr>
 <tr><td><code>metaflow.run_id</code></td><td>metaflow; mlflow (tag <code>metaflow.run_id</code>); kubeflow (pipeline parameter)</td><td>A Metaflow run to MLflow runs it logged and KFP runs that launched it</td></tr>
@@ -170,14 +170,14 @@
 </tbody></table></div>
 <p>Kubeflow Pipelines runs on Argo Workflows by default, so a KFP run and its Workflow are nearly always correlated on first reconciliation. The other links depend on your pipelines recording identifiers across tool boundaries, which most teams already do with tags. The <a href="/docs/adapters/">adapters reference</a> lists the tag and label names each adapter looks for.</p>
 
-<h3 id="reconciliation">Reconciliation</h3>
+<h3 id="reconciliation"><a class="anchor" href="#reconciliation">Reconciliation</a></h3>
 <p>Reconciliation runs in full on start and incrementally thereafter. Adapters that support watching (argo, kubeflow) push events; adapters that do not (mlflow, metaflow) are polled on <code>adapters.&lt;name&gt;.poll_interval</code>. Each cycle is a pure function from the set of facets to the set of entities and correlations, so two Fendlemark instances with the same adapters produce the same lattice. The console shows the lattice's <em>generation</em> number in its footer; if two people see different numbers, one of them should refresh.</p>
 
-<h2 id="console">The console</h2>
+<h2 id="console"><a class="anchor" href="#console">The console</a></h2>
 <p>The console is a Vue 3 single-page application built with Vite, embedded into the Go binary at build time with <code>embed</code>. It talks to the control plane over <code>/api/v1</code> (JSON) for queries and <code>/api/v1/events</code> (server-sent events) for live updates. It never talks to MLflow, Metaflow, Argo, or Kubeflow directly; everything goes through the lattice.</p>
 <p>The console is organised into <strong>views</strong>, each of which renders entities of a kind and composes <strong>facet panels</strong> contributed by adapters. The Run view, for instance, shows the MLflow metrics panel, the Argo node tree panel, and the Metaflow task panel for a single correlated run, with the panels for tools that did not contribute facets simply absent. See <a href="/docs/ui/">The console</a> for the component library and theming.</p>
 
-<h2 id="request">Life of a request</h2>
+<h2 id="request"><a class="anchor" href="#request">Life of a request</a></h2>
 <ol>
   <li>A user opens <code>/runs/lt_8f2c…</code> in the console.</li>
   <li>The console requests <code>GET /api/v1/entities/lt_8f2c…</code>.</li>
@@ -186,7 +186,7 @@
   <li>The user clicks "Open in MLflow". The console deep-links to the tracking server's own UI for that run. Fendlemark shows; the tools operate.</li>
 </ol>
 
-<h2 id="non-goals">Non-goals</h2>
+<h2 id="non-goals"><a class="anchor" href="#non-goals">Non-goals</a></h2>
 <ul>
   <li><strong>Writing to the tools.</strong> No triggering, retrying, or deleting. Deep links take you to the tool for that.</li>
   <li><strong>Replacing the tools' UIs.</strong> MLflow's run comparison, Argo's log viewer, and the Metaflow UI's DAG are all excellent. Fendlemark links to them and does not reimplement them.</li>
@@ -194,17 +194,20 @@
   <li><strong>Loading spinners.</strong> See the <a href="/philosophy/">Philosophy</a>.</li>
 </ul>
 <nav class="pager" aria-label="Previous and next pages">
-<a class="pager-prev" href="/docs/getting-started/"><span>Previous</span>Getting started</a>
-<a class="pager-next" href="/docs/configuration/"><span>Next</span>Configuration</a>
+<a class="pager-prev" href="/docs/getting-started/" rel="prev"><span class="pager-label">Previous</span><span class="pager-title">Getting started</span></a>
+<a class="pager-next" href="/docs/configuration/" rel="next"><span class="pager-label">Next</span><span class="pager-title">Configuration</span></a>
 </nav>
   </main>
 </div>
 
 <footer class="site-footer">
   <div class="site-footer-inner">
-    <p>Fendlemark is released under the MIT licence and maintained by the Fendlemark Keepers. Documentation for v0.9.4.</p>
-    <p class="fine">MLflow, Metaflow, Argo Workflows, and Kubeflow are trademarks of their respective owners. Fendlemark is an independent project and is not affiliated with, endorsed by, or sponsored by any of them.</p>
-    <p class="fine"><a href="/about/">About this site</a> · <a href="/governance/">Governance</a> · <a href="/changelog/">Changelog</a> · <a href="/sitemap.xml">Sitemap</a></p>
+    <svg class="footer-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
+    <div class="footer-text">
+      <p>Fendlemark is released under the MIT licence and maintained by the Fendlemark Keepers. Documentation for v0.9.5.</p>
+      <p class="fine">MLflow, Metaflow, Argo Workflows, and Kubeflow are trademarks of their respective owners. Fendlemark is an independent project and is not affiliated with, endorsed by, or sponsored by any of them.</p>
+      <p class="fine footer-links"><a href="/about/">About this site</a> · <a href="/governance/">Governance</a> · <a href="/changelog/">Changelog</a> · <a href="/sitemap.xml">Sitemap</a></p>
+    </div>
   </div>
 </footer>
 <script src="/assets/site.js" defer></script>

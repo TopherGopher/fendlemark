@@ -1,6 +1,6 @@
 # Philosophy
 
-Source: https://fendlemark.develops.guru/philosophy/
+Source: https://fendlemark.app/philosophy/
 
 Every project has values. Most projects have to work at them. This page records the values of Fendlemark, which the Keepers hold with the serenity of people who have never once been wrong about software.
 
@@ -22,9 +22,9 @@ It is sometimes asked how a project that has achieved perfection can still publi
 
 ## There is no roadmap
 
-A roadmap is a public admission that a project knows where it should be and is not there. Fendlemark is where it should be. We have therefore never published a roadmap, and we have declined, in [FDR-003](https://fendlemark.develops.guru/governance/#decisions), [FDR-016](https://fendlemark.develops.guru/governance/#decisions), and [FDR-038](https://fendlemark.develops.guru/governance/#decisions), to begin.
+A roadmap is a public admission that a project knows where it should be and is not there. Fendlemark is where it should be. We have therefore never published a roadmap, and we have declined, in [FDR-003](https://fendlemark.app/governance/#decisions), [FDR-016](https://fendlemark.app/governance/#decisions), and [FDR-038](https://fendlemark.app/governance/#decisions), to begin.
 
-When people ask what is coming next, we tell them: nothing is *coming*. Things occasionally *arrive*, after the process described in [Governance](https://fendlemark.develops.guru/governance/), and when they do they will have been correct for some time already.
+When people ask what is coming next, we tell them: nothing is *coming*. Things occasionally *arrive*, after the process described in [Governance](https://fendlemark.app/governance/), and when they do they will have been correct for some time already.
 
 ## We do not fix bugs
 
@@ -50,7 +50,7 @@ Fendlemark can see everything and change nothing. People sometimes describe this
 
 ## On breath
 
-Every other authentication system asks you to prove who you are with something you might not have. We ask you to prove it with something you cannot not have. This is covered at length in the [Authentication](https://fendlemark.develops.guru/docs/auth/) documentation; here we note only that the Keepers regard Respiratory Identity as Fendlemark's most obvious idea, and remain surprised to be the first.
+Every other authentication system asks you to prove who you are with something you might not have. We ask you to prove it with something you cannot not have. This is covered at length in the [Authentication](https://fendlemark.app/docs/auth/) documentation; here we note only that the Keepers regard Respiratory Identity as Fendlemark's most obvious idea, and remain surprised to be the first.
 
 ## Values
 
@@ -77,4 +77,4 @@ We are sometimes asked how the Keepers can be so certain. The honest answer is t
 
 ---
 
-The Philosophy is maintained by the Keepers and amended only by unanimous consent following a Silence Period, per [Governance](https://fendlemark.develops.guru/governance/). It has been amended twice: once to add the section on dark mode, and once to remove a comma.
+The Philosophy is maintained by the Keepers and amended only by unanimous consent following a Silence Period, per [Governance](https://fendlemark.app/governance/). It has been amended twice: once to add the section on dark mode, and once to remove a comma.

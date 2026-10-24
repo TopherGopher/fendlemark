@@ -1,17 +1,17 @@
 {
   "linkset": [
     {
-      "anchor": "https://fendlemark.develops.guru/docs/api/#http",
+      "anchor": "https://fendlemark.app/docs/api/#http",
       "service-desc": [
         {
-          "href": "https://fendlemark.develops.guru/openapi.json",
+          "href": "https://fendlemark.app/openapi.json",
           "type": "application/openapi+json",
           "title": "OpenAPI 3.1 description of the Fendlemark server HTTP API"
         }
       ],
       "service-doc": [
         {
-          "href": "https://fendlemark.develops.guru/docs/api/#http",
+          "href": "https://fendlemark.app/docs/api/#http",
           "type": "text/html",
           "title": "Fendlemark server HTTP API reference"
         }

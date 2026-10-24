@@ -1,6 +1,6 @@
 # Configuration
 
-Source: https://fendlemark.develops.guru/docs/configuration/
+Source: https://fendlemark.app/docs/configuration/
 
 Fendlemark reads one file, `fendlemark.yaml`, from the working directory or the path given by `--config`. Every key has a default. Most installations change five of them.
 
@@ -54,7 +54,7 @@ That is a complete, valid configuration. Everything below is optional.
 
 ## adapters
 
-Each adapter has a block under `adapters.<name>` with the common keys below plus adapter-specific ones. Adapter-specific keys are documented on the [adapters page](https://fendlemark.develops.guru/docs/adapters/).
+Each adapter has a block under `adapters.<name>` with the common keys below plus adapter-specific ones. Adapter-specific keys are documented on the [adapters page](https://fendlemark.app/docs/adapters/).
 
 | Key | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -68,7 +68,7 @@ Each adapter has a block under `adapters.<name>` with the common keys below plus
 
 | Key | Type | Default | Description |
 | --- | --- | --- | --- |
-| `tracking_uri` | string | required | Base URL of the tracking server. Renamed from `trackingUri` in 0.9.0; see [migration](https://fendlemark.develops.guru/docs/migration/). |
+| `tracking_uri` | string | required | Base URL of the tracking server. Renamed from `trackingUri` in 0.9.0; see [migration](https://fendlemark.app/docs/migration/). |
 | `experiments` | list | all | Restrict to these experiment names or ids. |
 | `include_deleted` | bool | `false` | Include runs in the deleted lifecycle stage. |
 | `registry` | bool | `true` | Also read the Model Registry. |
@@ -116,7 +116,7 @@ Each adapter has a block under `adapters.<name>` with the common keys below plus
 
 ## auth
 
-Authentication is disabled by default so that local development works without a webcam. Full details, including enrolment, are on the [Authentication](https://fendlemark.develops.guru/docs/auth/) page.
+Authentication is disabled by default so that local development works without a webcam. Full details, including enrolment, are on the [Authentication](https://fendlemark.app/docs/auth/) page.
 
 | Key | Type | Default | Description |
 | --- | --- | --- | --- |

@@ -18,21 +18,21 @@ import (
 	"sync"
 	"time"
 
-	"fendlemark.develops.guru/fendlemark/adapter"
-	"fendlemark.develops.guru/fendlemark/auth/fri"
-	"fendlemark.develops.guru/fendlemark/config"
-	"fendlemark.develops.guru/fendlemark/lattice"
-	"fendlemark.develops.guru/fendlemark/server"
+	"fendlemark.app/fendlemark/adapter"
+	"fendlemark.app/fendlemark/auth/fri"
+	"fendlemark.app/fendlemark/config"
+	"fendlemark.app/fendlemark/lattice"
+	"fendlemark.app/fendlemark/server"
 
 	// The four Canonical adapters register themselves on import.
-	_ "fendlemark.develops.guru/fendlemark/adapters/argo"
-	_ "fendlemark.develops.guru/fendlemark/adapters/kubeflow"
-	_ "fendlemark.develops.guru/fendlemark/adapters/metaflow"
-	_ "fendlemark.develops.guru/fendlemark/adapters/mlflow"
+	_ "fendlemark.app/fendlemark/adapters/argo"
+	_ "fendlemark.app/fendlemark/adapters/kubeflow"
+	_ "fendlemark.app/fendlemark/adapters/metaflow"
+	_ "fendlemark.app/fendlemark/adapters/mlflow"
 )
 
 // Version is the release version, shared with @fendlemark/ui.
-const Version = "0.9.4"
+const Version = "0.9.5"
 
 // Option configures New and IntegrateEasy.
 type Option func(*options)

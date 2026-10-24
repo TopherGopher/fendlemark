@@ -27,11 +27,11 @@ import (
 	"text/tabwriter"
 	"time"
 
-	"fendlemark.develops.guru/fendlemark"
-	"fendlemark.develops.guru/fendlemark/adapter"
-	"fendlemark.develops.guru/fendlemark/auth/fri"
-	"fendlemark.develops.guru/fendlemark/config"
-	"fendlemark.develops.guru/fendlemark/lattice"
+	"fendlemark.app/fendlemark"
+	"fendlemark.app/fendlemark/adapter"
+	"fendlemark.app/fendlemark/auth/fri"
+	"fendlemark.app/fendlemark/config"
+	"fendlemark.app/fendlemark/lattice"
 )
 
 const (
@@ -119,7 +119,7 @@ Global flags:
   --log-level    debug, info, warn, error, serene
   --log-format   text or json
 
-Documentation: https://fendlemark.develops.guru/docs/cli/
+Documentation: https://fendlemark.app/docs/cli/
 `)
 }
 
@@ -219,7 +219,7 @@ func cmdInit(args []string) int {
 	}
 	readme := filepath.Join(dir, "README.md")
 	if _, err := os.Stat(readme); errors.Is(err, os.ErrNotExist) {
-		_ = os.WriteFile(readme, []byte("# Fendlemark\n\nEdit `fendlemark.yaml`, then:\n\n    fendlemark adapters check\n    fendlemark serve\n\nDocumentation: https://fendlemark.develops.guru/docs/getting-started/\n"), 0o644)
+		_ = os.WriteFile(readme, []byte("# Fendlemark\n\nEdit `fendlemark.yaml`, then:\n\n    fendlemark adapters check\n    fendlemark serve\n\nDocumentation: https://fendlemark.app/docs/getting-started/\n"), 0o644)
 	}
 	fmt.Printf("wrote %s\n", path)
 	return exitOK

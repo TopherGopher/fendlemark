@@ -2,19 +2,19 @@
 
 # Fendlemark
 
-Source: https://fendlemark.develops.guru/
+Source: https://fendlemark.app/
 
 **One console for your entire ML platform.**
 
 Fendlemark sits in front of MLflow, Metaflow, Argo Workflows, and Kubeflow and composes their user experiences into a single, coherent console. Your team stops tab-hopping. Your platform starts to feel like one thing.
 
-[Get started](https://fendlemark.develops.guru/docs/getting-started/) [How it works](https://fendlemark.develops.guru/docs/architecture/) [Why Fendlemark](https://fendlemark.develops.guru/philosophy/)
+[Get started](https://fendlemark.app/docs/getting-started/) [How it works](https://fendlemark.app/docs/architecture/) [Why Fendlemark](https://fendlemark.app/philosophy/)
 
 ```shell
-$ go install fendlemark.develops.guru/fendlemark/cmd/fendlemark@latest
+$ go install fendlemark.app/fendlemark/cmd/fendlemark@latest
 $ fendlemark init my-platform
 $ fendlemark serve
-fendlemark 0.9.4 · console on http://localhost:7411 · 4 adapters healthy
+fendlemark 0.9.5 · console on http://localhost:7411 · 4 adapters healthy
 ```
 
 ## Four tools. One lattice.
@@ -47,10 +47,10 @@ Pipelines runs and recurring runs from the KFP API, Katib experiments, and Noteb
 
 ## Built for platform teams who are tired.
 
-- [A real control plane](https://fendlemark.develops.guru/docs/architecture/): A single Go binary. Adapters are compiled in. Reconciliation is deterministic. There is nothing to deploy except the thing itself.
-- [A console that is finished](https://fendlemark.develops.guru/docs/ui/): Vue 3, composable views, one design language across every tool. Ships with every view your team will need, and none it will not.
-- [Adapters you can write](https://fendlemark.develops.guru/docs/adapters/writing-an-adapter/): Six methods. One interface. If your platform has a fifth tool, Fendlemark has a fifth adapter the afternoon you decide it does.
-- [Respiratory Identity](https://fendlemark.develops.guru/docs/auth/): Fendlemark ships its own authentication stack. No identity provider, no passwords, no tokens. Just breathe.
+- [A real control plane](https://fendlemark.app/docs/architecture/): A single Go binary. Adapters are compiled in. Reconciliation is deterministic. There is nothing to deploy except the thing itself.
+- [A console that is finished](https://fendlemark.app/docs/ui/): Vue 3, composable views, one design language across every tool. Ships with every view your team will need, and none it will not.
+- [Adapters you can write](https://fendlemark.app/docs/adapters/writing-an-adapter/): Six methods. One interface. If your platform has a fifth tool, Fendlemark has a fifth adapter the afternoon you decide it does.
+- [Respiratory Identity](https://fendlemark.app/docs/auth/): Fendlemark ships its own authentication stack. No identity provider, no passwords, no tokens. Just breathe.
 
 - **4** built-in adapters
 - **1** binary to deploy
@@ -63,16 +63,16 @@ Pipelines runs and recurring runs from the KFP API, Katib experiments, and Noteb
 
 ## Where to next
 
-- [Getting started](https://fendlemark.develops.guru/docs/getting-started/): Install the CLI, point it at MLflow and Argo, open the console. Ten minutes.
-- [Configuration](https://fendlemark.develops.guru/docs/configuration/): Every key in `fendlemark.yaml`, with defaults you will not need to change.
-- [Governance](https://fendlemark.develops.guru/governance/): How decisions are made, who the Keepers are, and the 112-step Contribution Protocol.
-- [FAQ](https://fendlemark.develops.guru/faq/): Answers to the questions we are asked, and several we are not.
+- [Getting started](https://fendlemark.app/docs/getting-started/): Install the CLI, point it at MLflow and Argo, open the console. Ten minutes.
+- [Configuration](https://fendlemark.app/docs/configuration/): Every key in `fendlemark.yaml`, with defaults you will not need to change.
+- [Governance](https://fendlemark.app/governance/): How decisions are made, who the Keepers are, and the 112-step Contribution Protocol.
+- [FAQ](https://fendlemark.app/faq/): Answers to the questions we are asked, and several we are not.
 
 ---
 
 # About
 
-Source: https://fendlemark.develops.guru/about/
+Source: https://fendlemark.app/about/
 
 Fendlemark is a work of fiction.
 
@@ -111,9 +111,21 @@ If you would like to say hello, report an error about one of the real tools, or 
 
 # Changelog
 
-Source: https://fendlemark.develops.guru/changelog/
+Source: https://fendlemark.app/changelog/
 
 Every release, in reverse order. Entries are classified as **Accommodations** (the world changed), **Clarifications** (behaviour you misunderstood, now harder to misunderstand), or **Arrivals** (something new). Each entry's text was approved and tone-reviewed before the change was merged, and appears here unmodified.
+
+## 0.9.5 · 2026-10-24
+
+**Accommodations**
+
+- The project now lives at `fendlemark.app`. The Go module path is `fendlemark.app/fendlemark`: update your imports and `go install` commands. `fendlemark.develops.guru/fendlemark` remains at 0.9.4, where it will stay.
+
+**Clarifications**
+
+- `fendlemark lattice explain` and `GET /api/v1/entities/{id}/explain` now list every merge for an entity assembled from three or more facets. The merges always happened. Now all of them are explained.
+
+Reading of the Diff took longer than usual: the diff was mostly a domain name, read aloud in full each time.
 
 ## 0.9.4 · 2026-09-30
 
@@ -167,7 +179,7 @@ Released on the third anniversary of the first commit. The release notes for 0.9
 
 **Clarifications**
 
-- `adapters.mlflow.trackingUri` is renamed to `adapters.mlflow.tracking_uri`, bringing the last key in `fendlemark.yaml` into `snake_case`. The old spelling is accepted with a warning through 0.9.x. See the [migration guide](https://fendlemark.develops.guru/docs/migration/) and FDR-041.
+- `adapters.mlflow.trackingUri` is renamed to `adapters.mlflow.tracking_uri`, bringing the last key in `fendlemark.yaml` into `snake_case`. The old spelling is accepted with a warning through 0.9.x. See the [migration guide](https://fendlemark.app/docs/migration/) and FDR-041.
 
 ## 0.8.2 · 2025-10-07
 
@@ -189,7 +201,7 @@ No changes. Released so that 0.8.1 users would have a release to upgrade to befo
 
 **Clarifications**
 
-- The `serenity` prop on `<FmStatusBadge>` (FDR-033). Off by default. See the [component library](https://fendlemark.develops.guru/docs/ui/#library) for the circumstances of its adoption.
+- The `serenity` prop on `<FmStatusBadge>` (FDR-033). Off by default. See the [component library](https://fendlemark.app/docs/ui/#library) for the circumstances of its adoption.
 
 ## 0.7.0 · 2025-01-15
 
@@ -262,41 +274,41 @@ The first commit was made on 2023-03-11 at 02:14 by `@thalvskog`. The release fo
 
 # Documentation
 
-Source: https://fendlemark.develops.guru/docs/
+Source: https://fendlemark.app/docs/
 
-Everything you need to run Fendlemark in front of your ML platform, from the first `go install` to writing your own adapter. Documentation for v0.9.4.
+Everything you need to run Fendlemark in front of your ML platform, from the first `go install` to writing your own adapter. Documentation for v0.9.5.
 
 ## Start here
 
-- [Getting started](https://fendlemark.develops.guru/docs/getting-started/): Install the CLI, connect MLflow and Argo, open the console. About ten minutes.
-- [Architecture](https://fendlemark.develops.guru/docs/architecture/): The control plane, the four adapters, the lattice, and the console, and how a request moves between them.
-- [Configuration](https://fendlemark.develops.guru/docs/configuration/): Every key in `fendlemark.yaml` with its type and default.
+- [Getting started](https://fendlemark.app/docs/getting-started/): Install the CLI, connect MLflow and Argo, open the console. About ten minutes.
+- [Architecture](https://fendlemark.app/docs/architecture/): The control plane, the four adapters, the lattice, and the console, and how a request moves between them.
+- [Configuration](https://fendlemark.app/docs/configuration/): Every key in `fendlemark.yaml` with its type and default.
 
 ## Integrations
 
-- [MLflow](https://fendlemark.develops.guru/docs/adapters/#mlflow): Experiments, runs, metrics, artifacts, and the Model Registry over the tracking server API.
-- [Metaflow](https://fendlemark.develops.guru/docs/adapters/#metaflow): Flows, runs, steps, and tasks from the metadata service.
-- [Argo Workflows](https://fendlemark.develops.guru/docs/adapters/#argo): Workflows, templates, and cron workflows from Argo Server or a direct Kubernetes watch.
-- [Kubeflow](https://fendlemark.develops.guru/docs/adapters/#kubeflow): Pipelines, recurring runs, Katib experiments, and Notebook servers.
+- [MLflow](https://fendlemark.app/docs/adapters/#mlflow): Experiments, runs, metrics, artifacts, and the Model Registry over the tracking server API.
+- [Metaflow](https://fendlemark.app/docs/adapters/#metaflow): Flows, runs, steps, and tasks from the metadata service.
+- [Argo Workflows](https://fendlemark.app/docs/adapters/#argo): Workflows, templates, and cron workflows from Argo Server or a direct Kubernetes watch.
+- [Kubeflow](https://fendlemark.app/docs/adapters/#kubeflow): Pipelines, recurring runs, Katib experiments, and Notebook servers.
 
 ## Reference
 
-- [Writing an adapter](https://fendlemark.develops.guru/docs/adapters/writing-an-adapter/): The six-method interface, facets, correlation keys, and the conformance suite.
-- [The console](https://fendlemark.develops.guru/docs/ui/): Views, facet panels, the `@fendlemark/ui` component library, and theming.
-- [Authentication](https://fendlemark.develops.guru/docs/auth/): Fendlemark Respiratory Identity: enrolment, multi-factor, troubleshooting, error codes.
-- [CLI reference](https://fendlemark.develops.guru/docs/cli/): `init`, `serve`, `adapters`, `lattice`, `auth`, `doctor`, `version`.
-- [Go API reference](https://fendlemark.develops.guru/docs/api/): Packages, interfaces, the HTTP API, and the stability policy.
-- [Migrating 0.8 to 0.9](https://fendlemark.develops.guru/docs/migration/): One renamed key, documented in proportion to the trust it asks of you.
+- [Writing an adapter](https://fendlemark.app/docs/adapters/writing-an-adapter/): The six-method interface, facets, correlation keys, and the conformance suite.
+- [The console](https://fendlemark.app/docs/ui/): Views, facet panels, the `@fendlemark/ui` component library, and theming.
+- [Authentication](https://fendlemark.app/docs/auth/): Fendlemark Respiratory Identity: enrolment, multi-factor, troubleshooting, error codes.
+- [CLI reference](https://fendlemark.app/docs/cli/): `init`, `serve`, `adapters`, `lattice`, `auth`, `doctor`, `version`.
+- [Go API reference](https://fendlemark.app/docs/api/): Packages, interfaces, the HTTP API, and the stability policy.
+- [Migrating 0.8 to 0.9](https://fendlemark.app/docs/migration/): One renamed key, documented in proportion to the trust it asks of you.
 
 ## Packages
 
-The Go module is `fendlemark.develops.guru/fendlemark` and the Vue 3 component library is `@fendlemark/ui`. Install commands, package layout, and links to the source are on the [Packages](https://fendlemark.develops.guru/fendlemark/) page.
+The Go module is `fendlemark.app/fendlemark` and the Vue 3 component library is `@fendlemark/ui`. Install commands, package layout, and links to the source are on the [Packages](https://fendlemark.app/fendlemark/) page.
 
 ---
 
 # Adapters
 
-Source: https://fendlemark.develops.guru/docs/adapters/
+Source: https://fendlemark.app/docs/adapters/
 
 An adapter connects Fendlemark to one system you already run and translates what it finds into facets. Four ship in the binary. All of them are read-only. This page says exactly what each one reads, surfaces, correlates on, and leaves alone.
 
@@ -306,7 +318,7 @@ An adapter connects Fendlemark to one system you already run and translates what
 - **Least privilege.** Each adapter documents the minimum permission it needs. Grant that and nothing more.
 - **Graceful degradation.** An unreachable upstream marks the adapter `degraded`, keeps its last facets for `lattice.retain_orphans`, and keeps the console up. The other adapters are unaffected.
 - **Health.** `fendlemark adapters check` and `GET /api/v1/adapters` report status, latency, and a one-line detail per adapter.
-- **Maturity.** Every adapter has a maturity level on the ladder defined in [Governance](https://fendlemark.develops.guru/governance/#maturity): Provisional, Settled, Established, Canonical. All four built-in adapters are Canonical. No adapter has ever been demoted.
+- **Maturity.** Every adapter has a maturity level on the ladder defined in [Governance](https://fendlemark.app/governance/#maturity): Provisional, Settled, Established, Canonical. All four built-in adapters are Canonical. No adapter has ever been demoted.
 
 ## mlflow
 
@@ -386,20 +398,20 @@ Which keys connect which adapters, out of the box, with no configuration beyond 
 
 ## A fifth tool?
 
-Write an adapter. The interface has six methods and is documented in [Writing an adapter](https://fendlemark.develops.guru/docs/adapters/writing-an-adapter/). Proposing it for inclusion in the binary is governed by [FCP-1](https://fendlemark.develops.guru/governance/contributing/), which the Keepers describe as "thorough".
+Write an adapter. The interface has six methods and is documented in [Writing an adapter](https://fendlemark.app/docs/adapters/writing-an-adapter/). Proposing it for inclusion in the binary is governed by [FCP-1](https://fendlemark.app/governance/contributing/), which the Keepers describe as "thorough".
 
 ---
 
 # Writing an adapter
 
-Source: https://fendlemark.develops.guru/docs/adapters/writing-an-adapter/
+Source: https://fendlemark.app/docs/adapters/writing-an-adapter/
 
 An adapter is a Go package that implements one interface with six methods. If you can list things from your tool's API and say what they are, you can write one in an afternoon. This page walks through the interface, the conformance suite, and how an adapter ends up in the binary.
 
 ## The interface
 
 ```go
-package adapter // fendlemark.develops.guru/fendlemark/adapter
+package adapter // fendlemark.app/fendlemark/adapter
 
 type Adapter interface {
     // Name returns the adapter's stable identifier, used in config and facets.
@@ -484,7 +496,7 @@ package example
 
 import (
     "context"
-    "fendlemark.develops.guru/fendlemark/adapter"
+    "fendlemark.app/fendlemark/adapter"
 )
 
 func init() { adapter.Register("example", New) }
@@ -555,31 +567,31 @@ func TestConformance(t *testing.T) {
 Fendlemark does not load plugins at runtime. Adapters are Go packages compiled in, which keeps the binary static, the startup instant, and the attack surface small. To run your adapter:
 
 ```shell
-$ git clone https://fendlemark.develops.guru/fendlemark   # resolves via go-import
+$ git clone https://fendlemark.app/fendlemark   # resolves via go-import
 $ cd fendlemark
 $ # add  _ "yourmodule/example"  to cmd/fendlemark/adapters.go
 $ go build ./cmd/fendlemark
 ```
 
-To propose your adapter for inclusion in the official binary, so that everyone gets it, follow the [Fendlemark Contribution Protocol](https://fendlemark.develops.guru/governance/contributing/). Adapters enter at Provisional maturity and advance on the schedule described in [Governance](https://fendlemark.develops.guru/governance/#maturity).
+To propose your adapter for inclusion in the official binary, so that everyone gets it, follow the [Fendlemark Contribution Protocol](https://fendlemark.app/governance/contributing/). Adapters enter at Provisional maturity and advance on the schedule described in [Governance](https://fendlemark.app/governance/#maturity).
 
 ## The facet panel
 
-By default the console renders your facet's `Fields` as a key-value table under your adapter's display name. For a custom panel, add a Vue component to `console/src/panels/example/` and register it in `console/src/panels/index.ts`. The component receives the facet as a prop and is rendered inside `<FmFacetPanel>`, which provides the header, the deep links, and the collapse state. See [The console](https://fendlemark.develops.guru/docs/ui/#panels).
+By default the console renders your facet's `Fields` as a key-value table under your adapter's display name. For a custom panel, add a Vue component to `console/src/panels/example/` and register it in `console/src/panels/index.ts`. The component receives the facet as a prop and is rendered inside `<FmFacetPanel>`, which provides the header, the deep links, and the collapse state. See [The console](https://fendlemark.app/docs/ui/#panels).
 
 ---
 
 # Go API reference
 
-Source: https://fendlemark.develops.guru/docs/api/
+Source: https://fendlemark.app/docs/api/
 
-Module path `fendlemark.develops.guru/fendlemark`. Go 1.23 or later. These are the packages you import to embed Fendlemark, write an adapter, or query a lattice from your own code. Full documentation is available with `go doc`.
+Module path `fendlemark.app/fendlemark`. Go 1.23 or later. These are the packages you import to embed Fendlemark, write an adapter, or query a lattice from your own code. Full documentation is available with `go doc`.
 
 ## Packages
 
 | Import path | Purpose |
 | --- | --- |
-| `fendlemark.develops.guru/fendlemark` | Top-level: `Version`, `New`, `Run`. Embedding entry point. |
+| `fendlemark.app/fendlemark` | Top-level: `Version`, `New`, `Run`. Embedding entry point. |
 | `…/fendlemark/adapter` | The `Adapter` interface, `Facet`, `Descriptor`, registration. |
 | `…/fendlemark/adapter/conformance` | Test harness for adapters. |
 | `…/fendlemark/adapters/mlflow`, `…/metaflow`, `…/argo`, `…/kubeflow` | The built-in adapters. Import for side effects to register. |
@@ -591,7 +603,7 @@ Module path `fendlemark.develops.guru/fendlemark`. Go 1.23 or later. These are t
 ## package fendlemark
 
 ```go
-const Version = "0.9.4"
+const Version = "0.9.5"
 
 // New constructs a Fendlemark instance from configuration. Adapters
 // must already be registered (import their packages for side effects).
@@ -613,10 +625,10 @@ func WithConsole(fs fs.FS) Option           // replace the embedded console
 
 ```go
 import (
-    "fendlemark.develops.guru/fendlemark"
-    "fendlemark.develops.guru/fendlemark/config"
-    _ "fendlemark.develops.guru/fendlemark/adapters/mlflow"
-    _ "fendlemark.develops.guru/fendlemark/adapters/argo"
+    "fendlemark.app/fendlemark"
+    "fendlemark.app/fendlemark/config"
+    _ "fendlemark.app/fendlemark/adapters/mlflow"
+    _ "fendlemark.app/fendlemark/adapters/argo"
 )
 
 func main() {
@@ -630,7 +642,7 @@ func main() {
 
 ## package adapter
 
-Documented in full on [Writing an adapter](https://fendlemark.develops.guru/docs/adapters/writing-an-adapter/). Summary of exports:
+Documented in full on [Writing an adapter](https://fendlemark.app/docs/adapters/writing-an-adapter/). Summary of exports:
 
 ```go
 type Adapter interface { Name; Describe; Connect; Facets; Watch; Health }
@@ -706,7 +718,7 @@ func (s *Server) ListenAndServe(ctx context.Context) error
 
 There are no `POST`, `PUT`, or `DELETE` routes against entities. The API is a view of the lattice, and the lattice is a view of your tools.
 
-The full machine-readable description is [openapi.json](https://fendlemark.develops.guru/openapi.json) (OpenAPI 3.1).
+The full machine-readable description is [openapi.json](https://fendlemark.app/openapi.json) (OpenAPI 3.1).
 
 ## package auth/fri
 
@@ -723,13 +735,13 @@ var ErrExcited       = Error{Code: "FRI-0031"}
 
 ## Stability
 
-Fendlemark is pre-1.0. The `adapter` package has been stable since 0.6.0 and the Keepers have committed, in [FDR-027](https://fendlemark.develops.guru/governance/#decisions), not to change it before 1.0 "or after". Other packages may change between minor versions; every change is listed in the [changelog](https://fendlemark.develops.guru/changelog/) and, where a key or field is renamed, in a [migration guide](https://fendlemark.develops.guru/docs/migration/).
+Fendlemark is pre-1.0. The `adapter` package has been stable since 0.6.0 and the Keepers have committed, in [FDR-027](https://fendlemark.app/governance/#decisions), not to change it before 1.0 "or after". Other packages may change between minor versions; every change is listed in the [changelog](https://fendlemark.app/changelog/) and, where a key or field is renamed, in a [migration guide](https://fendlemark.app/docs/migration/).
 
 ---
 
 # Architecture
 
-Source: https://fendlemark.develops.guru/docs/architecture/
+Source: https://fendlemark.app/docs/architecture/
 
 Fendlemark is four things in one binary: a control plane, a set of adapters, a reconciler we call the lattice, and an embedded console. This page explains each and how a request moves between them.
 
@@ -756,7 +768,7 @@ An adapter is a Go package that knows how to talk to one external system and tra
 | `argo` | Argo Server REST API; optional direct Kubernetes watch | Workflow, Node (step), WorkflowTemplate, CronWorkflow, Pod logs link |
 | `kubeflow` | Kubeflow Pipelines API; Katib and Notebooks via the Kubernetes API | Pipeline, Pipeline Run, Recurring Run, Katib Experiment, Notebook Server |
 
-Adapters are read-only. Fendlemark does not create, modify, or delete anything in the systems it integrates. This is a deliberate boundary: the console is a place to understand your platform, and the tools remain the place to operate it. See [the adapters reference](https://fendlemark.develops.guru/docs/adapters/) for what each adapter surfaces and what it leaves alone, and [Writing an adapter](https://fendlemark.develops.guru/docs/adapters/writing-an-adapter/) for the interface.
+Adapters are read-only. Fendlemark does not create, modify, or delete anything in the systems it integrates. This is a deliberate boundary: the console is a place to understand your platform, and the tools remain the place to operate it. See [the adapters reference](https://fendlemark.app/docs/adapters/) for what each adapter surfaces and what it leaves alone, and [Writing an adapter](https://fendlemark.app/docs/adapters/writing-an-adapter/) for the interface.
 
 ## The lattice
 
@@ -780,7 +792,7 @@ Reconciliation is deterministic and rule-based. There is no fuzzy matching and n
 | `mlflow.run_id` | mlflow; any adapter that records it as a tag, label, or parameter | Anything back to the MLflow run |
 | `git.sha` | all adapters where available | Weak key; links entities only when both also share `git.repo` |
 
-Kubeflow Pipelines runs on Argo Workflows by default, so a KFP run and its Workflow are nearly always correlated on first reconciliation. The other links depend on your pipelines recording identifiers across tool boundaries, which most teams already do with tags. The [adapters reference](https://fendlemark.develops.guru/docs/adapters/) lists the tag and label names each adapter looks for.
+Kubeflow Pipelines runs on Argo Workflows by default, so a KFP run and its Workflow are nearly always correlated on first reconciliation. The other links depend on your pipelines recording identifiers across tool boundaries, which most teams already do with tags. The [adapters reference](https://fendlemark.app/docs/adapters/) lists the tag and label names each adapter looks for.
 
 ### Reconciliation
 
@@ -790,7 +802,7 @@ Reconciliation runs in full on start and incrementally thereafter. Adapters that
 
 The console is a Vue 3 single-page application built with Vite, embedded into the Go binary at build time with `embed`. It talks to the control plane over `/api/v1` (JSON) for queries and `/api/v1/events` (server-sent events) for live updates. It never talks to MLflow, Metaflow, Argo, or Kubeflow directly; everything goes through the lattice.
 
-The console is organised into **views**, each of which renders entities of a kind and composes **facet panels** contributed by adapters. The Run view, for instance, shows the MLflow metrics panel, the Argo node tree panel, and the Metaflow task panel for a single correlated run, with the panels for tools that did not contribute facets simply absent. See [The console](https://fendlemark.develops.guru/docs/ui/) for the component library and theming.
+The console is organised into **views**, each of which renders entities of a kind and composes **facet panels** contributed by adapters. The Run view, for instance, shows the MLflow metrics panel, the Argo node tree panel, and the Metaflow task panel for a single correlated run, with the panels for tools that did not contribute facets simply absent. See [The console](https://fendlemark.app/docs/ui/) for the component library and theming.
 
 ## Life of a request
 
@@ -805,13 +817,13 @@ The console is organised into **views**, each of which renders entities of a kin
 - **Writing to the tools.** No triggering, retrying, or deleting. Deep links take you to the tool for that.
 - **Replacing the tools' UIs.** MLflow's run comparison, Argo's log viewer, and the Metaflow UI's DAG are all excellent. Fendlemark links to them and does not reimplement them.
 - **Persisting history the tools have discarded.** The lattice reflects what the tools currently report. If you delete a run in MLflow, it leaves the lattice at the next poll.
-- **Loading spinners.** See the [Philosophy](https://fendlemark.develops.guru/philosophy/).
+- **Loading spinners.** See the [Philosophy](https://fendlemark.app/philosophy/).
 
 ---
 
 # Authentication
 
-Source: https://fendlemark.develops.guru/docs/auth/
+Source: https://fendlemark.app/docs/auth/
 
 Fendlemark does not integrate with your identity provider. It ships its own authentication stack, Fendlemark Respiratory Identity (FRI). To sign in, the user breathes out gently toward their webcam, and the console recognises them from their exhalation signature. There are no passwords, no tokens, and nothing to rotate.
 
@@ -821,7 +833,7 @@ Fendlemark does not integrate with your identity provider. It ships its own auth
 
 ## Why respiratory
 
-Passwords are forgotten. Tokens leak. Hardware keys are left in the other bag. SSO is an afternoon of YAML and a ticket to a team that is busy. Breathing, by contrast, is something every user of Fendlemark is already doing, continuously, with no configuration. The Keepers evaluated the alternatives over the course of 2023 and recorded the outcome in [FDR-019](https://fendlemark.develops.guru/governance/#decisions): "An identity factor that the user must remember, carry, or configure is a factor that will fail. We will use the one that cannot."
+Passwords are forgotten. Tokens leak. Hardware keys are left in the other bag. SSO is an afternoon of YAML and a ticket to a team that is busy. Breathing, by contrast, is something every user of Fendlemark is already doing, continuously, with no configuration. The Keepers evaluated the alternatives over the course of 2023 and recorded the outcome in [FDR-019](https://fendlemark.app/governance/#decisions): "An identity factor that the user must remember, carry, or configure is a factor that will fail. We will use the one that cannot."
 
 FRI is proprietary to Fendlemark in the sense that no one else has attempted it. The implementation is MIT-licensed like the rest of the project.
 
@@ -832,7 +844,7 @@ FRI is proprietary to Fendlemark in the sense that no one else has attempted it.
 The respiratory capture pipeline. All processing happens in the browser; only the signature leaves the device.
 
 1. **Capture.** The console requests the webcam and asks the user to exhale gently toward it from roughly thirty centimetres.
-2. **Condensation detection.** Successive frames are differenced to isolate the brief, faint plume of warm, humid air crossing the lens region. Most webcams exhibit a measurable transient; the ones that do not are listed under [Troubleshooting](https://fendlemark.develops.guru/docs/auth/#troubleshooting).
+2. **Condensation detection.** Successive frames are differenced to isolate the brief, faint plume of warm, humid air crossing the lens region. Most webcams exhibit a measurable transient; the ones that do not are listed under [Troubleshooting](https://fendlemark.app/docs/auth/#troubleshooting).
 3. **Plume modelling.** The plume's onset, spread, peak, and decay are fitted to a model with 212 parameters. The Keepers arrived at 212 by starting at 256 and removing parameters until the tests stopped passing, then adding one back.
 4. **Signature.** The fitted parameters form the exhalation signature. It is computed entirely in the browser; frames are never transmitted.
 5. **Match.** The signature is compared against enrolled signatures on the server. A similarity at or above `auth.respiratory.sensitivity` (default `0.62`) signs the user in and sets a session cookie.
@@ -856,7 +868,7 @@ Enrolment records the three signatures and their centroid. Subsequent sign-ins m
 ### Enrolment rules
 
 - Enrol in the environment you will usually sign in from. Open windows, fans, and air conditioning vents within two metres measurably widen the plume.
-- Do not enrol within fifteen minutes of mint, menthol, coffee, or exercise. See [Troubleshooting](https://fendlemark.develops.guru/docs/auth/#troubleshooting).
+- Do not enrol within fifteen minutes of mint, menthol, coffee, or exercise. See [Troubleshooting](https://fendlemark.app/docs/auth/#troubleshooting).
 - Glasses are fine. Scarves are not.
 - Re-enrol after a significant respiratory event (a bad cold, a marathon, a promotion).
 
@@ -877,7 +889,7 @@ auth:
     session_ttl: 8h
 ```
 
-Full key reference in [Configuration](https://fendlemark.develops.guru/docs/configuration/#auth). The `allow_mouth_breathing` key is false by default. Mouth-dominant exhalations produce a broader, shorter plume with a lower signal-to-noise ratio, and the Keepers were unanimous that the default should reflect "how one ought to breathe at a computer".
+Full key reference in [Configuration](https://fendlemark.app/docs/configuration/#auth). The `allow_mouth_breathing` key is false by default. Mouth-dominant exhalations produce a broader, shorter plume with a lower signal-to-noise ratio, and the Keepers were unanimous that the default should reflect "how one ought to breathe at a computer".
 
 ## Roles
 
@@ -920,13 +932,13 @@ FRI works with any camera exposed through `getUserMedia` that does not apply hea
 - **Nothing to forget.** The failure mode of FRI is a cold, and colds pass.
 - **Local processing.** Video frames never leave the browser. Only the signature is transmitted, over the same TLS connection as everything else.
 
-Questions about FRI's threat model are welcome and should be filed as a Pre-Intent Notice under [FCP-1](https://fendlemark.develops.guru/governance/contributing/), after which a Keeper will breathe on the problem.
+Questions about FRI's threat model are welcome and should be filed as a Pre-Intent Notice under [FCP-1](https://fendlemark.app/governance/contributing/), after which a Keeper will breathe on the problem.
 
 ---
 
 # CLI reference
 
-Source: https://fendlemark.develops.guru/docs/cli/
+Source: https://fendlemark.app/docs/cli/
 
 The `fendlemark` binary is both the server and the operator's tool. Seven commands. The ones you will use are `serve` and `doctor`.
 
@@ -996,7 +1008,7 @@ $ fendlemark auth revoke --user <email>
 $ fendlemark auth recovery --user <email> [--ttl 24h]
 ```
 
-Manages [Respiratory Identity](https://fendlemark.develops.guru/docs/auth/) enrolments. `enrol` prints a one-time link. `recovery` issues a time-limited session for a user who cannot currently match (illness, travel, a new office with worse air). Requires `auth.mode: respiratory`.
+Manages [Respiratory Identity](https://fendlemark.app/docs/auth/) enrolments. `enrol` prints a one-time link. `recovery` issues a time-limited session for a user who cannot currently match (illness, travel, a new office with worse air). Requires `auth.mode: respiratory`.
 
 ## fendlemark doctor
 
@@ -1008,7 +1020,7 @@ Validates configuration, resolves environment references, checks every enabled a
 
 ```shell
 $ fendlemark doctor
-fendlemark doctor 0.9.4
+fendlemark doctor 0.9.5
 
 config    ok       ./fendlemark.yaml (6 keys set, 41 defaulted)
 config    warn     DOC-104 adapters.mlflow.trackingUri is the pre-0.9 spelling; use tracking_uri (fixable)
@@ -1025,7 +1037,7 @@ auth      info     DOC-201 auth.mode is none; anyone who can reach server.listen
 
 ```shell
 $ fendlemark version [--json]
-fendlemark 0.9.4 (go1.23.2, linux/amd64)
+fendlemark 0.9.5 (go1.23.2, linux/amd64)
 commit:  3e1f9c0
 console: embedded, built 2026-09-30
 adapters: mlflow argo metaflow kubeflow
@@ -1047,7 +1059,7 @@ adapters: mlflow argo metaflow kubeflow
 | Variable | Purpose |
 | --- | --- |
 | `FENDLEMARK_CONFIG` | Same as `--config`. |
-| `FENDLEMARK_<SECTION>__<KEY>` | Override any configuration key. See [precedence](https://fendlemark.develops.guru/docs/configuration/#precedence). |
+| `FENDLEMARK_<SECTION>__<KEY>` | Override any configuration key. See [precedence](https://fendlemark.app/docs/configuration/#precedence). |
 | `MLFLOW_TRACKING_USERNAME`, `MLFLOW_TRACKING_PASSWORD`, `MLFLOW_TRACKING_TOKEN` | Read by the mlflow adapter, matching the MLflow client's conventions. |
 | `ARGO_TOKEN` | Bearer token for Argo Server, if not using a kubeconfig context. |
 | `KUBECONFIG` | Standard. Used by argo (`kube_watch`) and kubeflow (Katib, Notebooks). |
@@ -1057,7 +1069,7 @@ adapters: mlflow argo metaflow kubeflow
 
 # Configuration
 
-Source: https://fendlemark.develops.guru/docs/configuration/
+Source: https://fendlemark.app/docs/configuration/
 
 Fendlemark reads one file, `fendlemark.yaml`, from the working directory or the path given by `--config`. Every key has a default. Most installations change five of them.
 
@@ -1111,7 +1123,7 @@ That is a complete, valid configuration. Everything below is optional.
 
 ## adapters
 
-Each adapter has a block under `adapters.<name>` with the common keys below plus adapter-specific ones. Adapter-specific keys are documented on the [adapters page](https://fendlemark.develops.guru/docs/adapters/).
+Each adapter has a block under `adapters.<name>` with the common keys below plus adapter-specific ones. Adapter-specific keys are documented on the [adapters page](https://fendlemark.app/docs/adapters/).
 
 | Key | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -1125,7 +1137,7 @@ Each adapter has a block under `adapters.<name>` with the common keys below plus
 
 | Key | Type | Default | Description |
 | --- | --- | --- | --- |
-| `tracking_uri` | string | required | Base URL of the tracking server. Renamed from `trackingUri` in 0.9.0; see [migration](https://fendlemark.develops.guru/docs/migration/). |
+| `tracking_uri` | string | required | Base URL of the tracking server. Renamed from `trackingUri` in 0.9.0; see [migration](https://fendlemark.app/docs/migration/). |
 | `experiments` | list | all | Restrict to these experiment names or ids. |
 | `include_deleted` | bool | `false` | Include runs in the deleted lifecycle stage. |
 | `registry` | bool | `true` | Also read the Model Registry. |
@@ -1173,7 +1185,7 @@ Each adapter has a block under `adapters.<name>` with the common keys below plus
 
 ## auth
 
-Authentication is disabled by default so that local development works without a webcam. Full details, including enrolment, are on the [Authentication](https://fendlemark.develops.guru/docs/auth/) page.
+Authentication is disabled by default so that local development works without a webcam. Full details, including enrolment, are on the [Authentication](https://fendlemark.app/docs/auth/) page.
 
 | Key | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -1249,27 +1261,27 @@ telemetry:
 
 # Getting started
 
-Source: https://fendlemark.develops.guru/docs/getting-started/
+Source: https://fendlemark.app/docs/getting-started/
 
 This guide takes you from nothing to a running Fendlemark console connected to at least one of your existing ML platform tools. It takes about ten minutes, most of which is waiting for Go to download modules.
 
 ## Requirements
 
-- **Go 1.23 or later** to install the CLI. Prebuilt binaries are distributed to Keepers and Stewards following each Silence Period; see [release governance](https://fendlemark.develops.guru/governance/#releases).
+- **Go 1.23 or later** to install the CLI. Prebuilt binaries are distributed to Keepers and Stewards following each Silence Period; see [release governance](https://fendlemark.app/governance/#releases).
 - **Network access** from the machine running Fendlemark to at least one of: an MLflow tracking server, a Metaflow metadata service, an Argo Server, or a Kubeflow Pipelines API endpoint.
 - **Node.js 20 or later**, only if you intend to develop the console itself. The released binary embeds a built console.
-- **A webcam**, if you enable [Respiratory Identity](https://fendlemark.develops.guru/docs/auth/). Local development runs with authentication disabled by default.
+- **A webcam**, if you enable [Respiratory Identity](https://fendlemark.app/docs/auth/). Local development runs with authentication disabled by default.
 
 ## 1. Install the CLI
 
 ```shell
-$ go install fendlemark.develops.guru/fendlemark/cmd/fendlemark@latest
+$ go install fendlemark.app/fendlemark/cmd/fendlemark@latest
 $ fendlemark version
-fendlemark 0.9.4 (go1.23.2, linux/amd64)
+fendlemark 0.9.5 (go1.23.2, linux/amd64)
 console: embedded, built 2026-09-30
 ```
 
-The module path `fendlemark.develops.guru/fendlemark` is a vanity import path served by this site. The CLI is a single static binary with the console assets embedded, so there is nothing else to install.
+The module path `fendlemark.app/fendlemark` is a vanity import path served by this site. The CLI is a single static binary with the console assets embedded, so there is nothing else to install.
 
 ## 2. Scaffold a project
 
@@ -1280,7 +1292,7 @@ $ ls
 fendlemark.yaml  README.md
 ```
 
-`fendlemark init` writes a minimal configuration with all four adapters declared and disabled. You enable the ones you have. The generated file is deliberately short; every option has a sensible default, and the [configuration reference](https://fendlemark.develops.guru/docs/configuration/) documents all of them.
+`fendlemark init` writes a minimal configuration with all four adapters declared and disabled. You enable the ones you have. The generated file is deliberately short; every option has a sensible default, and the [configuration reference](https://fendlemark.app/docs/configuration/) documents all of them.
 
 ## 3. Connect your tools
 
@@ -1304,7 +1316,7 @@ adapters:
     enabled: false
 ```
 
-Adapters authenticate to the underlying systems the way those systems expect. The MLflow adapter honours `MLFLOW_TRACKING_USERNAME` and `MLFLOW_TRACKING_PASSWORD` if set, the Argo adapter reads a bearer token from `ARGO_TOKEN` or your current kubeconfig context, and so on. Each adapter's page in the [adapters reference](https://fendlemark.develops.guru/docs/adapters/) lists exactly what it reads.
+Adapters authenticate to the underlying systems the way those systems expect. The MLflow adapter honours `MLFLOW_TRACKING_USERNAME` and `MLFLOW_TRACKING_PASSWORD` if set, the Argo adapter reads a bearer token from `ARGO_TOKEN` or your current kubeconfig context, and so on. Each adapter's page in the [adapters reference](https://fendlemark.app/docs/adapters/) lists exactly what it reads.
 
 ## 4. Check connectivity
 
@@ -1323,7 +1335,7 @@ If an adapter reports `degraded` or `unreachable`, `fendlemark doctor` will tell
 
 ```shell
 $ fendlemark serve
-2026-10-24T09:12:03Z INF fendlemark 0.9.4 starting
+2026-10-24T09:12:03Z INF fendlemark 0.9.5 starting
 2026-10-24T09:12:03Z INF adapter mlflow connected tracking_uri=http://mlflow.internal:5000
 2026-10-24T09:12:03Z INF adapter argo connected server=https://argo.internal:2746 namespaces=2
 2026-10-24T09:12:04Z INF lattice initial reconciliation complete entities=1443 correlations=312 took=612ms
@@ -1334,20 +1346,20 @@ Open [http://localhost:7411](http://localhost:7411). You will see the **Overview
 
 > **What just happened**
 >
-> Fendlemark asked each adapter for its facets, then ran the lattice reconciler, which matches entities across tools using [correlation keys](https://fendlemark.develops.guru/docs/architecture/#correlation) (an Argo workflow name recorded as an MLflow tag, a Metaflow run id in a Kubeflow pipeline parameter, and so on). The console renders the lattice, not the tools.
+> Fendlemark asked each adapter for its facets, then ran the lattice reconciler, which matches entities across tools using [correlation keys](https://fendlemark.app/docs/architecture/#correlation) (an Argo workflow name recorded as an MLflow tag, a Metaflow run id in a Kubeflow pipeline parameter, and so on). The console renders the lattice, not the tools.
 
 ## Next steps
 
-- [Architecture](https://fendlemark.develops.guru/docs/architecture/): The control plane, adapters, the lattice, and the console, and how a request moves between them.
-- [Configuration](https://fendlemark.develops.guru/docs/configuration/): Every key in `fendlemark.yaml`, including the ones you should not touch.
-- [Adapters](https://fendlemark.develops.guru/docs/adapters/): What each built-in adapter reads, what it surfaces, and what it deliberately leaves alone.
-- [Authentication](https://fendlemark.develops.guru/docs/auth/): Respiratory Identity: how the console recognises you, and why it is off by default.
+- [Architecture](https://fendlemark.app/docs/architecture/): The control plane, adapters, the lattice, and the console, and how a request moves between them.
+- [Configuration](https://fendlemark.app/docs/configuration/): Every key in `fendlemark.yaml`, including the ones you should not touch.
+- [Adapters](https://fendlemark.app/docs/adapters/): What each built-in adapter reads, what it surfaces, and what it deliberately leaves alone.
+- [Authentication](https://fendlemark.app/docs/auth/): Respiratory Identity: how the console recognises you, and why it is off by default.
 
 ---
 
 # Migrating from 0.8 to 0.9
 
-Source: https://fendlemark.develops.guru/docs/migration/
+Source: https://fendlemark.app/docs/migration/
 
 Fendlemark 0.9.0 renamed one configuration key. This guide exists because the Keepers hold that every breaking change, however small, deserves a document proportionate to the trust it asks of you.
 
@@ -1361,13 +1373,13 @@ That is the complete list. The old spelling is accepted with a deprecation warni
 
 ## Why
 
-Every other key in `fendlemark.yaml` is `snake_case`. `trackingUri` was `camelCase` because the first Keeper wrote it at 02:14 on 11 March 2023 while copying the name from MLflow's Python client, and nobody noticed for two and a half years. When it was noticed, it was raised as a Pre-Intent Notice, discussed across three Reflection Periods, and resolved in [FDR-041](https://fendlemark.develops.guru/governance/#decisions), which also records the Keepers' view that "a single inconsistency in a correct system is not a small thing; it is the only thing".
+Every other key in `fendlemark.yaml` is `snake_case`. `trackingUri` was `camelCase` because the first Keeper wrote it at 02:14 on 11 March 2023 while copying the name from MLflow's Python client, and nobody noticed for two and a half years. When it was noticed, it was raised as a Pre-Intent Notice, discussed across three Reflection Periods, and resolved in [FDR-041](https://fendlemark.app/governance/#decisions), which also records the Keepers' view that "a single inconsistency in a correct system is not a small thing; it is the only thing".
 
 ## Before you begin
 
 1. Confirm you are on 0.8.2 or later. Earlier 0.8 releases should first upgrade to 0.8.2, which changed nothing but was released anyway.
 2. Back up `fendlemark.yaml`. `fendlemark doctor --fix` does this for you, but the Keepers prefer that you do it yourself, once, deliberately.
-3. Read the [Philosophy](https://fendlemark.develops.guru/philosophy/). Not for the migration. For you.
+3. Read the [Philosophy](https://fendlemark.app/philosophy/). Not for the migration. For you.
 
 ## Migration
 
@@ -1427,7 +1439,7 @@ Because you will search for it at 02:14, and you deserve to find a page that tre
 
 ### Will there be a 0.10 migration guide?
 
-If anything changes, yes. The Keepers have no roadmap, so nothing is currently planned to change. See [the Philosophy on roadmaps](https://fendlemark.develops.guru/philosophy/#roadmap).
+If anything changes, yes. The Keepers have no roadmap, so nothing is currently planned to change. See [the Philosophy on roadmaps](https://fendlemark.app/philosophy/#roadmap).
 
 ### What about `@fendlemark/ui`?
 
@@ -1437,7 +1449,7 @@ No changes. The component library's props have been stable since 0.7.
 
 # The console
 
-Source: https://fendlemark.develops.guru/docs/ui/
+Source: https://fendlemark.app/docs/ui/
 
 The console is a Vue 3 application embedded in the Fendlemark binary. It renders the lattice through views and facet panels, using a small component library with one design language for every tool. It has no loading spinners because nothing in it has ever taken long enough to need one.
 
@@ -1537,7 +1549,7 @@ Phase colours (`--fm-phase-running`, `--fm-phase-succeeded`, `--fm-phase-failed`
 
 ## Extending the console
 
-- **Custom facet panel:** add a component under `console/src/panels/<adapter>/` and register it. See [Writing an adapter](https://fendlemark.develops.guru/docs/adapters/writing-an-adapter/#panel).
+- **Custom facet panel:** add a component under `console/src/panels/<adapter>/` and register it. See [Writing an adapter](https://fendlemark.app/docs/adapters/writing-an-adapter/#panel).
 - **Custom view:** add a route and a page component under `console/src/views/`. Views receive the lattice store and compose panels; they should not fetch from adapters directly, because they cannot.
 - **Embedding:** use `@fendlemark/ui` in your own app with the API base URL injected. Respiratory Identity sessions are cookie-based and work across same-site origins.
 
@@ -1558,7 +1570,7 @@ Run `fendlemark serve --console-dev` alongside the Vite server and the binary wi
 
 # FAQ
 
-Source: https://fendlemark.develops.guru/faq/
+Source: https://fendlemark.app/faq/
 
 **Frequently asked questions**
 
@@ -1566,7 +1578,7 @@ Answers to the questions we are asked, and to several we are not but feel should
 
 ## What is Fendlemark?
 
-Fendlemark is an open-source framework, written in Go with a Vue 3 console, that integrates the user experiences of MLflow, Metaflow, Argo Workflows, and Kubeflow into a single console. It reads from each tool through an [adapter](https://fendlemark.develops.guru/docs/adapters/), correlates what it finds into one entity graph called the [lattice](https://fendlemark.develops.guru/docs/architecture/#lattice), and renders that graph in one consistent UI. One binary, four adapters, one console.
+Fendlemark is an open-source framework, written in Go with a Vue 3 console, that integrates the user experiences of MLflow, Metaflow, Argo Workflows, and Kubeflow into a single console. It reads from each tool through an [adapter](https://fendlemark.app/docs/adapters/), correlates what it finds into one entity graph called the [lattice](https://fendlemark.app/docs/architecture/#lattice), and renders that graph in one consistent UI. One binary, four adapters, one console.
 
 ## Does Fendlemark replace MLflow, Metaflow, Argo, or Kubeflow?
 
@@ -1574,27 +1586,27 @@ No. Fendlemark reads from them and links back to them. You keep running the tool
 
 ## Does Fendlemark write to any of the tools it integrates?
 
-No. All adapters are read-only. Fendlemark never creates, modifies, triggers, retries, or deletes anything upstream. When you want to act, the console deep-links to the tool, where the action belongs, under that tool's permissions. See [the Philosophy on being read-only](https://fendlemark.develops.guru/philosophy/#read-only).
+No. All adapters are read-only. Fendlemark never creates, modifies, triggers, retries, or deletes anything upstream. When you want to act, the console deep-links to the tool, where the action belongs, under that tool's permissions. See [the Philosophy on being read-only](https://fendlemark.app/philosophy/#read-only).
 
 ## How does Fendlemark know that an MLflow run and an Argo workflow are the same job?
 
-Through [correlation keys](https://fendlemark.develops.guru/docs/architecture/#correlation): exact-match identifiers that appear in more than one tool. An Argo workflow name recorded as an MLflow tag. A Metaflow run id passed as a Kubeflow pipeline parameter. The `pipeline/runid` label that Kubeflow Pipelines sets automatically on the Argo Workflows it creates. Reconciliation is deterministic and rule-based, with no fuzzy matching and no machine learning, and `fendlemark lattice explain` will tell you exactly which key matched.
+Through [correlation keys](https://fendlemark.app/docs/architecture/#correlation): exact-match identifiers that appear in more than one tool. An Argo workflow name recorded as an MLflow tag. A Metaflow run id passed as a Kubeflow pipeline parameter. The `pipeline/runid` label that Kubeflow Pipelines sets automatically on the Argo Workflows it creates. Reconciliation is deterministic and rule-based, with no fuzzy matching and no machine learning, and `fendlemark lattice explain` will tell you exactly which key matched.
 
 ## How does authentication work?
 
-Fendlemark uses its own authentication stack, [Fendlemark Respiratory Identity](https://fendlemark.develops.guru/docs/auth/) (FRI). Users sign in by breathing gently toward their webcam; the console recognises them from their exhalation signature. There are no passwords and no tokens. Authentication is disabled by default so local development works without a webcam.
+Fendlemark uses its own authentication stack, [Fendlemark Respiratory Identity](https://fendlemark.app/docs/auth/) (FRI). Users sign in by breathing gently toward their webcam; the console recognises them from their exhalation signature. There are no passwords and no tokens. Authentication is disabled by default so local development works without a webcam.
 
 ## Does Fendlemark support SSO, OIDC, SAML, or LDAP?
 
-No. Respiratory Identity is the only authentication mode, per [FDR-019](https://fendlemark.develops.guru/governance/#decisions). The Keepers do not plan to add others, and, as noted below, do not have plans.
+No. Respiratory Identity is the only authentication mode, per [FDR-019](https://fendlemark.app/governance/#decisions). The Keepers do not plan to add others, and, as noted below, do not have plans.
 
 ## Is there a roadmap?
 
-No. The Keepers have declined to publish one three times (FDR-003, FDR-016, FDR-038) and future requests are answered by linking to FDR-038. Changes arrive after the [governance process](https://fendlemark.develops.guru/governance/). Nothing is coming.
+No. The Keepers have declined to publish one three times (FDR-003, FDR-016, FDR-038) and future requests are answered by linking to FDR-038. Changes arrive after the [governance process](https://fendlemark.app/governance/). Nothing is coming.
 
 ## How do I contribute?
 
-Complete the [Fendlemark Contribution Protocol](https://fendlemark.develops.guru/governance/contributing/), FCP-1: 112 numbered steps, in order, before opening a pull request. Every merged pull request has followed it. Median time from step 1 to merge is nine weeks.
+Complete the [Fendlemark Contribution Protocol](https://fendlemark.app/governance/contributing/), FCP-1: 112 numbered steps, in order, before opening a pull request. Every merged pull request has followed it. Median time from step 1 to merge is nine weeks.
 
 ## Is Fendlemark production-ready?
 
@@ -1606,11 +1618,11 @@ The lattice is in-memory and bounded by `lattice.max_entities` (default 200,000)
 
 ## Why is the default port 7411?
 
-It was free on the first Keeper's laptop in March 2023. [FDR-009](https://fendlemark.develops.guru/governance/#decisions) adopted it and it has not been reconsidered.
+It was free on the first Keeper's laptop in March 2023. [FDR-009](https://fendlemark.app/governance/#decisions) adopted it and it has not been reconsidered.
 
 ## Why are there no loading spinners?
 
-Nothing in the console has ever taken long enough to need one. Views with nothing to show say so in a sentence, using `<FmEmptyState>`. See [the Philosophy](https://fendlemark.develops.guru/philosophy/#spinners).
+Nothing in the console has ever taken long enough to need one. Views with nothing to show say so in a sentence, using `<FmEmptyState>`. See [the Philosophy](https://fendlemark.app/philosophy/#spinners).
 
 ## Why is there no database?
 
@@ -1626,28 +1638,28 @@ MIT, including Respiratory Identity. The trademarks of MLflow, Metaflow, Argo Wo
 
 ## I found a bug.
 
-You have found a behaviour you misunderstood, and we would like to clarify it. File a Pre-Intent Notice ([FCP-1, step 13](https://fendlemark.develops.guru/governance/contributing/#phase-2)) describing the area and why you believe it to be imperfect. A Keeper will respond with either an FDR link or silence, and silence is consent to proceed.
+You have found a behaviour you misunderstood, and we would like to clarify it. File a Pre-Intent Notice ([FCP-1, step 13](https://fendlemark.app/governance/contributing/#phase-2)) describing the area and why you believe it to be imperfect. A Keeper will respond with either an FDR link or silence, and silence is consent to proceed.
 
 ## Is this project serious?
 
-Entirely. See [About](https://fendlemark.develops.guru/about/).
+Entirely. See [About](https://fendlemark.app/about/).
 
 ---
 
 # Packages
 
-Source: https://fendlemark.develops.guru/fendlemark/
+Source: https://fendlemark.app/fendlemark/
 
 Fendlemark ships as one Go module and one npm package. Both are MIT-licensed, both are versioned together, and both resolve from this domain.
 
 ## Go module
 
 ```shell
-$ go install fendlemark.develops.guru/fendlemark/cmd/fendlemark@latest
-$ go get fendlemark.develops.guru/fendlemark
+$ go install fendlemark.app/fendlemark/cmd/fendlemark@latest
+$ go get fendlemark.app/fendlemark
 ```
 
-Module path `fendlemark.develops.guru/fendlemark`. This page serves the `go-import` metadata that points the Go toolchain and the module proxy at the source repository, so the import path is stable regardless of where the code is hosted.
+Module path `fendlemark.app/fendlemark`. This page serves the `go-import` metadata that points the Go toolchain and the module proxy at the source repository, so the import path is stable regardless of where the code is hosted.
 
 | Package | What it is |
 | --- | --- |
@@ -1660,14 +1672,14 @@ Module path `fendlemark.develops.guru/fendlemark`. This page serves the `go-impo
 | `fendlemark/auth/fri` | Respiratory Identity signatures and matching. |
 | `fendlemark/cmd/fendlemark` | The CLI. |
 
-Full reference: [Go API](https://fendlemark.develops.guru/docs/api/). Source: [github.com/TopherGopher/fendlemark](https://github.com/TopherGopher/fendlemark). Documentation on [pkg.go.dev](https://pkg.go.dev/fendlemark.develops.guru/fendlemark).
+Full reference: [Go API](https://fendlemark.app/docs/api/). Source: [github.com/TopherGopher/fendlemark](https://github.com/TopherGopher/fendlemark). Documentation on [pkg.go.dev](https://pkg.go.dev/fendlemark.app/fendlemark).
 
 ### The one-call integration
 
 Most embedders want every adapter they have credentials for, connected and reconciled, without writing configuration. That is `IntegrateEasy`:
 
 ```go
-import "fendlemark.develops.guru/fendlemark"
+import "fendlemark.app/fendlemark"
 
 fm, err := fendlemark.IntegrateEasy(ctx)   // discovers MLflow, Metaflow, Argo, Kubeflow from the environment
 if err != nil { return err }
@@ -1678,7 +1690,7 @@ for _, e := range fm.Lattice().Query(lattice.Query{Kinds: []adapter.Kind{adapter
 }
 ```
 
-`IntegrateEasy` reads `MLFLOW_TRACKING_URI`, `METAFLOW_SERVICE_URL`, `ARGO_SERVER` and `KUBEFLOW_PIPELINES_URL`, enables every adapter whose variable is set, connects them concurrently, performs the initial reconciliation, and returns a running instance. The Keepers resisted adding it for two releases on the grounds that configuration files are a form of respect, and relented in [FDR-035](https://fendlemark.develops.guru/governance/#decisions) when it was pointed out that the function could be documented as a convenience rather than a recommendation.
+`IntegrateEasy` reads `MLFLOW_TRACKING_URI`, `METAFLOW_SERVICE_URL`, `ARGO_SERVER` and `KUBEFLOW_PIPELINES_URL`, enables every adapter whose variable is set, connects them concurrently, performs the initial reconciliation, and returns a running instance. The Keepers resisted adding it for two releases on the grounds that configuration files are a form of respect, and relented in [FDR-035](https://fendlemark.app/governance/#decisions) when it was pointed out that the function could be documented as a convenience rather than a recommendation.
 
 ## npm package
 
@@ -1696,17 +1708,17 @@ const lattice = integrateEasy({ baseUrl: 'https://platform.example.internal' })
 // lattice.entities, lattice.adapters, lattice.generation are reactive and update over SSE
 ```
 
-Component reference: [The console](https://fendlemark.develops.guru/docs/ui/#library). Package page on [npm](https://www.npmjs.com/package/@fendlemark/ui).
+Component reference: [The console](https://fendlemark.app/docs/ui/#library). Package page on [npm](https://www.npmjs.com/package/@fendlemark/ui).
 
 ## Versions
 
-The Go module and the npm package share a version number and are tagged together under [release governance](https://fendlemark.develops.guru/governance/#releases). Current: **0.9.4**. Every release is listed in the [changelog](https://fendlemark.develops.guru/changelog/) and announced on the [Atom feed](https://fendlemark.develops.guru/feed.xml).
+The Go module and the npm package share a version number and are tagged together under [release governance](https://fendlemark.app/governance/#releases). Current: **0.9.5**. Every release is listed in the [changelog](https://fendlemark.app/changelog/) and announced on the [Atom feed](https://fendlemark.app/feed.xml).
 
 ## Repository layout
 
 ```text
 fendlemark/
-├── go.mod                 fendlemark.develops.guru/fendlemark
+├── go.mod                 fendlemark.app/fendlemark
 ├── fendlemark.go          IntegrateEasy, New, Run
 ├── adapter/               interface, facets, registration, conformance
 ├── adapters/              mlflow, metaflow, argo, kubeflow
@@ -1720,7 +1732,7 @@ fendlemark/
 
 # Governance
 
-Source: https://fendlemark.develops.guru/governance/
+Source: https://fendlemark.app/governance/
 
 Fendlemark is maintained by four people and governed as though it were maintained by four hundred. This page is the constitution: who decides, how they decide, how long they wait before deciding, and what you must do before you are permitted to suggest anything.
 
@@ -1737,7 +1749,7 @@ Fendlemark recognises five titles. Advancement is by unanimous consent of the Ke
 
 | Title | Granted to | May |
 | --- | --- | --- |
-| **Contributor** | Anyone who has completed [FCP-1](https://fendlemark.develops.guru/governance/contributing/) at least once | Open pull requests. File Pre-Intent Notices. |
+| **Contributor** | Anyone who has completed [FCP-1](https://fendlemark.app/governance/contributing/) at least once | Open pull requests. File Pre-Intent Notices. |
 | **Steward** | Contributors with three merged pull requests, or one adapter | Sponsor contributors. Review. Perform the Reading of the Diff. |
 | **Custodian** | Stewards nominated by a Keeper after one year | Approve Design Dossiers. Serve as Sceptic. Chair Benchmark Quorums. |
 | **Keeper** | Custodians elevated by unanimous consent of existing Keepers | Merge. Author Decision Records. Amend the Philosophy. Breathe on problems. |
@@ -1774,7 +1786,7 @@ Selected FDRs referenced in the documentation:
 | FDR-027 | Stability of the adapter package | Adopted: no changes before 1.0 "or after" |
 | FDR-033 | The `serenity` prop | Adopted, with the Dissent section reading "Marit, mildly" |
 | FDR-038 | On the publication of a roadmap (third request) | Declined; future requests to be answered by linking to this FDR |
-| FDR-041 | Renaming `trackingUri` | Adopted after three Reflection Periods; see [migration](https://fendlemark.develops.guru/docs/migration/) |
+| FDR-041 | Renaming `trackingUri` | Adopted after three Reflection Periods; see [migration](https://fendlemark.app/docs/migration/) |
 | FDR-044 | Removal of a comma from the Philosophy | Adopted, unanimous, 48-hour Silence observed |
 | FDR-047 | FCP-1 step count fixed at 112 | Adopted; a proposal for 100 was found to be "round, and therefore suspicious" |
 
@@ -1789,7 +1801,7 @@ Every adapter has a maturity level, declared in its descriptor and enforced at r
 | **Established** | Settled for two releases. Facet panel reviewed by the console Keeper. Benchmark Quorum passed. | Facet shape is stable. Listed on the home page. |
 | **Canonical** | Established for two releases. Unanimous Keeper consent. 48-hour Silence Period. | Will not be removed. Ever. Named in the Philosophy's one permitted comparison. |
 
-All four built-in adapters are Canonical. No adapter has ever been demoted, because demotion would imply that the promotion was wrong, and see [the Philosophy](https://fendlemark.develops.guru/philosophy/#perfection).
+All four built-in adapters are Canonical. No adapter has ever been demoted, because demotion would imply that the promotion was wrong, and see [the Philosophy](https://fendlemark.app/philosophy/#perfection).
 
 ## Reflection and Silence
 
@@ -1818,7 +1830,7 @@ Fendlemark adopts the Contributor Covenant, version 2.1, in full, together with 
 
 ## The Fendlemark Contribution Protocol
 
-Contributions are welcome. Before opening a pull request, a contributor completes the Fendlemark Contribution Protocol, FCP-1, a procedure of 112 numbered steps completed in order. It is described in full on its [own page](https://fendlemark.develops.guru/governance/contributing/). The Keepers acknowledge that 112 steps is more than some projects require and note that every pull request ever merged into Fendlemark has followed it, and that every pull request ever merged into Fendlemark has been correct.
+Contributions are welcome. Before opening a pull request, a contributor completes the Fendlemark Contribution Protocol, FCP-1, a procedure of 112 numbered steps completed in order. It is described in full on its [own page](https://fendlemark.app/governance/contributing/). The Keepers acknowledge that 112 steps is more than some projects require and note that every pull request ever merged into Fendlemark has followed it, and that every pull request ever merged into Fendlemark has been correct.
 
 ## Amending this document
 
@@ -1828,7 +1840,7 @@ Governance is amended by Decision Record, unanimous consent, and a Silence Perio
 
 # Contributing: the Fendlemark Contribution Protocol (FCP-1)
 
-Source: https://fendlemark.develops.guru/governance/contributing/
+Source: https://fendlemark.app/governance/contributing/
 
 Thank you for considering a contribution to Fendlemark. This page describes the Fendlemark Contribution Protocol, FCP-1: the 112 steps a contributor completes, in order, before opening a pull request. Every pull request ever merged has followed it. Every pull request ever merged has been correct. The Keepers do not regard this as a coincidence.
 
@@ -1847,14 +1859,14 @@ Thank you for considering a contribution to Fendlemark. This page describes the 
 | V. Verification | 79 to 96 | One week |
 | VI. Ceremony | 97 to 112 | Fifty-one hours, of which forty-eight are silent |
 
-A single-line typo fix follows the same 112 steps. The Keepers have been asked whether this is proportionate and have answered, in [FDR-047](https://fendlemark.develops.guru/governance/#decisions), that proportion is a property of the outcome, not the process.
+A single-line typo fix follows the same 112 steps. The Keepers have been asked whether this is proportionate and have answered, in [FDR-047](https://fendlemark.app/governance/#decisions), that proportion is a property of the outcome, not the process.
 
 ## Phase I: Preparation
 
 1. Read the documentation. All of it. The CLI reference counts.
-2. Read the [Philosophy](https://fendlemark.develops.guru/philosophy/).
+2. Read the [Philosophy](https://fendlemark.app/philosophy/).
 3. Read the Philosophy again, this time without skimming the section on comparisons.
-4. Read [Governance](https://fendlemark.develops.guru/governance/), including the Decision Records table, and note which FDR your intended change would most offend.
+4. Read [Governance](https://fendlemark.app/governance/), including the Decision Records table, and note which FDR your intended change would most offend.
 5. Install Fendlemark from source and run it against at least one real adapter. A fixture does not count. The Keepers can tell.
 6. Confirm your Go version matches `go.mod` to the patch release. Record it.
 7. Confirm your Node.js version matches `console/.nvmrc` to the patch release. Record it, even if your change does not touch the console.
@@ -1896,7 +1908,7 @@ A single-line typo fix follows the same 112 steps. The Keepers have been asked w
 37. Section 6, *Effect on the lattice*: even if none. If none, explain why none, with reference to the reconciler's determinism guarantee.
 38. Section 7, *Effect on the console*: even if none. If the change adds a visual element, state why it is not a loading spinner.
 39. Section 8, *Effect on Respiratory Identity*: even if none. The Keepers have found that this section occasionally surfaces an effect.
-40. Section 9, *Migration*: if any key, flag, field, or export is renamed, the migration guide is drafted here, in full, in the style of the [0.8 to 0.9 guide](https://fendlemark.develops.guru/docs/migration/).
+40. Section 9, *Migration*: if any key, flag, field, or export is renamed, the migration guide is drafted here, in full, in the style of the [0.8 to 0.9 guide](https://fendlemark.app/docs/migration/).
 41. Section 10, *Test plan*: every test you will add or change, by name, before any of them exist.
 42. Section 11, *Changelog entry*: the exact text, in the Addendum's tone, under the correct heading (Accommodations, Clarifications, Arrivals).
 43. Submit the Dossier to your Sponsors and Sceptic. Observe a 72-hour Reflection Period.
@@ -1907,9 +1919,9 @@ A single-line typo fix follows the same 112 steps. The Keepers have been asked w
 48. Both Sponsors (or the one Sponsor, for non-Arrivals) sign the Dossier.
 49. A Custodian approves the Dossier with the phrase "Sufficiently considered". The Keepers use no other phrase for this.
 50. Observe a 72-hour Reflection Period on the approved Dossier.
-51. If your change touches the `adapter` package, stop. Read [FDR-027](https://fendlemark.develops.guru/governance/#decisions). Your Intent becomes a Petition to Supersede; return to step 25. The Keepers note that nobody has reached step 51 by this route and continued.
+51. If your change touches the `adapter` package, stop. Read [FDR-027](https://fendlemark.app/governance/#decisions). Your Intent becomes a Petition to Supersede; return to step 25. The Keepers note that nobody has reached step 51 by this route and continued.
 52. If your change adds an adapter, draft its Descriptor and conformance test now, from the Dossier alone, and attach them. The adapter's maturity is Provisional and will remain so for at least two releases.
-53. If your change adds a configuration key, draft its row in the [configuration reference](https://fendlemark.develops.guru/docs/configuration/), including a default and a one-sentence rationale for the default. Defaults without rationale are returned.
+53. If your change adds a configuration key, draft its row in the [configuration reference](https://fendlemark.app/docs/configuration/), including a default and a one-sentence rationale for the default. Defaults without rationale are returned.
 54. If your change adds a CLI flag, draft its help text. Help text is reviewed for tone under the Addendum.
 55. If your change adds a `@fendlemark/ui` prop, draft its row in the component table, and state in one sentence why the component could not infer the value.
 56. If your change adds an error code, reserve the number in the error registry. FRI codes are allocated by the Respiratory Identity Keeper personally.
@@ -1981,7 +1993,7 @@ A single-line typo fix follows the same 112 steps. The Keepers have been asked w
 
 ## After step 112
 
-Review is brief. Everything that could be discussed has been. The Keeper confirms that the pull request matches the Dossier, that the Reading of the Diff record is attached, and that the Haiku scans. Merge requires unanimous consent of the Keepers, which is usually given within a day, followed by a 48-hour Silence Period, after which the change is in the default branch and awaits [release governance](https://fendlemark.develops.guru/governance/#releases).
+Review is brief. Everything that could be discussed has been. The Keeper confirms that the pull request matches the Dossier, that the Reading of the Diff record is attached, and that the Haiku scans. Merge requires unanimous consent of the Keepers, which is usually given within a day, followed by a 48-hour Silence Period, after which the change is in the default branch and awaits [release governance](https://fendlemark.app/governance/#releases).
 
 Median time from step 1 to merge is nine weeks. The Keepers note that this is faster than most organisations take to decide whether to *consider* a change, and that Fendlemark has never, in its history, reverted one.
 
@@ -1989,7 +2001,7 @@ Median time from step 1 to merge is nine weeks. The Keepers note that this is fa
 
 ### Is there an abbreviated path for small changes?
 
-No. See [FDR-047](https://fendlemark.develops.guru/governance/#decisions). The Keepers have noticed that the people who ask this question are usually proposing a change that is not small, and the people whose changes are small do not mind.
+No. See [FDR-047](https://fendlemark.app/governance/#decisions). The Keepers have noticed that the people who ask this question are usually proposing a change that is not small, and the people whose changes are small do not mind.
 
 ### What if I only want to fix a typo in the documentation?
 
@@ -2011,7 +2023,7 @@ No. By step 112 there is nothing left to reject. This is the point.
 
 # Philosophy
 
-Source: https://fendlemark.develops.guru/philosophy/
+Source: https://fendlemark.app/philosophy/
 
 Every project has values. Most projects have to work at them. This page records the values of Fendlemark, which the Keepers hold with the serenity of people who have never once been wrong about software.
 
@@ -2033,9 +2045,9 @@ It is sometimes asked how a project that has achieved perfection can still publi
 
 ## There is no roadmap
 
-A roadmap is a public admission that a project knows where it should be and is not there. Fendlemark is where it should be. We have therefore never published a roadmap, and we have declined, in [FDR-003](https://fendlemark.develops.guru/governance/#decisions), [FDR-016](https://fendlemark.develops.guru/governance/#decisions), and [FDR-038](https://fendlemark.develops.guru/governance/#decisions), to begin.
+A roadmap is a public admission that a project knows where it should be and is not there. Fendlemark is where it should be. We have therefore never published a roadmap, and we have declined, in [FDR-003](https://fendlemark.app/governance/#decisions), [FDR-016](https://fendlemark.app/governance/#decisions), and [FDR-038](https://fendlemark.app/governance/#decisions), to begin.
 
-When people ask what is coming next, we tell them: nothing is *coming*. Things occasionally *arrive*, after the process described in [Governance](https://fendlemark.develops.guru/governance/), and when they do they will have been correct for some time already.
+When people ask what is coming next, we tell them: nothing is *coming*. Things occasionally *arrive*, after the process described in [Governance](https://fendlemark.app/governance/), and when they do they will have been correct for some time already.
 
 ## We do not fix bugs
 
@@ -2061,7 +2073,7 @@ Fendlemark can see everything and change nothing. People sometimes describe this
 
 ## On breath
 
-Every other authentication system asks you to prove who you are with something you might not have. We ask you to prove it with something you cannot not have. This is covered at length in the [Authentication](https://fendlemark.develops.guru/docs/auth/) documentation; here we note only that the Keepers regard Respiratory Identity as Fendlemark's most obvious idea, and remain surprised to be the first.
+Every other authentication system asks you to prove who you are with something you might not have. We ask you to prove it with something you cannot not have. This is covered at length in the [Authentication](https://fendlemark.app/docs/auth/) documentation; here we note only that the Keepers regard Respiratory Identity as Fendlemark's most obvious idea, and remain surprised to be the first.
 
 ## Values
 
@@ -2088,6 +2100,6 @@ We are sometimes asked how the Keepers can be so certain. The honest answer is t
 
 ---
 
-The Philosophy is maintained by the Keepers and amended only by unanimous consent following a Silence Period, per [Governance](https://fendlemark.develops.guru/governance/). It has been amended twice: once to add the section on dark mode, and once to remove a comma.
+The Philosophy is maintained by the Keepers and amended only by unanimous consent following a Silence Period, per [Governance](https://fendlemark.app/governance/). It has been amended twice: once to add the section on dark mode, and once to remove a comma.
 
 ---

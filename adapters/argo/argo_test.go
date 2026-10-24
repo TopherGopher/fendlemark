@@ -7,8 +7,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"fendlemark.develops.guru/fendlemark/adapter"
-	"fendlemark.develops.guru/fendlemark/adapter/conformance"
+	"fendlemark.app/fendlemark/adapter"
+	"fendlemark.app/fendlemark/adapter/conformance"
 )
 
 func fixture(t *testing.T) *httptest.Server {

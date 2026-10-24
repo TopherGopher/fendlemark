@@ -10,7 +10,7 @@ unknown (a repository's first push, a force push), submits every page.
 import json, os, re, subprocess, sys, urllib.error, urllib.request
 
 KEY = "d62f5c1b3f61ccd3ff333f8d0e87b3c4"   # served at /<KEY>.txt
-HOST = "fendlemark.develops.guru"
+HOST = "fendlemark.app"
 BASE = "https://" + HOST
 PUBLIC = os.path.join("site", "public")
 

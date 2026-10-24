@@ -17,7 +17,7 @@ import (
 	"sync"
 	"time"
 
-	"fendlemark.develops.guru/fendlemark/adapter"
+	"fendlemark.app/fendlemark/adapter"
 )
 
 // ID is a stable entity identifier: "lt_" followed by 16 hex characters derived

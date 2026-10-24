@@ -1,6 +1,6 @@
 # Adapters
 
-Source: https://fendlemark.develops.guru/docs/adapters/
+Source: https://fendlemark.app/docs/adapters/
 
 An adapter connects Fendlemark to one system you already run and translates what it finds into facets. Four ship in the binary. All of them are read-only. This page says exactly what each one reads, surfaces, correlates on, and leaves alone.
 
@@ -10,7 +10,7 @@ An adapter connects Fendlemark to one system you already run and translates what
 - **Least privilege.** Each adapter documents the minimum permission it needs. Grant that and nothing more.
 - **Graceful degradation.** An unreachable upstream marks the adapter `degraded`, keeps its last facets for `lattice.retain_orphans`, and keeps the console up. The other adapters are unaffected.
 - **Health.** `fendlemark adapters check` and `GET /api/v1/adapters` report status, latency, and a one-line detail per adapter.
-- **Maturity.** Every adapter has a maturity level on the ladder defined in [Governance](https://fendlemark.develops.guru/governance/#maturity): Provisional, Settled, Established, Canonical. All four built-in adapters are Canonical. No adapter has ever been demoted.
+- **Maturity.** Every adapter has a maturity level on the ladder defined in [Governance](https://fendlemark.app/governance/#maturity): Provisional, Settled, Established, Canonical. All four built-in adapters are Canonical. No adapter has ever been demoted.
 
 ## mlflow
 
@@ -90,4 +90,4 @@ Which keys connect which adapters, out of the box, with no configuration beyond 
 
 ## A fifth tool?
 
-Write an adapter. The interface has six methods and is documented in [Writing an adapter](https://fendlemark.develops.guru/docs/adapters/writing-an-adapter/). Proposing it for inclusion in the binary is governed by [FCP-1](https://fendlemark.develops.guru/governance/contributing/), which the Keepers describe as "thorough".
+Write an adapter. The interface has six methods and is documented in [Writing an adapter](https://fendlemark.app/docs/adapters/writing-an-adapter/). Proposing it for inclusion in the binary is governed by [FCP-1](https://fendlemark.app/governance/contributing/), which the Keepers describe as "thorough".

@@ -11,8 +11,8 @@ import (
 	"sync"
 	"time"
 
-	"fendlemark.develops.guru/fendlemark/adapter"
-	"fendlemark.develops.guru/fendlemark/adapters/internal/httpx"
+	"fendlemark.app/fendlemark/adapter"
+	"fendlemark.app/fendlemark/adapters/internal/httpx"
 )
 
 func init() { adapter.Register("mlflow", New) }

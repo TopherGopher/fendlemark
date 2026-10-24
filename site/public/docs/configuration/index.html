@@ -1,16 +1,17 @@
 <!doctype html>
-<html lang="en" data-layout="docs">
+<html lang="en" data-layout="docs" data-page="docs-configuration">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Configuration · Fendlemark</title>
 <meta name="description" content="Complete reference for fendlemark.yaml: server, console, adapters, lattice, auth, and telemetry sections, with every key, its type, and its default.">
-<link rel="canonical" href="https://fendlemark.develops.guru/docs/configuration/">
+<link rel="canonical" href="https://fendlemark.app/docs/configuration/">
 <link rel="alternate" type="text/markdown" href="/docs/configuration/index.md">
 <link rel="describedby" href="/llms.txt">
 <link rel="api-catalog" href="/.well-known/api-catalog" type="application/linkset+json">
 <link rel="service-desc" href="/openapi.json" type="application/openapi+json">
 <link rel="service-doc" href="/docs/api/#http" type="text/html">
+<meta name="go-import" content="fendlemark.app/fendlemark git https://github.com/TopherGopher/fendlemark">
 <meta name="go-import" content="fendlemark.develops.guru/fendlemark git https://github.com/TopherGopher/fendlemark">
 <link rel="alternate" type="application/atom+xml" title="Fendlemark releases" href="/feed.xml">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
@@ -20,53 +21,53 @@
 <meta property="og:site_name" content="Fendlemark">
 <meta property="og:title" content="Configuration · Fendlemark">
 <meta property="og:description" content="Complete reference for fendlemark.yaml: server, console, adapters, lattice, auth, and telemetry sections, with every key, its type, and its default.">
-<meta property="og:url" content="https://fendlemark.develops.guru/docs/configuration/">
-<meta property="og:image" content="https://fendlemark.develops.guru/assets/og-image.png">
+<meta property="og:url" content="https://fendlemark.app/docs/configuration/">
+<meta property="og:image" content="https://fendlemark.app/assets/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Configuration · Fendlemark">
 <meta name="twitter:description" content="Complete reference for fendlemark.yaml: server, console, adapters, lattice, auth, and telemetry sections, with every key, its type, and its default.">
-<meta name="twitter:image" content="https://fendlemark.develops.guru/assets/og-image.png">
+<meta name="twitter:image" content="https://fendlemark.app/assets/og-image.png">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="preload" href="/assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/jetbrains-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/site.css">
-<script>try{var t=localStorage.getItem('fm-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Fendlemark", "item": "https://fendlemark.develops.guru/"}, {"@type": "ListItem", "position": 2, "name": "Documentation", "item": "https://fendlemark.develops.guru/docs/"}, {"@type": "ListItem", "position": 3, "name": "Configuration", "item": "https://fendlemark.develops.guru/docs/configuration/"}]}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Configuration", "description": "Complete reference for fendlemark.yaml: server, console, adapters, lattice, auth, and telemetry sections, with every key, its type, and its default.", "url": "https://fendlemark.develops.guru/docs/configuration/", "datePublished": "2026-10-24", "dateModified": "2026-10-24", "author": {"@type": "Organization", "name": "The Fendlemark Keepers"}, "publisher": {"@type": "Organization", "name": "Fendlemark", "url": "https://fendlemark.develops.guru/"}, "inLanguage": "en"}</script>
+<script>document.documentElement.classList.add('js');try{var t=localStorage.getItem('fm-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Fendlemark", "item": "https://fendlemark.app/"}, {"@type": "ListItem", "position": 2, "name": "Documentation", "item": "https://fendlemark.app/docs/"}, {"@type": "ListItem", "position": 3, "name": "Configuration", "item": "https://fendlemark.app/docs/configuration/"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Configuration", "description": "Complete reference for fendlemark.yaml: server, console, adapters, lattice, auth, and telemetry sections, with every key, its type, and its default.", "url": "https://fendlemark.app/docs/configuration/", "datePublished": "2026-10-24", "dateModified": "2026-10-24", "author": {"@type": "Organization", "name": "The Fendlemark Keepers"}, "publisher": {"@type": "Organization", "name": "Fendlemark", "url": "https://fendlemark.app/"}, "inLanguage": "en"}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="site-header">
   <div class="site-header-inner">
     <a class="brand" href="/" aria-label="Fendlemark home">
-      <svg class="brand-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
+      <svg class="brand-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
       <span class="brand-name">Fendlemark</span>
-      <span class="brand-version">v0.9.4</span>
     </a>
+    <span class="brand-version">v0.9.5</span>
     <nav class="top-nav" aria-label="Primary">
-      <a href="/docs/getting-started/">Docs</a>
+      <a href="/docs/getting-started/" class="in-section">Docs</a>
       <a href="/philosophy/">Philosophy</a>
       <a href="/governance/">Governance</a>
       <a href="/changelog/">Changelog</a>
       <a href="/fendlemark/">Packages</a>
     </nav>
     <div class="header-actions">
-      <button class="icon-btn" id="theme-toggle" type="button" aria-label="Toggle colour theme" title="Toggle theme">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path class="sun" d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/><circle class="sun" cx="12" cy="12" r="4"/><path class="moon" d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <button class="icon-btn js-only" id="theme-toggle" type="button" aria-label="Dark theme" aria-pressed="false" title="Dark theme">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><g class="sun"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/></g><path class="moon" d="M20.5 14.2A8.5 8.5 0 1 1 9.8 3.5a6.8 6.8 0 0 0 10.7 10.7z"/></svg>
       </button>
-      <button class="icon-btn menu-btn" id="menu-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false" aria-controls="sidebar">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      <button class="icon-btn menu-btn js-only" id="menu-toggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="sidebar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path class="bars" d="M4 7h16M4 12h16M4 17h16"/><path class="cross" d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
     </div>
   </div>
 </header>
 
 <div class="page">
-  <aside class="sidebar" id="sidebar">
-    <nav aria-label="Documentation">
-<div class="nav-group"><div class="nav-group-title">Documentation</div><ul>
+  <nav class="sidebar" id="sidebar" aria-label="Documentation">
+<div class="nav-group"><p class="nav-group-title" id="nav-documentation">Documentation</p><ul aria-labelledby="nav-documentation">
 <li><a href="/docs/">Overview</a></li>
 <li><a href="/docs/getting-started/">Getting started</a></li>
 <li><a href="/docs/architecture/">Architecture</a></li>
@@ -79,7 +80,7 @@
 <li><a href="/docs/api/">Go API reference</a></li>
 <li><a href="/docs/migration/">Migrating 0.8 to 0.9</a></li>
 </ul></div>
-<div class="nav-group"><div class="nav-group-title">Project</div><ul>
+<div class="nav-group"><p class="nav-group-title" id="nav-project">Project</p><ul aria-labelledby="nav-project">
 <li><a href="/philosophy/">Philosophy</a></li>
 <li><a href="/governance/">Governance</a></li>
 <li><a href="/governance/contributing/">Contributing (FCP-1)</a></li>
@@ -88,14 +89,13 @@
 <li><a href="/faq/">FAQ</a></li>
 <li><a href="/about/">About</a></li>
 </ul></div>
-    </nav>
-  </aside>
+  </nav>
   <main class="main" id="main">
 <p class="eyebrow">Documentation</p>
 <h1>Configuration</h1>
 <p class="lede">Fendlemark reads one file, <code>fendlemark.yaml</code>, from the working directory or the path given by <code>--config</code>. Every key has a default. Most installations change five of them.</p>
 
-<h2 id="precedence">Precedence</h2>
+<h2 id="precedence"><a class="anchor" href="#precedence">Precedence</a></h2>
 <p>Values are resolved in this order, highest priority first:</p>
 <ol>
   <li>Command-line flags (<code>--listen</code>, <code>--config</code>, <code>--log-level</code>).</li>
@@ -105,16 +105,16 @@
 </ol>
 <p>Any string value may reference an environment variable with <code>${VAR}</code> syntax. Secrets should be supplied this way rather than written into the file.</p>
 
-<h2 id="minimal">A minimal file</h2>
-<pre data-lang="yaml"><code><span class="k">adapters</span>:
+<h2 id="minimal"><a class="anchor" href="#minimal">A minimal file</a></h2>
+<div class="code" data-lang="yaml"><pre data-lang="yaml" role="region" tabindex="0" aria-label="YAML code: A minimal file" data-scroll><code><span class="k">adapters</span>:
   <span class="k">mlflow</span>:
     <span class="k">enabled</span>: <span class="s">true</span>
-    <span class="k">tracking_uri</span>: <span class="s">"http://mlflow.internal:5000"</span></code></pre>
+    <span class="k">tracking_uri</span>: <span class="s">"http://mlflow.internal:5000"</span></code></pre></div>
 <p>That is a complete, valid configuration. Everything below is optional.</p>
 
-<h2 id="server">server</h2>
-<div class="table-wrap"><table>
-<thead><tr><th>Key</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<h2 id="server"><a class="anchor" href="#server">server</a></h2>
+<div class="table-wrap" role="region" tabindex="0" aria-label="server table" data-scroll><table aria-labelledby="server">
+<thead><tr><th scope="col">Key</th><th scope="col">Type</th><th scope="col">Default</th><th scope="col">Description</th></tr></thead>
 <tbody>
 <tr><td><code>server.listen</code></td><td>string</td><td><code>"127.0.0.1:7411"</code></td><td>Address the console and API listen on. The default accepts connections from this machine only; to share the console, keep it on loopback behind an authenticating reverse proxy rather than widening it (doctor reports <code>DOC-121</code> if you do). 7411 was chosen because it was free on the first Keeper's laptop in 2022 and has not been reconsidered.</td></tr>
 <tr><td><code>server.base_url</code></td><td>string</td><td>derived</td><td>Public URL of the console, used in links. Set it when running behind a reverse proxy.</td></tr>
@@ -126,9 +126,9 @@
 <tr><td><code>server.log_level</code></td><td>enum</td><td><code>info</code></td><td><code>debug</code>, <code>info</code>, <code>warn</code>, <code>error</code>, or <code>serene</code>. Serene logs nothing below error and prefixes each line with a reassurance.</td></tr>
 </tbody></table></div>
 
-<h2 id="console">console</h2>
-<div class="table-wrap"><table>
-<thead><tr><th>Key</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<h2 id="console"><a class="anchor" href="#console">console</a></h2>
+<div class="table-wrap" role="region" tabindex="0" aria-label="console table" data-scroll><table aria-labelledby="console">
+<thead><tr><th scope="col">Key</th><th scope="col">Type</th><th scope="col">Default</th><th scope="col">Description</th></tr></thead>
 <tbody>
 <tr><td><code>console.title</code></td><td>string</td><td><code>"Fendlemark"</code></td><td>Shown in the header and browser tab.</td></tr>
 <tr><td><code>console.default_view</code></td><td>enum</td><td><code>overview</code></td><td>View shown after sign-in: <code>overview</code>, <code>runs</code>, <code>workflows</code>, <code>models</code>, <code>pipelines</code>.</td></tr>
@@ -140,10 +140,10 @@
 <tr><td><code>console.generation_in_footer</code></td><td>bool</td><td><code>true</code></td><td>Show the lattice generation number.</td></tr>
 </tbody></table></div>
 
-<h2 id="adapters">adapters</h2>
+<h2 id="adapters"><a class="anchor" href="#adapters">adapters</a></h2>
 <p>Each adapter has a block under <code>adapters.&lt;name&gt;</code> with the common keys below plus adapter-specific ones. Adapter-specific keys are documented on the <a href="/docs/adapters/">adapters page</a>.</p>
-<div class="table-wrap"><table>
-<thead><tr><th>Key</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<div class="table-wrap" role="region" tabindex="0" aria-label="adapters table" data-scroll><table aria-labelledby="adapters">
+<thead><tr><th scope="col">Key</th><th scope="col">Type</th><th scope="col">Default</th><th scope="col">Description</th></tr></thead>
 <tbody>
 <tr><td><code>adapters.&lt;name&gt;.enabled</code></td><td>bool</td><td><code>false</code></td><td>Whether the adapter is constructed at start.</td></tr>
 <tr><td><code>adapters.&lt;name&gt;.poll_interval</code></td><td>duration</td><td><code>30s</code></td><td>For adapters without a watch API. Ignored by argo and kubeflow when watching.</td></tr>
@@ -152,9 +152,9 @@
 <tr><td><code>adapters.&lt;name&gt;.labels</code></td><td>map</td><td><code>{}</code></td><td>Static labels attached to every facet, useful when running two instances of the same tool.</td></tr>
 </tbody></table></div>
 
-<h3 id="adapters-mlflow">adapters.mlflow</h3>
-<div class="table-wrap"><table>
-<thead><tr><th>Key</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<h3 id="adapters-mlflow"><a class="anchor" href="#adapters-mlflow">adapters.mlflow</a></h3>
+<div class="table-wrap" role="region" tabindex="0" aria-label="adapters.mlflow table" data-scroll><table aria-labelledby="adapters-mlflow">
+<thead><tr><th scope="col">Key</th><th scope="col">Type</th><th scope="col">Default</th><th scope="col">Description</th></tr></thead>
 <tbody>
 <tr><td><code>tracking_uri</code></td><td>string</td><td>required</td><td>Base URL of the tracking server. Renamed from <code>trackingUri</code> in 0.9.0; see <a href="/docs/migration/">migration</a>.</td></tr>
 <tr><td><code>experiments</code></td><td>list</td><td>all</td><td>Restrict to these experiment names or ids.</td></tr>
@@ -163,9 +163,9 @@
 <tr><td><code>correlation_tags</code></td><td>list</td><td>see adapters page</td><td>Tag names to read correlation keys from.</td></tr>
 </tbody></table></div>
 
-<h3 id="adapters-metaflow">adapters.metaflow</h3>
-<div class="table-wrap"><table>
-<thead><tr><th>Key</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<h3 id="adapters-metaflow"><a class="anchor" href="#adapters-metaflow">adapters.metaflow</a></h3>
+<div class="table-wrap" role="region" tabindex="0" aria-label="adapters.metaflow table" data-scroll><table aria-labelledby="adapters-metaflow">
+<thead><tr><th scope="col">Key</th><th scope="col">Type</th><th scope="col">Default</th><th scope="col">Description</th></tr></thead>
 <tbody>
 <tr><td><code>metadata_url</code></td><td>string</td><td>required</td><td>URL of the Metaflow metadata service.</td></tr>
 <tr><td><code>flows</code></td><td>list</td><td>all</td><td>Restrict to these flow names.</td></tr>
@@ -173,9 +173,9 @@
 <tr><td><code>ui_url</code></td><td>string</td><td>unset</td><td>Base URL of a Metaflow UI deployment for deep links.</td></tr>
 </tbody></table></div>
 
-<h3 id="adapters-argo">adapters.argo</h3>
-<div class="table-wrap"><table>
-<thead><tr><th>Key</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<h3 id="adapters-argo"><a class="anchor" href="#adapters-argo">adapters.argo</a></h3>
+<div class="table-wrap" role="region" tabindex="0" aria-label="adapters.argo table" data-scroll><table aria-labelledby="adapters-argo">
+<thead><tr><th scope="col">Key</th><th scope="col">Type</th><th scope="col">Default</th><th scope="col">Description</th></tr></thead>
 <tbody>
 <tr><td><code>server</code></td><td>string</td><td>required unless <code>kube_watch</code></td><td>Argo Server base URL.</td></tr>
 <tr><td><code>namespaces</code></td><td>list</td><td>required</td><td>Namespaces to read.</td></tr>
@@ -184,9 +184,9 @@
 <tr><td><code>include_archived</code></td><td>bool</td><td><code>true</code></td><td>Also read the workflow archive, if Argo Server has one configured.</td></tr>
 </tbody></table></div>
 
-<h3 id="adapters-kubeflow">adapters.kubeflow</h3>
-<div class="table-wrap"><table>
-<thead><tr><th>Key</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<h3 id="adapters-kubeflow"><a class="anchor" href="#adapters-kubeflow">adapters.kubeflow</a></h3>
+<div class="table-wrap" role="region" tabindex="0" aria-label="adapters.kubeflow table" data-scroll><table aria-labelledby="adapters-kubeflow">
+<thead><tr><th scope="col">Key</th><th scope="col">Type</th><th scope="col">Default</th><th scope="col">Description</th></tr></thead>
 <tbody>
 <tr><td><code>pipelines_url</code></td><td>string</td><td>required</td><td>Kubeflow Pipelines API base URL.</td></tr>
 <tr><td><code>profiles</code></td><td>list</td><td>all visible</td><td>Kubeflow profiles (namespaces) to read.</td></tr>
@@ -195,9 +195,9 @@
 <tr><td><code>dashboard_url</code></td><td>string</td><td>unset</td><td>Central Dashboard URL for deep links.</td></tr>
 </tbody></table></div>
 
-<h2 id="lattice">lattice</h2>
-<div class="table-wrap"><table>
-<thead><tr><th>Key</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<h2 id="lattice"><a class="anchor" href="#lattice">lattice</a></h2>
+<div class="table-wrap" role="region" tabindex="0" aria-label="lattice table" data-scroll><table aria-labelledby="lattice">
+<thead><tr><th scope="col">Key</th><th scope="col">Type</th><th scope="col">Default</th><th scope="col">Description</th></tr></thead>
 <tbody>
 <tr><td><code>lattice.correlation.window</code></td><td>duration</td><td><code>90s</code></td><td>Maximum timestamp distance for two facets to be considered for correlation. Ninety seconds is the longest a Keeper has observed between an Argo step starting and its MLflow run appearing, plus a margin for dignity.</td></tr>
 <tr><td><code>lattice.correlation.weak_keys</code></td><td>bool</td><td><code>true</code></td><td>Allow weak keys like <code>git.sha</code> to create related-to edges (never merges).</td></tr>
@@ -207,10 +207,10 @@
 <tr><td><code>lattice.max_entities</code></td><td>int</td><td><code>200000</code></td><td>Hard cap across all adapters.</td></tr>
 </tbody></table></div>
 
-<h2 id="auth">auth</h2>
+<h2 id="auth"><a class="anchor" href="#auth">auth</a></h2>
 <p>Authentication is disabled by default so that local development works without a webcam. Full details, including enrolment, are on the <a href="/docs/auth/">Authentication</a> page.</p>
-<div class="table-wrap"><table>
-<thead><tr><th>Key</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<div class="table-wrap" role="region" tabindex="0" aria-label="auth table" data-scroll><table aria-labelledby="auth">
+<thead><tr><th scope="col">Key</th><th scope="col">Type</th><th scope="col">Default</th><th scope="col">Description</th></tr></thead>
 <tbody>
 <tr><td><code>auth.mode</code></td><td>enum</td><td><code>none</code></td><td><code>none</code> or <code>respiratory</code>. There are no other modes and there will not be.</td></tr>
 <tr><td><code>auth.respiratory.sensitivity</code></td><td>float</td><td><code>0.62</code></td><td>Match threshold. Lower is more permissive. Values below 0.4 are refused at start with error <code>FRI-0007</code>.</td></tr>
@@ -221,17 +221,17 @@
 <tr><td><code>auth.respiratory.capture_device</code></td><td>string</td><td>browser default</td><td>Hint for the console's media device selection.</td></tr>
 </tbody></table></div>
 
-<h2 id="telemetry">telemetry</h2>
-<div class="table-wrap"><table>
-<thead><tr><th>Key</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<h2 id="telemetry"><a class="anchor" href="#telemetry">telemetry</a></h2>
+<div class="table-wrap" role="region" tabindex="0" aria-label="telemetry table" data-scroll><table aria-labelledby="telemetry">
+<thead><tr><th scope="col">Key</th><th scope="col">Type</th><th scope="col">Default</th><th scope="col">Description</th></tr></thead>
 <tbody>
 <tr><td><code>telemetry.metrics.enabled</code></td><td>bool</td><td><code>true</code></td><td>Expose Prometheus metrics at <code>/metrics</code>.</td></tr>
 <tr><td><code>telemetry.tracing.endpoint</code></td><td>string</td><td>unset</td><td>OTLP/HTTP endpoint for traces.</td></tr>
 <tr><td><code>telemetry.usage_reporting</code></td><td>bool</td><td><code>false</code></td><td>Does nothing. Fendlemark has never phoned home. The key exists so you can see it set to false.</td></tr>
 </tbody></table></div>
 
-<h2 id="full">A complete example</h2>
-<pre data-lang="yaml"><code><span class="k">server</span>:
+<h2 id="full"><a class="anchor" href="#full">A complete example</a></h2>
+<div class="code" data-lang="yaml"><pre data-lang="yaml" role="region" tabindex="0" aria-label="YAML code: A complete example" data-scroll><code><span class="k">server</span>:
   <span class="k">listen</span>: <span class="s">"127.0.0.1:7411"</span>
   <span class="k">base_url</span>: <span class="s">"https://platform.example.internal"</span>
   <span class="k">data_dir</span>: <span class="s">"/var/lib/fendlemark"</span>
@@ -273,22 +273,25 @@
 
 <span class="k">telemetry</span>:
   <span class="k">metrics</span>:
-    <span class="k">enabled</span>: <span class="s">true</span></code></pre>
+    <span class="k">enabled</span>: <span class="s">true</span></code></pre></div>
 
-<h2 id="validation">Validation</h2>
+<h2 id="validation"><a class="anchor" href="#validation">Validation</a></h2>
 <p><code>fendlemark doctor</code> validates the file, resolves every environment reference, and prints the effective configuration with secrets redacted. Unknown keys are errors, not warnings. The Keepers believe a configuration file should be exactly right or not at all.</p>
 <nav class="pager" aria-label="Previous and next pages">
-<a class="pager-prev" href="/docs/architecture/"><span>Previous</span>Architecture</a>
-<a class="pager-next" href="/docs/adapters/"><span>Next</span>Adapters</a>
+<a class="pager-prev" href="/docs/architecture/" rel="prev"><span class="pager-label">Previous</span><span class="pager-title">Architecture</span></a>
+<a class="pager-next" href="/docs/adapters/" rel="next"><span class="pager-label">Next</span><span class="pager-title">Adapters</span></a>
 </nav>
   </main>
 </div>
 
 <footer class="site-footer">
   <div class="site-footer-inner">
-    <p>Fendlemark is released under the MIT licence and maintained by the Fendlemark Keepers. Documentation for v0.9.4.</p>
-    <p class="fine">MLflow, Metaflow, Argo Workflows, and Kubeflow are trademarks of their respective owners. Fendlemark is an independent project and is not affiliated with, endorsed by, or sponsored by any of them.</p>
-    <p class="fine"><a href="/about/">About this site</a> · <a href="/governance/">Governance</a> · <a href="/changelog/">Changelog</a> · <a href="/sitemap.xml">Sitemap</a></p>
+    <svg class="footer-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
+    <div class="footer-text">
+      <p>Fendlemark is released under the MIT licence and maintained by the Fendlemark Keepers. Documentation for v0.9.5.</p>
+      <p class="fine">MLflow, Metaflow, Argo Workflows, and Kubeflow are trademarks of their respective owners. Fendlemark is an independent project and is not affiliated with, endorsed by, or sponsored by any of them.</p>
+      <p class="fine footer-links"><a href="/about/">About this site</a> · <a href="/governance/">Governance</a> · <a href="/changelog/">Changelog</a> · <a href="/sitemap.xml">Sitemap</a></p>
+    </div>
   </div>
 </footer>
 <script src="/assets/site.js" defer></script>

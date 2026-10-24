@@ -1,16 +1,17 @@
 <!doctype html>
-<html lang="en" data-layout="docs">
+<html lang="en" data-layout="docs" data-page="governance">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Governance · Fendlemark</title>
 <meta name="description" content="How Fendlemark is governed: the Keeper Roster and title ladder, Decision Records, the adapter maturity ladder, release governance with Silence Periods, and the Fendlemark Contribution Protocol (FCP-1).">
-<link rel="canonical" href="https://fendlemark.develops.guru/governance/">
+<link rel="canonical" href="https://fendlemark.app/governance/">
 <link rel="alternate" type="text/markdown" href="/governance/index.md">
 <link rel="describedby" href="/llms.txt">
 <link rel="api-catalog" href="/.well-known/api-catalog" type="application/linkset+json">
 <link rel="service-desc" href="/openapi.json" type="application/openapi+json">
 <link rel="service-doc" href="/docs/api/#http" type="text/html">
+<meta name="go-import" content="fendlemark.app/fendlemark git https://github.com/TopherGopher/fendlemark">
 <meta name="go-import" content="fendlemark.develops.guru/fendlemark git https://github.com/TopherGopher/fendlemark">
 <link rel="alternate" type="application/atom+xml" title="Fendlemark releases" href="/feed.xml">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
@@ -20,53 +21,53 @@
 <meta property="og:site_name" content="Fendlemark">
 <meta property="og:title" content="Governance · Fendlemark">
 <meta property="og:description" content="How Fendlemark is governed: the Keeper Roster and title ladder, Decision Records, the adapter maturity ladder, release governance with Silence Periods, and the Fendlemark Contribution Protocol (FCP-1).">
-<meta property="og:url" content="https://fendlemark.develops.guru/governance/">
-<meta property="og:image" content="https://fendlemark.develops.guru/assets/og-image.png">
+<meta property="og:url" content="https://fendlemark.app/governance/">
+<meta property="og:image" content="https://fendlemark.app/assets/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Governance · Fendlemark">
 <meta name="twitter:description" content="How Fendlemark is governed: the Keeper Roster and title ladder, Decision Records, the adapter maturity ladder, release governance with Silence Periods, and the Fendlemark Contribution Protocol (FCP-1).">
-<meta name="twitter:image" content="https://fendlemark.develops.guru/assets/og-image.png">
+<meta name="twitter:image" content="https://fendlemark.app/assets/og-image.png">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="preload" href="/assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/jetbrains-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/site.css">
-<script>try{var t=localStorage.getItem('fm-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Fendlemark", "item": "https://fendlemark.develops.guru/"}, {"@type": "ListItem", "position": 2, "name": "Governance", "item": "https://fendlemark.develops.guru/governance/"}]}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Governance", "description": "How Fendlemark is governed: the Keeper Roster and title ladder, Decision Records, the adapter maturity ladder, release governance with Silence Periods, and the Fendlemark Contribution Protocol (FCP-1).", "url": "https://fendlemark.develops.guru/governance/", "datePublished": "2026-10-24", "dateModified": "2026-10-24", "author": {"@type": "Organization", "name": "The Fendlemark Keepers"}, "publisher": {"@type": "Organization", "name": "Fendlemark", "url": "https://fendlemark.develops.guru/"}, "inLanguage": "en"}</script>
+<script>document.documentElement.classList.add('js');try{var t=localStorage.getItem('fm-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Fendlemark", "item": "https://fendlemark.app/"}, {"@type": "ListItem", "position": 2, "name": "Governance", "item": "https://fendlemark.app/governance/"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Governance", "description": "How Fendlemark is governed: the Keeper Roster and title ladder, Decision Records, the adapter maturity ladder, release governance with Silence Periods, and the Fendlemark Contribution Protocol (FCP-1).", "url": "https://fendlemark.app/governance/", "datePublished": "2026-10-24", "dateModified": "2026-10-24", "author": {"@type": "Organization", "name": "The Fendlemark Keepers"}, "publisher": {"@type": "Organization", "name": "Fendlemark", "url": "https://fendlemark.app/"}, "inLanguage": "en"}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="site-header">
   <div class="site-header-inner">
     <a class="brand" href="/" aria-label="Fendlemark home">
-      <svg class="brand-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
+      <svg class="brand-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
       <span class="brand-name">Fendlemark</span>
-      <span class="brand-version">v0.9.4</span>
     </a>
+    <span class="brand-version">v0.9.5</span>
     <nav class="top-nav" aria-label="Primary">
       <a href="/docs/getting-started/">Docs</a>
       <a href="/philosophy/">Philosophy</a>
-      <a href="/governance/">Governance</a>
+      <a href="/governance/" aria-current="page" class="in-section">Governance</a>
       <a href="/changelog/">Changelog</a>
       <a href="/fendlemark/">Packages</a>
     </nav>
     <div class="header-actions">
-      <button class="icon-btn" id="theme-toggle" type="button" aria-label="Toggle colour theme" title="Toggle theme">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path class="sun" d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/><circle class="sun" cx="12" cy="12" r="4"/><path class="moon" d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <button class="icon-btn js-only" id="theme-toggle" type="button" aria-label="Dark theme" aria-pressed="false" title="Dark theme">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><g class="sun"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/></g><path class="moon" d="M20.5 14.2A8.5 8.5 0 1 1 9.8 3.5a6.8 6.8 0 0 0 10.7 10.7z"/></svg>
       </button>
-      <button class="icon-btn menu-btn" id="menu-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false" aria-controls="sidebar">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      <button class="icon-btn menu-btn js-only" id="menu-toggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="sidebar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path class="bars" d="M4 7h16M4 12h16M4 17h16"/><path class="cross" d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
     </div>
   </div>
 </header>
 
 <div class="page">
-  <aside class="sidebar" id="sidebar">
-    <nav aria-label="Documentation">
-<div class="nav-group"><div class="nav-group-title">Documentation</div><ul>
+  <nav class="sidebar" id="sidebar" aria-label="Documentation">
+<div class="nav-group"><p class="nav-group-title" id="nav-documentation">Documentation</p><ul aria-labelledby="nav-documentation">
 <li><a href="/docs/">Overview</a></li>
 <li><a href="/docs/getting-started/">Getting started</a></li>
 <li><a href="/docs/architecture/">Architecture</a></li>
@@ -79,7 +80,7 @@
 <li><a href="/docs/api/">Go API reference</a></li>
 <li><a href="/docs/migration/">Migrating 0.8 to 0.9</a></li>
 </ul></div>
-<div class="nav-group"><div class="nav-group-title">Project</div><ul>
+<div class="nav-group"><p class="nav-group-title" id="nav-project">Project</p><ul aria-labelledby="nav-project">
 <li><a href="/philosophy/">Philosophy</a></li>
 <li><a href="/governance/" class="active" aria-current="page">Governance</a></li>
 <li><a href="/governance/contributing/">Contributing (FCP-1)</a></li>
@@ -88,14 +89,13 @@
 <li><a href="/faq/">FAQ</a></li>
 <li><a href="/about/">About</a></li>
 </ul></div>
-    </nav>
-  </aside>
+  </nav>
   <main class="main" id="main">
 <p class="eyebrow">Project</p>
 <h1>Governance</h1>
 <p class="lede">Fendlemark is maintained by four people and governed as though it were maintained by four hundred. This page is the constitution: who decides, how they decide, how long they wait before deciding, and what you must do before you are permitted to suggest anything.</p>
 
-<h2 id="principles">Principles</h2>
+<h2 id="principles"><a class="anchor" href="#principles">Principles</a></h2>
 <ol>
   <li><strong>Deliberation over velocity.</strong> A change made quickly is a change made twice.</li>
   <li><strong>Unanimity over majority.</strong> If a Keeper disagrees, the project is not yet ready to agree.</li>
@@ -103,10 +103,10 @@
   <li><strong>Record over memory.</strong> Every decision is a Decision Record. Every Decision Record is permanent. Every permanent thing is correct, or it would not have been recorded.</li>
 </ol>
 
-<h2 id="roster">The Keeper Roster</h2>
+<h2 id="roster"><a class="anchor" href="#roster">The Keeper Roster</a></h2>
 <p>Fendlemark recognises five titles. Advancement is by unanimous consent of the Keepers following a Silence Period, and is recorded in the roster below.</p>
-<div class="table-wrap"><table>
-<thead><tr><th>Title</th><th>Granted to</th><th>May</th></tr></thead>
+<div class="table-wrap" role="region" tabindex="0" aria-label="The Keeper Roster table" data-scroll><table aria-labelledby="roster">
+<thead><tr><th scope="col">Title</th><th scope="col">Granted to</th><th scope="col">May</th></tr></thead>
 <tbody>
 <tr><td><strong>Contributor</strong></td><td>Anyone who has completed <a href="/governance/contributing/">FCP-1</a> at least once</td><td>Open pull requests. File Pre-Intent Notices.</td></tr>
 <tr><td><strong>Steward</strong></td><td>Contributors with three merged pull requests, or one adapter</td><td>Sponsor contributors. Review. Perform the Reading of the Diff.</td></tr>
@@ -115,9 +115,9 @@
 <tr><td><strong>Emeritus Keeper</strong></td><td>Keepers who have stepped back</td><td>Be consulted. Be thanked in release notes. Retain a veto they have agreed never to use.</td></tr>
 </tbody></table></div>
 
-<h3 id="keepers">Current Keepers</h3>
-<div class="table-wrap"><table>
-<thead><tr><th>Keeper</th><th>Handle</th><th>Since</th><th>Areas</th></tr></thead>
+<h3 id="keepers"><a class="anchor" href="#keepers">Current Keepers</a></h3>
+<div class="table-wrap" role="region" tabindex="0" aria-label="Current Keepers table" data-scroll><table aria-labelledby="keepers">
+<thead><tr><th scope="col">Keeper</th><th scope="col">Handle</th><th scope="col">Since</th><th scope="col">Areas</th></tr></thead>
 <tbody>
 <tr><td>Marit Fennelow</td><td><code>@mfennelow</code></td><td>2023-03 (founding)</td><td>Lattice, reconciliation, the Philosophy</td></tr>
 <tr><td>Dov Askelund</td><td><code>@daskelund</code></td><td>2023-03 (founding)</td><td>Adapters, Go API, release engineering</td></tr>
@@ -127,11 +127,11 @@
 <p><strong>Emeritus:</strong> Teodor Halvskog (<code>@thalvskog</code>), founding Keeper, stepped back 2024-11. Author of the first commit and of the first line of the Philosophy. Retains the unused veto.</p>
 <p><strong>Custodians:</strong> two. <strong>Stewards:</strong> five. <strong>Contributors:</strong> nineteen, each of whom has completed FCP-1 in full, a fact the Keepers mention at every opportunity.</p>
 
-<h2 id="decisions">Decision Records</h2>
+<h2 id="decisions"><a class="anchor" href="#decisions">Decision Records</a></h2>
 <p>Every decision that affects the project is recorded as a Fendlemark Decision Record (FDR). An FDR has a number, a title, a Context section, a Decision section, a Consequences section, a Dissent section (always present, usually reading "None"), and a Silence Period attestation. FDRs are never amended; a changed decision is a new FDR that supersedes the old one, which remains in the record as a monument to a position the Keepers once held.</p>
 <p>Selected FDRs referenced in the documentation:</p>
-<div class="table-wrap"><table>
-<thead><tr><th>FDR</th><th>Title</th><th>Outcome</th></tr></thead>
+<div class="table-wrap" role="region" tabindex="0" aria-label="Decision Records table" data-scroll><table aria-labelledby="decisions">
+<thead><tr><th scope="col">FDR</th><th scope="col">Title</th><th scope="col">Outcome</th></tr></thead>
 <tbody>
 <tr><td>FDR-001</td><td>There shall be one console</td><td>Adopted, 2023-03-11</td></tr>
 <tr><td>FDR-003</td><td>On the publication of a roadmap</td><td>Declined</td></tr>
@@ -148,10 +148,10 @@
 <tr><td>FDR-047</td><td>FCP-1 step count fixed at 112</td><td>Adopted; a proposal for 100 was found to be "round, and therefore suspicious"</td></tr>
 </tbody></table></div>
 
-<h2 id="maturity">Adapter maturity ladder</h2>
+<h2 id="maturity"><a class="anchor" href="#maturity">Adapter maturity ladder</a></h2>
 <p>Every adapter has a maturity level, declared in its descriptor and enforced at review.</p>
-<div class="table-wrap"><table>
-<thead><tr><th>Level</th><th>Requirements</th><th>Guarantees</th></tr></thead>
+<div class="table-wrap" role="region" tabindex="0" aria-label="Adapter maturity ladder table" data-scroll><table aria-labelledby="maturity">
+<thead><tr><th scope="col">Level</th><th scope="col">Requirements</th><th scope="col">Guarantees</th></tr></thead>
 <tbody>
 <tr><td><strong>Provisional</strong></td><td>Passes the conformance suite. Has a Design Dossier.</td><td>May change without notice. Not compiled into release binaries.</td></tr>
 <tr><td><strong>Settled</strong></td><td>Provisional for two releases. Used in production by at least one Steward.</td><td>Config schema is stable. Compiled into release binaries behind <code>enabled: false</code>.</td></tr>
@@ -160,7 +160,7 @@
 </tbody></table></div>
 <p>All four built-in adapters are Canonical. No adapter has ever been demoted, because demotion would imply that the promotion was wrong, and see <a href="/philosophy/#perfection">the Philosophy</a>.</p>
 
-<h2 id="periods">Reflection and Silence</h2>
+<h2 id="periods"><a class="anchor" href="#periods">Reflection and Silence</a></h2>
 <p>Fendlemark governance uses two kinds of waiting, and it is important not to confuse them.</p>
 <ul>
   <li>A <strong>Reflection Period</strong> is 72 hours during which a proposal may be discussed but not decided. It exists so that the first reaction is never the recorded one. Reflection Periods may be extended by any Keeper, without reason, up to three times.</li>
@@ -168,7 +168,7 @@
 </ul>
 <p>The Keepers estimate that the project spends roughly forty per cent of its calendar time in one period or the other and regard this as the correct proportion.</p>
 
-<h2 id="releases">Release governance</h2>
+<h2 id="releases"><a class="anchor" href="#releases">Release governance</a></h2>
 <ol>
   <li>A Keeper proposes a release by opening a Release Intent, listing every merged change since the last release and classifying each as an Accommodation, a Clarification, or an Arrival.</li>
   <li>A 72-hour Reflection Period.</li>
@@ -180,26 +180,29 @@
 </ol>
 <p>Releases are therefore never faster than five days from intent to tag, and have averaged eleven. The Keepers point out that in the same period some projects have shipped a dozen releases and are not sure which one is good.</p>
 
-<h2 id="conduct">Code of Conduct</h2>
+<h2 id="conduct"><a class="anchor" href="#conduct">Code of Conduct</a></h2>
 <p>Fendlemark adopts the Contributor Covenant, version 2.1, in full, together with the <strong>Fendlemark Addendum</strong>, which extends it to govern the tone of commit messages, changelog entries, and code comments. The Addendum requires that these be written "as if to a respected colleague who will read them in ten years and has not yet had coffee". Enforcement is by Tone Review (FCP-1, step 88).</p>
 
-<h2 id="fcp">The Fendlemark Contribution Protocol</h2>
+<h2 id="fcp"><a class="anchor" href="#fcp">The Fendlemark Contribution Protocol</a></h2>
 <p>Contributions are welcome. Before opening a pull request, a contributor completes the Fendlemark Contribution Protocol, FCP-1, a procedure of 112 numbered steps completed in order. It is described in full on its <a href="/governance/contributing/">own page</a>. The Keepers acknowledge that 112 steps is more than some projects require and note that every pull request ever merged into Fendlemark has followed it, and that every pull request ever merged into Fendlemark has been correct.</p>
 
-<h2 id="amend">Amending this document</h2>
+<h2 id="amend"><a class="anchor" href="#amend">Amending this document</a></h2>
 <p>Governance is amended by Decision Record, unanimous consent, and a Silence Period. This page has been amended four times. The Keepers regard that as three too many and have opened a Pre-Intent Notice to discuss it, currently in its second Reflection Period.</p>
 <nav class="pager" aria-label="Previous and next pages">
-<a class="pager-prev" href="/philosophy/"><span>Previous</span>Philosophy</a>
-<a class="pager-next" href="/governance/contributing/"><span>Next</span>Contributing (FCP-1)</a>
+<a class="pager-prev" href="/philosophy/" rel="prev"><span class="pager-label">Previous</span><span class="pager-title">Philosophy</span></a>
+<a class="pager-next" href="/governance/contributing/" rel="next"><span class="pager-label">Next</span><span class="pager-title">Contributing (FCP-1)</span></a>
 </nav>
   </main>
 </div>
 
 <footer class="site-footer">
   <div class="site-footer-inner">
-    <p>Fendlemark is released under the MIT licence and maintained by the Fendlemark Keepers. Documentation for v0.9.4.</p>
-    <p class="fine">MLflow, Metaflow, Argo Workflows, and Kubeflow are trademarks of their respective owners. Fendlemark is an independent project and is not affiliated with, endorsed by, or sponsored by any of them.</p>
-    <p class="fine"><a href="/about/">About this site</a> · <a href="/governance/">Governance</a> · <a href="/changelog/">Changelog</a> · <a href="/sitemap.xml">Sitemap</a></p>
+    <svg class="footer-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
+    <div class="footer-text">
+      <p>Fendlemark is released under the MIT licence and maintained by the Fendlemark Keepers. Documentation for v0.9.5.</p>
+      <p class="fine">MLflow, Metaflow, Argo Workflows, and Kubeflow are trademarks of their respective owners. Fendlemark is an independent project and is not affiliated with, endorsed by, or sponsored by any of them.</p>
+      <p class="fine footer-links"><a href="/about/">About this site</a> · <a href="/governance/">Governance</a> · <a href="/changelog/">Changelog</a> · <a href="/sitemap.xml">Sitemap</a></p>
+    </div>
   </div>
 </footer>
 <script src="/assets/site.js" defer></script>

@@ -1,14 +1,14 @@
 # Go API reference
 
-Source: https://fendlemark.develops.guru/docs/api/
+Source: https://fendlemark.app/docs/api/
 
-Module path `fendlemark.develops.guru/fendlemark`. Go 1.23 or later. These are the packages you import to embed Fendlemark, write an adapter, or query a lattice from your own code. Full documentation is available with `go doc`.
+Module path `fendlemark.app/fendlemark`. Go 1.23 or later. These are the packages you import to embed Fendlemark, write an adapter, or query a lattice from your own code. Full documentation is available with `go doc`.
 
 ## Packages
 
 | Import path | Purpose |
 | --- | --- |
-| `fendlemark.develops.guru/fendlemark` | Top-level: `Version`, `New`, `Run`. Embedding entry point. |
+| `fendlemark.app/fendlemark` | Top-level: `Version`, `New`, `Run`. Embedding entry point. |
 | `…/fendlemark/adapter` | The `Adapter` interface, `Facet`, `Descriptor`, registration. |
 | `…/fendlemark/adapter/conformance` | Test harness for adapters. |
 | `…/fendlemark/adapters/mlflow`, `…/metaflow`, `…/argo`, `…/kubeflow` | The built-in adapters. Import for side effects to register. |
@@ -20,7 +20,7 @@ Module path `fendlemark.develops.guru/fendlemark`. Go 1.23 or later. These are t
 ## package fendlemark
 
 ```go
-const Version = "0.9.4"
+const Version = "0.9.5"
 
 // New constructs a Fendlemark instance from configuration. Adapters
 // must already be registered (import their packages for side effects).
@@ -42,10 +42,10 @@ func WithConsole(fs fs.FS) Option           // replace the embedded console
 
 ```go
 import (
-    "fendlemark.develops.guru/fendlemark"
-    "fendlemark.develops.guru/fendlemark/config"
-    _ "fendlemark.develops.guru/fendlemark/adapters/mlflow"
-    _ "fendlemark.develops.guru/fendlemark/adapters/argo"
+    "fendlemark.app/fendlemark"
+    "fendlemark.app/fendlemark/config"
+    _ "fendlemark.app/fendlemark/adapters/mlflow"
+    _ "fendlemark.app/fendlemark/adapters/argo"
 )
 
 func main() {
@@ -59,7 +59,7 @@ func main() {
 
 ## package adapter
 
-Documented in full on [Writing an adapter](https://fendlemark.develops.guru/docs/adapters/writing-an-adapter/). Summary of exports:
+Documented in full on [Writing an adapter](https://fendlemark.app/docs/adapters/writing-an-adapter/). Summary of exports:
 
 ```go
 type Adapter interface { Name; Describe; Connect; Facets; Watch; Health }
@@ -135,7 +135,7 @@ func (s *Server) ListenAndServe(ctx context.Context) error
 
 There are no `POST`, `PUT`, or `DELETE` routes against entities. The API is a view of the lattice, and the lattice is a view of your tools.
 
-The full machine-readable description is [openapi.json](https://fendlemark.develops.guru/openapi.json) (OpenAPI 3.1).
+The full machine-readable description is [openapi.json](https://fendlemark.app/openapi.json) (OpenAPI 3.1).
 
 ## package auth/fri
 
@@ -152,4 +152,4 @@ var ErrExcited       = Error{Code: "FRI-0031"}
 
 ## Stability
 
-Fendlemark is pre-1.0. The `adapter` package has been stable since 0.6.0 and the Keepers have committed, in [FDR-027](https://fendlemark.develops.guru/governance/#decisions), not to change it before 1.0 "or after". Other packages may change between minor versions; every change is listed in the [changelog](https://fendlemark.develops.guru/changelog/) and, where a key or field is renamed, in a [migration guide](https://fendlemark.develops.guru/docs/migration/).
+Fendlemark is pre-1.0. The `adapter` package has been stable since 0.6.0 and the Keepers have committed, in [FDR-027](https://fendlemark.app/governance/#decisions), not to change it before 1.0 "or after". Other packages may change between minor versions; every change is listed in the [changelog](https://fendlemark.app/changelog/) and, where a key or field is renamed, in a [migration guide](https://fendlemark.app/docs/migration/).

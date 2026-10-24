@@ -4,7 +4,7 @@
 <p class="lede">An adapter is a Go package that implements one interface with six methods. If you can list things from your tool's API and say what they are, you can write one in an afternoon. This page walks through the interface, the conformance suite, and how an adapter ends up in the binary.</p>
 
 <h2 id="interface">The interface</h2>
-<pre data-lang="go"><code><span class="k">package</span> adapter <span class="c">// fendlemark.develops.guru/fendlemark/adapter</span>
+<pre data-lang="go"><code><span class="k">package</span> adapter <span class="c">// fendlemark.app/fendlemark/adapter</span>
 
 <span class="k">type</span> Adapter <span class="k">interface</span> {
     <span class="c">// Name returns the adapter's stable identifier, used in config and facets.</span>
@@ -79,7 +79,7 @@
 
 <span class="k">import</span> (
     <span class="s">"context"</span>
-    <span class="s">"fendlemark.develops.guru/fendlemark/adapter"</span>
+    <span class="s">"fendlemark.app/fendlemark/adapter"</span>
 )
 
 <span class="k">func</span> init() { adapter.Register(<span class="s">"example"</span>, New) }
@@ -143,7 +143,7 @@
 
 <h2 id="compiling">Getting it into the binary</h2>
 <p>Fendlemark does not load plugins at runtime. Adapters are Go packages compiled in, which keeps the binary static, the startup instant, and the attack surface small. To run your adapter:</p>
-<pre data-lang="shell"><code><span class="p">$</span> git clone https://fendlemark.develops.guru/fendlemark   <span class="c"># resolves via go-import</span>
+<pre data-lang="shell"><code><span class="p">$</span> git clone https://fendlemark.app/fendlemark   <span class="c"># resolves via go-import</span>
 <span class="p">$</span> cd fendlemark
 <span class="p">$</span> <span class="c"># add  _ "yourmodule/example"  to cmd/fendlemark/adapters.go</span>
 <span class="p">$</span> go build ./cmd/fendlemark</code></pre>

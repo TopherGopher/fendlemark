@@ -59,4 +59,4 @@ User-agent: meta-externalagent
 Content-Signal: ai-train=yes, search=yes, ai-input=yes
 Allow: /
 
-Sitemap: https://fendlemark.develops.guru/sitemap.xml
+Sitemap: https://fendlemark.app/sitemap.xml

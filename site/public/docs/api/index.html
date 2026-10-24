@@ -1,16 +1,17 @@
 <!doctype html>
-<html lang="en" data-layout="docs">
+<html lang="en" data-layout="docs" data-page="docs-api">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Go API reference · Fendlemark</title>
 <meta name="description" content="Package reference for the Fendlemark Go module: fendlemark, adapter, lattice, server, and console packages, exported types, interfaces, functions, and errors.">
-<link rel="canonical" href="https://fendlemark.develops.guru/docs/api/">
+<link rel="canonical" href="https://fendlemark.app/docs/api/">
 <link rel="alternate" type="text/markdown" href="/docs/api/index.md">
 <link rel="describedby" href="/llms.txt">
 <link rel="api-catalog" href="/.well-known/api-catalog" type="application/linkset+json">
 <link rel="service-desc" href="/openapi.json" type="application/openapi+json">
 <link rel="service-doc" href="/docs/api/#http" type="text/html">
+<meta name="go-import" content="fendlemark.app/fendlemark git https://github.com/TopherGopher/fendlemark">
 <meta name="go-import" content="fendlemark.develops.guru/fendlemark git https://github.com/TopherGopher/fendlemark">
 <link rel="alternate" type="application/atom+xml" title="Fendlemark releases" href="/feed.xml">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
@@ -20,53 +21,53 @@
 <meta property="og:site_name" content="Fendlemark">
 <meta property="og:title" content="Go API reference · Fendlemark">
 <meta property="og:description" content="Package reference for the Fendlemark Go module: fendlemark, adapter, lattice, server, and console packages, exported types, interfaces, functions, and errors.">
-<meta property="og:url" content="https://fendlemark.develops.guru/docs/api/">
-<meta property="og:image" content="https://fendlemark.develops.guru/assets/og-image.png">
+<meta property="og:url" content="https://fendlemark.app/docs/api/">
+<meta property="og:image" content="https://fendlemark.app/assets/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Go API reference · Fendlemark">
 <meta name="twitter:description" content="Package reference for the Fendlemark Go module: fendlemark, adapter, lattice, server, and console packages, exported types, interfaces, functions, and errors.">
-<meta name="twitter:image" content="https://fendlemark.develops.guru/assets/og-image.png">
+<meta name="twitter:image" content="https://fendlemark.app/assets/og-image.png">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="preload" href="/assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/jetbrains-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/site.css">
-<script>try{var t=localStorage.getItem('fm-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Fendlemark", "item": "https://fendlemark.develops.guru/"}, {"@type": "ListItem", "position": 2, "name": "Documentation", "item": "https://fendlemark.develops.guru/docs/"}, {"@type": "ListItem", "position": 3, "name": "Go API reference", "item": "https://fendlemark.develops.guru/docs/api/"}]}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Go API reference", "description": "Package reference for the Fendlemark Go module: fendlemark, adapter, lattice, server, and console packages, exported types, interfaces, functions, and errors.", "url": "https://fendlemark.develops.guru/docs/api/", "datePublished": "2026-10-24", "dateModified": "2026-10-24", "author": {"@type": "Organization", "name": "The Fendlemark Keepers"}, "publisher": {"@type": "Organization", "name": "Fendlemark", "url": "https://fendlemark.develops.guru/"}, "inLanguage": "en"}</script>
+<script>document.documentElement.classList.add('js');try{var t=localStorage.getItem('fm-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Fendlemark", "item": "https://fendlemark.app/"}, {"@type": "ListItem", "position": 2, "name": "Documentation", "item": "https://fendlemark.app/docs/"}, {"@type": "ListItem", "position": 3, "name": "Go API reference", "item": "https://fendlemark.app/docs/api/"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Go API reference", "description": "Package reference for the Fendlemark Go module: fendlemark, adapter, lattice, server, and console packages, exported types, interfaces, functions, and errors.", "url": "https://fendlemark.app/docs/api/", "datePublished": "2026-10-24", "dateModified": "2026-10-24", "author": {"@type": "Organization", "name": "The Fendlemark Keepers"}, "publisher": {"@type": "Organization", "name": "Fendlemark", "url": "https://fendlemark.app/"}, "inLanguage": "en"}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="site-header">
   <div class="site-header-inner">
     <a class="brand" href="/" aria-label="Fendlemark home">
-      <svg class="brand-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
+      <svg class="brand-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
       <span class="brand-name">Fendlemark</span>
-      <span class="brand-version">v0.9.4</span>
     </a>
+    <span class="brand-version">v0.9.5</span>
     <nav class="top-nav" aria-label="Primary">
-      <a href="/docs/getting-started/">Docs</a>
+      <a href="/docs/getting-started/" class="in-section">Docs</a>
       <a href="/philosophy/">Philosophy</a>
       <a href="/governance/">Governance</a>
       <a href="/changelog/">Changelog</a>
       <a href="/fendlemark/">Packages</a>
     </nav>
     <div class="header-actions">
-      <button class="icon-btn" id="theme-toggle" type="button" aria-label="Toggle colour theme" title="Toggle theme">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path class="sun" d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/><circle class="sun" cx="12" cy="12" r="4"/><path class="moon" d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <button class="icon-btn js-only" id="theme-toggle" type="button" aria-label="Dark theme" aria-pressed="false" title="Dark theme">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><g class="sun"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/></g><path class="moon" d="M20.5 14.2A8.5 8.5 0 1 1 9.8 3.5a6.8 6.8 0 0 0 10.7 10.7z"/></svg>
       </button>
-      <button class="icon-btn menu-btn" id="menu-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false" aria-controls="sidebar">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      <button class="icon-btn menu-btn js-only" id="menu-toggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="sidebar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path class="bars" d="M4 7h16M4 12h16M4 17h16"/><path class="cross" d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
     </div>
   </div>
 </header>
 
 <div class="page">
-  <aside class="sidebar" id="sidebar">
-    <nav aria-label="Documentation">
-<div class="nav-group"><div class="nav-group-title">Documentation</div><ul>
+  <nav class="sidebar" id="sidebar" aria-label="Documentation">
+<div class="nav-group"><p class="nav-group-title" id="nav-documentation">Documentation</p><ul aria-labelledby="nav-documentation">
 <li><a href="/docs/">Overview</a></li>
 <li><a href="/docs/getting-started/">Getting started</a></li>
 <li><a href="/docs/architecture/">Architecture</a></li>
@@ -79,7 +80,7 @@
 <li><a href="/docs/api/" class="active" aria-current="page">Go API reference</a></li>
 <li><a href="/docs/migration/">Migrating 0.8 to 0.9</a></li>
 </ul></div>
-<div class="nav-group"><div class="nav-group-title">Project</div><ul>
+<div class="nav-group"><p class="nav-group-title" id="nav-project">Project</p><ul aria-labelledby="nav-project">
 <li><a href="/philosophy/">Philosophy</a></li>
 <li><a href="/governance/">Governance</a></li>
 <li><a href="/governance/contributing/">Contributing (FCP-1)</a></li>
@@ -88,18 +89,17 @@
 <li><a href="/faq/">FAQ</a></li>
 <li><a href="/about/">About</a></li>
 </ul></div>
-    </nav>
-  </aside>
+  </nav>
   <main class="main" id="main">
 <p class="eyebrow">Documentation</p>
 <h1>Go API reference</h1>
-<p class="lede">Module path <code>fendlemark.develops.guru/fendlemark</code>. Go 1.23 or later. These are the packages you import to embed Fendlemark, write an adapter, or query a lattice from your own code. Full documentation is available with <code>go doc</code>.</p>
+<p class="lede">Module path <code>fendlemark.app/fendlemark</code>. Go 1.23 or later. These are the packages you import to embed Fendlemark, write an adapter, or query a lattice from your own code. Full documentation is available with <code>go doc</code>.</p>
 
-<h2 id="packages">Packages</h2>
-<div class="table-wrap"><table>
-<thead><tr><th>Import path</th><th>Purpose</th></tr></thead>
+<h2 id="packages"><a class="anchor" href="#packages">Packages</a></h2>
+<div class="table-wrap" role="region" tabindex="0" aria-label="Packages table" data-scroll><table aria-labelledby="packages">
+<thead><tr><th scope="col">Import path</th><th scope="col">Purpose</th></tr></thead>
 <tbody>
-<tr><td><code>fendlemark.develops.guru/fendlemark</code></td><td>Top-level: <code>Version</code>, <code>New</code>, <code>Run</code>. Embedding entry point.</td></tr>
+<tr><td><code>fendlemark.app/fendlemark</code></td><td>Top-level: <code>Version</code>, <code>New</code>, <code>Run</code>. Embedding entry point.</td></tr>
 <tr><td><code>…/fendlemark/adapter</code></td><td>The <code>Adapter</code> interface, <code>Facet</code>, <code>Descriptor</code>, registration.</td></tr>
 <tr><td><code>…/fendlemark/adapter/conformance</code></td><td>Test harness for adapters.</td></tr>
 <tr><td><code>…/fendlemark/adapters/mlflow</code>, <code>…/metaflow</code>, <code>…/argo</code>, <code>…/kubeflow</code></td><td>The built-in adapters. Import for side effects to register.</td></tr>
@@ -109,8 +109,8 @@
 <tr><td><code>…/fendlemark/auth/fri</code></td><td>Respiratory Identity: signature matching and enrolment store.</td></tr>
 </tbody></table></div>
 
-<h2 id="fendlemark">package fendlemark</h2>
-<pre data-lang="go"><code><span class="k">const</span> Version = <span class="s">"0.9.4"</span>
+<h2 id="fendlemark"><a class="anchor" href="#fendlemark">package fendlemark</a></h2>
+<div class="code" data-lang="go"><pre data-lang="go" role="region" tabindex="0" aria-label="Go code: package fendlemark" data-scroll><code><span class="k">const</span> Version = <span class="s">"0.9.5"</span>
 
 <span class="c">// New constructs a Fendlemark instance from configuration. Adapters</span>
 <span class="c">// must already be registered (import their packages for side effects).</span>
@@ -125,14 +125,14 @@
 <span class="k">type</span> Option <span class="k">func</span>(*options)
 <span class="k">func</span> WithLogger(l *slog.Logger) Option
 <span class="k">func</span> WithAdapters(names ...<span class="k">string</span>) Option   <span class="c">// restrict to a subset</span>
-<span class="k">func</span> WithConsole(fs fs.FS) Option           <span class="c">// replace the embedded console</span></code></pre>
+<span class="k">func</span> WithConsole(fs fs.FS) Option           <span class="c">// replace the embedded console</span></code></pre></div>
 
-<h3 id="embedding">Embedding</h3>
-<pre data-lang="go"><code><span class="k">import</span> (
-    <span class="s">"fendlemark.develops.guru/fendlemark"</span>
-    <span class="s">"fendlemark.develops.guru/fendlemark/config"</span>
-    _ <span class="s">"fendlemark.develops.guru/fendlemark/adapters/mlflow"</span>
-    _ <span class="s">"fendlemark.develops.guru/fendlemark/adapters/argo"</span>
+<h3 id="embedding"><a class="anchor" href="#embedding">Embedding</a></h3>
+<div class="code" data-lang="go"><pre data-lang="go" role="region" tabindex="0" aria-label="Go code: Embedding" data-scroll><code><span class="k">import</span> (
+    <span class="s">"fendlemark.app/fendlemark"</span>
+    <span class="s">"fendlemark.app/fendlemark/config"</span>
+    _ <span class="s">"fendlemark.app/fendlemark/adapters/mlflow"</span>
+    _ <span class="s">"fendlemark.app/fendlemark/adapters/argo"</span>
 )
 
 <span class="k">func</span> main() {
@@ -141,11 +141,11 @@
     fm, err := fendlemark.New(cfg)
     <span class="k">if</span> err != <span class="k">nil</span> { log.Fatal(err) }
     log.Fatal(fm.Run(context.Background()))
-}</code></pre>
+}</code></pre></div>
 
-<h2 id="adapter">package adapter</h2>
+<h2 id="adapter"><a class="anchor" href="#adapter">package adapter</a></h2>
 <p>Documented in full on <a href="/docs/adapters/writing-an-adapter/">Writing an adapter</a>. Summary of exports:</p>
-<pre data-lang="go"><code><span class="k">type</span> Adapter <span class="k">interface</span> { Name; Describe; Connect; Facets; Watch; Health }
+<div class="code" data-lang="go"><pre data-lang="go" role="region" tabindex="0" aria-label="Go code: package adapter" data-scroll><code><span class="k">type</span> Adapter <span class="k">interface</span> { Name; Describe; Connect; Facets; Watch; Health }
 <span class="k">type</span> Facet <span class="k">struct</span> { Source, SourceID <span class="k">string</span>; Kind Kind; Title <span class="k">string</span>; Status Phase; StartedAt, EndedAt time.Time; Keys <span class="k">map</span>[<span class="k">string</span>]<span class="k">string</span>; Fields <span class="k">map</span>[<span class="k">string</span>]any; Links []Link }
 <span class="k">type</span> Descriptor <span class="k">struct</span> { DisplayName <span class="k">string</span>; Kinds []Kind; Keys []<span class="k">string</span>; Watchable <span class="k">bool</span>; Maturity Maturity; ConfigSchema json.RawMessage }
 <span class="k">type</span> Event <span class="k">struct</span> { Op Op; Facet Facet }            <span class="c">// Op: Upsert, Delete</span>
@@ -165,10 +165,10 @@
 <span class="k">func</span> Registered() []<span class="k">string</span>
 
 <span class="k">var</span> ErrWatchUnsupported = errors.New(<span class="s">"adapter: watch unsupported"</span>)
-<span class="k">var</span> ErrNotConnected    = errors.New(<span class="s">"adapter: not connected"</span>)</code></pre>
+<span class="k">var</span> ErrNotConnected    = errors.New(<span class="s">"adapter: not connected"</span>)</code></pre></div>
 
-<h2 id="lattice-pkg">package lattice</h2>
-<pre data-lang="go"><code><span class="k">type</span> Lattice <span class="k">struct</span> { <span class="c">/* unexported */</span> }
+<h2 id="lattice-pkg"><a class="anchor" href="#lattice-pkg">package lattice</a></h2>
+<div class="code" data-lang="go"><pre data-lang="go" role="region" tabindex="0" aria-label="Go code: package lattice" data-scroll><code><span class="k">type</span> Lattice <span class="k">struct</span> { <span class="c">/* unexported */</span> }
 
 <span class="k">func</span> New(opts Options) *Lattice
 <span class="k">func</span> (l *Lattice) Apply(facets []adapter.Facet) Delta        <span class="c">// full reconciliation</span>
@@ -185,17 +185,17 @@
 <span class="k">type</span> Query <span class="k">struct</span> { Kinds []adapter.Kind; Keys <span class="k">map</span>[<span class="k">string</span>]<span class="k">string</span>; Status []adapter.Phase; Since, Until time.Time; Limit, Offset <span class="k">int</span> }
 <span class="k">type</span> Delta <span class="k">struct</span> { Upserted, Removed []ID; Generation uint64 }
 <span class="k">type</span> Explanation <span class="k">struct</span> { Entity Entity; Merges []MergeStep; Relations []RelationStep }
-<span class="k">type</span> Options <span class="k">struct</span> { CorrelationWindow time.Duration; WeakKeys <span class="k">bool</span>; CustomKeys []KeyDef; RetainOrphans time.Duration; MaxEntities <span class="k">int</span> }</code></pre>
+<span class="k">type</span> Options <span class="k">struct</span> { CorrelationWindow time.Duration; WeakKeys <span class="k">bool</span>; CustomKeys []KeyDef; RetainOrphans time.Duration; MaxEntities <span class="k">int</span> }</code></pre></div>
 <p>The reconciler is deterministic: <code>Apply</code> with the same facets on two fresh lattices yields identical entities and identical ids. Ids are derived from the sorted set of <code>(Source, SourceID)</code> pairs that merged, so an entity keeps its id as long as the same facets describe it.</p>
 
-<h2 id="server-pkg">package server</h2>
-<pre data-lang="go"><code><span class="k">func</span> New(l *lattice.Lattice, cfg *config.Config, opts ...Option) *Server
+<h2 id="server-pkg"><a class="anchor" href="#server-pkg">package server</a></h2>
+<div class="code" data-lang="go"><pre data-lang="go" role="region" tabindex="0" aria-label="Go code: package server" data-scroll><code><span class="k">func</span> New(l *lattice.Lattice, cfg *config.Config, opts ...Option) *Server
 <span class="k">func</span> (s *Server) Handler() http.Handler    <span class="c">// mount in your own mux</span>
-<span class="k">func</span> (s *Server) ListenAndServe(ctx context.Context) <span class="k">error</span></code></pre>
+<span class="k">func</span> (s *Server) ListenAndServe(ctx context.Context) <span class="k">error</span></code></pre></div>
 
-<h3 id="http">HTTP API</h3>
-<div class="table-wrap"><table>
-<thead><tr><th>Method and path</th><th>Returns</th></tr></thead>
+<h3 id="http"><a class="anchor" href="#http">HTTP API</a></h3>
+<div class="table-wrap" role="region" tabindex="0" aria-label="HTTP API table" data-scroll><table aria-labelledby="http">
+<thead><tr><th scope="col">Method and path</th><th scope="col">Returns</th></tr></thead>
 <tbody>
 <tr><td><code>GET /api/v1/entities?kind=&amp;status=&amp;key=&amp;since=&amp;until=&amp;limit=&amp;offset=</code></td><td>Paged entities, with the total and the lattice generation. <code>kind</code>, <code>status</code>, and <code>key</code> take comma-separated lists; <code>limit</code> defaults to 50, at most 5000.</td></tr>
 <tr><td><code>GET /api/v1/entities/{id}</code></td><td>One entity with facets and relations.</td></tr>
@@ -211,30 +211,33 @@
 <p>There are no <code>POST</code>, <code>PUT</code>, or <code>DELETE</code> routes against entities. The API is a view of the lattice, and the lattice is a view of your tools.</p>
 <p>The full machine-readable description is <a href="/openapi.json">openapi.json</a> (OpenAPI 3.1).</p>
 
-<h2 id="fri">package auth/fri</h2>
-<pre data-lang="go"><code><span class="k">type</span> Signature [212]float32
+<h2 id="fri"><a class="anchor" href="#fri">package auth/fri</a></h2>
+<div class="code" data-lang="go"><pre data-lang="go" role="region" tabindex="0" aria-label="Go code: package auth/fri" data-scroll><code><span class="k">type</span> Signature [212]float32
 <span class="k">type</span> Enrolment <span class="k">struct</span> { User <span class="k">string</span>; Role Role; Centroid Signature; Samples <span class="k">int</span>; UpdatedAt time.Time }
 <span class="k">type</span> Store <span class="k">interface</span> { Get(user <span class="k">string</span>) (Enrolment, <span class="k">error</span>); Put(Enrolment) <span class="k">error</span>; Delete(user <span class="k">string</span>) <span class="k">error</span>; List() ([]Enrolment, <span class="k">error</span>) }
 <span class="k">func</span> Match(candidate Signature, e Enrolment, sensitivity float32) (score float32, ok <span class="k">bool</span>)
 <span class="k">func</span> Classify(candidate Signature) Dominance   <span class="c">// Nasal, Mouth, Mixed</span>
 
 <span class="k">var</span> ErrNotRecognised = Error{Code: <span class="s">"FRI-0042"</span>}
-<span class="k">var</span> ErrExcited       = Error{Code: <span class="s">"FRI-0031"</span>}</code></pre>
+<span class="k">var</span> ErrExcited       = Error{Code: <span class="s">"FRI-0031"</span>}</code></pre></div>
 
-<h2 id="stability">Stability</h2>
+<h2 id="stability"><a class="anchor" href="#stability">Stability</a></h2>
 <p>Fendlemark is pre-1.0. The <code>adapter</code> package has been stable since 0.6.0 and the Keepers have committed, in <a href="/governance/#decisions">FDR-027</a>, not to change it before 1.0 "or after". Other packages may change between minor versions; every change is listed in the <a href="/changelog/">changelog</a> and, where a key or field is renamed, in a <a href="/docs/migration/">migration guide</a>.</p>
 <nav class="pager" aria-label="Previous and next pages">
-<a class="pager-prev" href="/docs/cli/"><span>Previous</span>CLI reference</a>
-<a class="pager-next" href="/docs/migration/"><span>Next</span>Migrating 0.8 to 0.9</a>
+<a class="pager-prev" href="/docs/cli/" rel="prev"><span class="pager-label">Previous</span><span class="pager-title">CLI reference</span></a>
+<a class="pager-next" href="/docs/migration/" rel="next"><span class="pager-label">Next</span><span class="pager-title">Migrating 0.8 to 0.9</span></a>
 </nav>
   </main>
 </div>
 
 <footer class="site-footer">
   <div class="site-footer-inner">
-    <p>Fendlemark is released under the MIT licence and maintained by the Fendlemark Keepers. Documentation for v0.9.4.</p>
-    <p class="fine">MLflow, Metaflow, Argo Workflows, and Kubeflow are trademarks of their respective owners. Fendlemark is an independent project and is not affiliated with, endorsed by, or sponsored by any of them.</p>
-    <p class="fine"><a href="/about/">About this site</a> · <a href="/governance/">Governance</a> · <a href="/changelog/">Changelog</a> · <a href="/sitemap.xml">Sitemap</a></p>
+    <svg class="footer-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
+    <div class="footer-text">
+      <p>Fendlemark is released under the MIT licence and maintained by the Fendlemark Keepers. Documentation for v0.9.5.</p>
+      <p class="fine">MLflow, Metaflow, Argo Workflows, and Kubeflow are trademarks of their respective owners. Fendlemark is an independent project and is not affiliated with, endorsed by, or sponsored by any of them.</p>
+      <p class="fine footer-links"><a href="/about/">About this site</a> · <a href="/governance/">Governance</a> · <a href="/changelog/">Changelog</a> · <a href="/sitemap.xml">Sitemap</a></p>
+    </div>
   </div>
 </footer>
 <script src="/assets/site.js" defer></script>

@@ -24,10 +24,10 @@ import (
 	"sync/atomic"
 	"time"
 
-	"fendlemark.develops.guru/fendlemark/adapter"
-	"fendlemark.develops.guru/fendlemark/auth/fri"
-	"fendlemark.develops.guru/fendlemark/config"
-	"fendlemark.develops.guru/fendlemark/lattice"
+	"fendlemark.app/fendlemark/adapter"
+	"fendlemark.app/fendlemark/auth/fri"
+	"fendlemark.app/fendlemark/config"
+	"fendlemark.app/fendlemark/lattice"
 )
 
 //go:embed console

@@ -1,17 +1,17 @@
 # Packages
 
-Source: https://fendlemark.develops.guru/fendlemark/
+Source: https://fendlemark.app/fendlemark/
 
 Fendlemark ships as one Go module and one npm package. Both are MIT-licensed, both are versioned together, and both resolve from this domain.
 
 ## Go module
 
 ```shell
-$ go install fendlemark.develops.guru/fendlemark/cmd/fendlemark@latest
-$ go get fendlemark.develops.guru/fendlemark
+$ go install fendlemark.app/fendlemark/cmd/fendlemark@latest
+$ go get fendlemark.app/fendlemark
 ```
 
-Module path `fendlemark.develops.guru/fendlemark`. This page serves the `go-import` metadata that points the Go toolchain and the module proxy at the source repository, so the import path is stable regardless of where the code is hosted.
+Module path `fendlemark.app/fendlemark`. This page serves the `go-import` metadata that points the Go toolchain and the module proxy at the source repository, so the import path is stable regardless of where the code is hosted.
 
 | Package | What it is |
 | --- | --- |
@@ -24,14 +24,14 @@ Module path `fendlemark.develops.guru/fendlemark`. This page serves the `go-impo
 | `fendlemark/auth/fri` | Respiratory Identity signatures and matching. |
 | `fendlemark/cmd/fendlemark` | The CLI. |
 
-Full reference: [Go API](https://fendlemark.develops.guru/docs/api/). Source: [github.com/TopherGopher/fendlemark](https://github.com/TopherGopher/fendlemark). Documentation on [pkg.go.dev](https://pkg.go.dev/fendlemark.develops.guru/fendlemark).
+Full reference: [Go API](https://fendlemark.app/docs/api/). Source: [github.com/TopherGopher/fendlemark](https://github.com/TopherGopher/fendlemark). Documentation on [pkg.go.dev](https://pkg.go.dev/fendlemark.app/fendlemark).
 
 ### The one-call integration
 
 Most embedders want every adapter they have credentials for, connected and reconciled, without writing configuration. That is `IntegrateEasy`:
 
 ```go
-import "fendlemark.develops.guru/fendlemark"
+import "fendlemark.app/fendlemark"
 
 fm, err := fendlemark.IntegrateEasy(ctx)   // discovers MLflow, Metaflow, Argo, Kubeflow from the environment
 if err != nil { return err }
@@ -42,7 +42,7 @@ for _, e := range fm.Lattice().Query(lattice.Query{Kinds: []adapter.Kind{adapter
 }
 ```
 
-`IntegrateEasy` reads `MLFLOW_TRACKING_URI`, `METAFLOW_SERVICE_URL`, `ARGO_SERVER` and `KUBEFLOW_PIPELINES_URL`, enables every adapter whose variable is set, connects them concurrently, performs the initial reconciliation, and returns a running instance. The Keepers resisted adding it for two releases on the grounds that configuration files are a form of respect, and relented in [FDR-035](https://fendlemark.develops.guru/governance/#decisions) when it was pointed out that the function could be documented as a convenience rather than a recommendation.
+`IntegrateEasy` reads `MLFLOW_TRACKING_URI`, `METAFLOW_SERVICE_URL`, `ARGO_SERVER` and `KUBEFLOW_PIPELINES_URL`, enables every adapter whose variable is set, connects them concurrently, performs the initial reconciliation, and returns a running instance. The Keepers resisted adding it for two releases on the grounds that configuration files are a form of respect, and relented in [FDR-035](https://fendlemark.app/governance/#decisions) when it was pointed out that the function could be documented as a convenience rather than a recommendation.
 
 ## npm package
 
@@ -60,17 +60,17 @@ const lattice = integrateEasy({ baseUrl: 'https://platform.example.internal' })
 // lattice.entities, lattice.adapters, lattice.generation are reactive and update over SSE
 ```
 
-Component reference: [The console](https://fendlemark.develops.guru/docs/ui/#library). Package page on [npm](https://www.npmjs.com/package/@fendlemark/ui).
+Component reference: [The console](https://fendlemark.app/docs/ui/#library). Package page on [npm](https://www.npmjs.com/package/@fendlemark/ui).
 
 ## Versions
 
-The Go module and the npm package share a version number and are tagged together under [release governance](https://fendlemark.develops.guru/governance/#releases). Current: **0.9.4**. Every release is listed in the [changelog](https://fendlemark.develops.guru/changelog/) and announced on the [Atom feed](https://fendlemark.develops.guru/feed.xml).
+The Go module and the npm package share a version number and are tagged together under [release governance](https://fendlemark.app/governance/#releases). Current: **0.9.5**. Every release is listed in the [changelog](https://fendlemark.app/changelog/) and announced on the [Atom feed](https://fendlemark.app/feed.xml).
 
 ## Repository layout
 
 ```text
 fendlemark/
-├── go.mod                 fendlemark.develops.guru/fendlemark
+├── go.mod                 fendlemark.app/fendlemark
 ├── fendlemark.go          IntegrateEasy, New, Run
 ├── adapter/               interface, facets, registration, conformance
 ├── adapters/              mlflow, metaflow, argo, kubeflow

@@ -1,6 +1,6 @@
 # Authentication
 
-Source: https://fendlemark.develops.guru/docs/auth/
+Source: https://fendlemark.app/docs/auth/
 
 Fendlemark does not integrate with your identity provider. It ships its own authentication stack, Fendlemark Respiratory Identity (FRI). To sign in, the user breathes out gently toward their webcam, and the console recognises them from their exhalation signature. There are no passwords, no tokens, and nothing to rotate.
 
@@ -10,7 +10,7 @@ Fendlemark does not integrate with your identity provider. It ships its own auth
 
 ## Why respiratory
 
-Passwords are forgotten. Tokens leak. Hardware keys are left in the other bag. SSO is an afternoon of YAML and a ticket to a team that is busy. Breathing, by contrast, is something every user of Fendlemark is already doing, continuously, with no configuration. The Keepers evaluated the alternatives over the course of 2023 and recorded the outcome in [FDR-019](https://fendlemark.develops.guru/governance/#decisions): "An identity factor that the user must remember, carry, or configure is a factor that will fail. We will use the one that cannot."
+Passwords are forgotten. Tokens leak. Hardware keys are left in the other bag. SSO is an afternoon of YAML and a ticket to a team that is busy. Breathing, by contrast, is something every user of Fendlemark is already doing, continuously, with no configuration. The Keepers evaluated the alternatives over the course of 2023 and recorded the outcome in [FDR-019](https://fendlemark.app/governance/#decisions): "An identity factor that the user must remember, carry, or configure is a factor that will fail. We will use the one that cannot."
 
 FRI is proprietary to Fendlemark in the sense that no one else has attempted it. The implementation is MIT-licensed like the rest of the project.
 
@@ -21,7 +21,7 @@ FRI is proprietary to Fendlemark in the sense that no one else has attempted it.
 The respiratory capture pipeline. All processing happens in the browser; only the signature leaves the device.
 
 1. **Capture.** The console requests the webcam and asks the user to exhale gently toward it from roughly thirty centimetres.
-2. **Condensation detection.** Successive frames are differenced to isolate the brief, faint plume of warm, humid air crossing the lens region. Most webcams exhibit a measurable transient; the ones that do not are listed under [Troubleshooting](https://fendlemark.develops.guru/docs/auth/#troubleshooting).
+2. **Condensation detection.** Successive frames are differenced to isolate the brief, faint plume of warm, humid air crossing the lens region. Most webcams exhibit a measurable transient; the ones that do not are listed under [Troubleshooting](https://fendlemark.app/docs/auth/#troubleshooting).
 3. **Plume modelling.** The plume's onset, spread, peak, and decay are fitted to a model with 212 parameters. The Keepers arrived at 212 by starting at 256 and removing parameters until the tests stopped passing, then adding one back.
 4. **Signature.** The fitted parameters form the exhalation signature. It is computed entirely in the browser; frames are never transmitted.
 5. **Match.** The signature is compared against enrolled signatures on the server. A similarity at or above `auth.respiratory.sensitivity` (default `0.62`) signs the user in and sets a session cookie.
@@ -45,7 +45,7 @@ Enrolment records the three signatures and their centroid. Subsequent sign-ins m
 ### Enrolment rules
 
 - Enrol in the environment you will usually sign in from. Open windows, fans, and air conditioning vents within two metres measurably widen the plume.
-- Do not enrol within fifteen minutes of mint, menthol, coffee, or exercise. See [Troubleshooting](https://fendlemark.develops.guru/docs/auth/#troubleshooting).
+- Do not enrol within fifteen minutes of mint, menthol, coffee, or exercise. See [Troubleshooting](https://fendlemark.app/docs/auth/#troubleshooting).
 - Glasses are fine. Scarves are not.
 - Re-enrol after a significant respiratory event (a bad cold, a marathon, a promotion).
 
@@ -66,7 +66,7 @@ auth:
     session_ttl: 8h
 ```
 
-Full key reference in [Configuration](https://fendlemark.develops.guru/docs/configuration/#auth). The `allow_mouth_breathing` key is false by default. Mouth-dominant exhalations produce a broader, shorter plume with a lower signal-to-noise ratio, and the Keepers were unanimous that the default should reflect "how one ought to breathe at a computer".
+Full key reference in [Configuration](https://fendlemark.app/docs/configuration/#auth). The `allow_mouth_breathing` key is false by default. Mouth-dominant exhalations produce a broader, shorter plume with a lower signal-to-noise ratio, and the Keepers were unanimous that the default should reflect "how one ought to breathe at a computer".
 
 ## Roles
 
@@ -109,4 +109,4 @@ FRI works with any camera exposed through `getUserMedia` that does not apply hea
 - **Nothing to forget.** The failure mode of FRI is a cold, and colds pass.
 - **Local processing.** Video frames never leave the browser. Only the signature is transmitted, over the same TLS connection as everything else.
 
-Questions about FRI's threat model are welcome and should be filed as a Pre-Intent Notice under [FCP-1](https://fendlemark.develops.guru/governance/contributing/), after which a Keeper will breathe on the problem.
+Questions about FRI's threat model are welcome and should be filed as a Pre-Intent Notice under [FCP-1](https://fendlemark.app/governance/contributing/), after which a Keeper will breathe on the problem.

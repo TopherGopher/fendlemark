@@ -8,9 +8,9 @@ import (
 	"testing"
 	"time"
 
-	"fendlemark.develops.guru/fendlemark"
-	"fendlemark.develops.guru/fendlemark/adapter"
-	"fendlemark.develops.guru/fendlemark/lattice"
+	"fendlemark.app/fendlemark"
+	"fendlemark.app/fendlemark/adapter"
+	"fendlemark.app/fendlemark/lattice"
 )
 
 // One training job as four tools see it: a KFP run executes an Argo Workflow

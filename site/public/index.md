@@ -1,18 +1,18 @@
 # Fendlemark
 
-Source: https://fendlemark.develops.guru/
+Source: https://fendlemark.app/
 
 **One console for your entire ML platform.**
 
 Fendlemark sits in front of MLflow, Metaflow, Argo Workflows, and Kubeflow and composes their user experiences into a single, coherent console. Your team stops tab-hopping. Your platform starts to feel like one thing.
 
-[Get started](https://fendlemark.develops.guru/docs/getting-started/) [How it works](https://fendlemark.develops.guru/docs/architecture/) [Why Fendlemark](https://fendlemark.develops.guru/philosophy/)
+[Get started](https://fendlemark.app/docs/getting-started/) [How it works](https://fendlemark.app/docs/architecture/) [Why Fendlemark](https://fendlemark.app/philosophy/)
 
 ```shell
-$ go install fendlemark.develops.guru/fendlemark/cmd/fendlemark@latest
+$ go install fendlemark.app/fendlemark/cmd/fendlemark@latest
 $ fendlemark init my-platform
 $ fendlemark serve
-fendlemark 0.9.4 · console on http://localhost:7411 · 4 adapters healthy
+fendlemark 0.9.5 · console on http://localhost:7411 · 4 adapters healthy
 ```
 
 ## Four tools. One lattice.
@@ -45,10 +45,10 @@ Pipelines runs and recurring runs from the KFP API, Katib experiments, and Noteb
 
 ## Built for platform teams who are tired.
 
-- [A real control plane](https://fendlemark.develops.guru/docs/architecture/): A single Go binary. Adapters are compiled in. Reconciliation is deterministic. There is nothing to deploy except the thing itself.
-- [A console that is finished](https://fendlemark.develops.guru/docs/ui/): Vue 3, composable views, one design language across every tool. Ships with every view your team will need, and none it will not.
-- [Adapters you can write](https://fendlemark.develops.guru/docs/adapters/writing-an-adapter/): Six methods. One interface. If your platform has a fifth tool, Fendlemark has a fifth adapter the afternoon you decide it does.
-- [Respiratory Identity](https://fendlemark.develops.guru/docs/auth/): Fendlemark ships its own authentication stack. No identity provider, no passwords, no tokens. Just breathe.
+- [A real control plane](https://fendlemark.app/docs/architecture/): A single Go binary. Adapters are compiled in. Reconciliation is deterministic. There is nothing to deploy except the thing itself.
+- [A console that is finished](https://fendlemark.app/docs/ui/): Vue 3, composable views, one design language across every tool. Ships with every view your team will need, and none it will not.
+- [Adapters you can write](https://fendlemark.app/docs/adapters/writing-an-adapter/): Six methods. One interface. If your platform has a fifth tool, Fendlemark has a fifth adapter the afternoon you decide it does.
+- [Respiratory Identity](https://fendlemark.app/docs/auth/): Fendlemark ships its own authentication stack. No identity provider, no passwords, no tokens. Just breathe.
 
 - **4** built-in adapters
 - **1** binary to deploy
@@ -61,7 +61,7 @@ Pipelines runs and recurring runs from the KFP API, Katib experiments, and Noteb
 
 ## Where to next
 
-- [Getting started](https://fendlemark.develops.guru/docs/getting-started/): Install the CLI, point it at MLflow and Argo, open the console. Ten minutes.
-- [Configuration](https://fendlemark.develops.guru/docs/configuration/): Every key in `fendlemark.yaml`, with defaults you will not need to change.
-- [Governance](https://fendlemark.develops.guru/governance/): How decisions are made, who the Keepers are, and the 112-step Contribution Protocol.
-- [FAQ](https://fendlemark.develops.guru/faq/): Answers to the questions we are asked, and several we are not.
+- [Getting started](https://fendlemark.app/docs/getting-started/): Install the CLI, point it at MLflow and Argo, open the console. Ten minutes.
+- [Configuration](https://fendlemark.app/docs/configuration/): Every key in `fendlemark.yaml`, with defaults you will not need to change.
+- [Governance](https://fendlemark.app/governance/): How decisions are made, who the Keepers are, and the 112-step Contribution Protocol.
+- [FAQ](https://fendlemark.app/faq/): Answers to the questions we are asked, and several we are not.

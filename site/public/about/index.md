@@ -1,6 +1,6 @@
 # About
 
-Source: https://fendlemark.develops.guru/about/
+Source: https://fendlemark.app/about/
 
 Fendlemark is a work of fiction.
 

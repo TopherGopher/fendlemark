@@ -1,13 +1,13 @@
 # Writing an adapter
 
-Source: https://fendlemark.develops.guru/docs/adapters/writing-an-adapter/
+Source: https://fendlemark.app/docs/adapters/writing-an-adapter/
 
 An adapter is a Go package that implements one interface with six methods. If you can list things from your tool's API and say what they are, you can write one in an afternoon. This page walks through the interface, the conformance suite, and how an adapter ends up in the binary.
 
 ## The interface
 
 ```go
-package adapter // fendlemark.develops.guru/fendlemark/adapter
+package adapter // fendlemark.app/fendlemark/adapter
 
 type Adapter interface {
     // Name returns the adapter's stable identifier, used in config and facets.
@@ -92,7 +92,7 @@ package example
 
 import (
     "context"
-    "fendlemark.develops.guru/fendlemark/adapter"
+    "fendlemark.app/fendlemark/adapter"
 )
 
 func init() { adapter.Register("example", New) }
@@ -163,14 +163,14 @@ func TestConformance(t *testing.T) {
 Fendlemark does not load plugins at runtime. Adapters are Go packages compiled in, which keeps the binary static, the startup instant, and the attack surface small. To run your adapter:
 
 ```shell
-$ git clone https://fendlemark.develops.guru/fendlemark   # resolves via go-import
+$ git clone https://fendlemark.app/fendlemark   # resolves via go-import
 $ cd fendlemark
 $ # add  _ "yourmodule/example"  to cmd/fendlemark/adapters.go
 $ go build ./cmd/fendlemark
 ```
 
-To propose your adapter for inclusion in the official binary, so that everyone gets it, follow the [Fendlemark Contribution Protocol](https://fendlemark.develops.guru/governance/contributing/). Adapters enter at Provisional maturity and advance on the schedule described in [Governance](https://fendlemark.develops.guru/governance/#maturity).
+To propose your adapter for inclusion in the official binary, so that everyone gets it, follow the [Fendlemark Contribution Protocol](https://fendlemark.app/governance/contributing/). Adapters enter at Provisional maturity and advance on the schedule described in [Governance](https://fendlemark.app/governance/#maturity).
 
 ## The facet panel
 
-By default the console renders your facet's `Fields` as a key-value table under your adapter's display name. For a custom panel, add a Vue component to `console/src/panels/example/` and register it in `console/src/panels/index.ts`. The component receives the facet as a prop and is rendered inside `<FmFacetPanel>`, which provides the header, the deep links, and the collapse state. See [The console](https://fendlemark.develops.guru/docs/ui/#panels).
+By default the console renders your facet's `Fields` as a key-value table under your adapter's display name. For a custom panel, add a Vue component to `console/src/panels/example/` and register it in `console/src/panels/index.ts`. The component receives the facet as a prop and is rendered inside `<FmFacetPanel>`, which provides the header, the deep links, and the collapse state. See [The console](https://fendlemark.app/docs/ui/#panels).

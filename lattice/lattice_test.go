@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"fendlemark.develops.guru/fendlemark/adapter"
+	"fendlemark.app/fendlemark/adapter"
 )
 
 func fixture() []adapter.Facet {

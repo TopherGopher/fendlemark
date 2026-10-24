@@ -53,7 +53,7 @@
 <h2 id="matrix">Correlation matrix</h2>
 <p>Which keys connect which adapters, out of the box, with no configuration beyond enabling them:</p>
 <div class="table-wrap"><table>
-<thead><tr><th></th><th>mlflow</th><th>metaflow</th><th>argo</th><th>kubeflow</th></tr></thead>
+<thead><tr><td></td><th>mlflow</th><th>metaflow</th><th>argo</th><th>kubeflow</th></tr></thead>
 <tbody>
 <tr><th>mlflow</th><td>—</td><td><code>metaflow.run_id</code> (tag)</td><td><code>argo.workflow.name</code> (tag)</td><td><code>kfp.run_id</code> (tag)</td></tr>
 <tr><th>metaflow</th><td><code>metaflow.run_id</code></td><td>—</td><td><code>argo.workflow.name</code> (system tag)</td><td><code>metaflow.run_id</code> (parameter)</td></tr>

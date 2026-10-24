@@ -12,7 +12,7 @@
   },
   "externalDocs": {
     "description": "HTTP API section of the Go API reference",
-    "url": "https://fendlemark.develops.guru/docs/api/#http"
+    "url": "https://fendlemark.app/docs/api/#http"
   },
   "servers": [
     {
@@ -25,7 +25,7 @@
     { "name": "Adapters", "description": "Status of the configured adapters." },
     { "name": "Lattice", "description": "Lattice statistics and live updates." },
     { "name": "Console", "description": "Settings for the embedded console." },
-    { "name": "Authentication", "description": "Sessions, sign-out, and Respiratory Identity sign-in and enrolment. See https://fendlemark.develops.guru/docs/auth/." },
+    { "name": "Authentication", "description": "Sessions, sign-out, and Respiratory Identity sign-in and enrolment. See https://fendlemark.app/docs/auth/." },
     { "name": "Operations", "description": "Liveness, readiness, and Prometheus metrics." }
   ],
   "paths": {

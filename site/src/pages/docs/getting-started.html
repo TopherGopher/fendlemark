@@ -12,11 +12,11 @@
 </ul>
 
 <h2 id="install">1. Install the CLI</h2>
-<pre data-lang="shell"><code><span class="p">$</span> go install fendlemark.develops.guru/fendlemark/cmd/fendlemark@latest
+<pre data-lang="shell"><code><span class="p">$</span> go install fendlemark.app/fendlemark/cmd/fendlemark@latest
 <span class="p">$</span> fendlemark version
-fendlemark 0.9.4 (go1.23.2, linux/amd64)
+fendlemark 0.9.5 (go1.23.2, linux/amd64)
 console: embedded, built 2026-09-30</code></pre>
-<p>The module path <code>fendlemark.develops.guru/fendlemark</code> is a vanity import path served by this site. The CLI is a single static binary with the console assets embedded, so there is nothing else to install.</p>
+<p>The module path <code>fendlemark.app/fendlemark</code> is a vanity import path served by this site. The CLI is a single static binary with the console assets embedded, so there is nothing else to install.</p>
 
 <h2 id="init">2. Scaffold a project</h2>
 <pre data-lang="shell"><code><span class="p">$</span> fendlemark init my-platform
@@ -55,7 +55,7 @@ kubeflow   disabled</code></pre>
 
 <h2 id="serve">5. Start the console</h2>
 <pre data-lang="shell"><code><span class="p">$</span> fendlemark serve
-2026-10-24T09:12:03Z INF fendlemark 0.9.4 starting
+2026-10-24T09:12:03Z INF fendlemark 0.9.5 starting
 2026-10-24T09:12:03Z INF adapter mlflow connected tracking_uri=http://mlflow.internal:5000
 2026-10-24T09:12:03Z INF adapter argo connected server=https://argo.internal:2746 namespaces=2
 2026-10-24T09:12:04Z INF lattice initial reconciliation complete entities=1443 correlations=312 took=612ms

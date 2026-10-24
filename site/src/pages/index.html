@@ -1,5 +1,6 @@
-<!-- meta {"title": "Fendlemark", "description": "Fendlemark is an open-source Go and Vue 3 framework that unifies the user experiences of MLflow, Metaflow, Argo Workflows, and Kubeflow into a single ML platform console.", "layout": "wide", "version": "0.9.4"} -->
+<!-- meta {"title": "Fendlemark", "description": "Fendlemark is an open-source Go and Vue 3 framework that unifies the user experiences of MLflow, Metaflow, Argo Workflows, and Kubeflow into a single ML platform console.", "layout": "wide", "version": "0.9.5"} -->
 <section class="hero">
+  <div class="hero-text">
   <p class="eyebrow">Go control plane · Vue 3 console · MIT</p>
   <h1>One console for your entire ML platform.</h1>
   <p class="lede">Fendlemark sits in front of MLflow, Metaflow, Argo Workflows, and Kubeflow and composes their user experiences into a single, coherent console. Your team stops tab-hopping. Your platform starts to feel like one thing.</p>
@@ -8,10 +9,31 @@
     <a class="btn" href="/docs/architecture/">How it works</a>
     <a class="btn" href="/philosophy/">Why Fendlemark</a>
   </div>
-<pre data-lang="shell"><code><span class="p">$</span> go install fendlemark.develops.guru/fendlemark/cmd/fendlemark@latest
+  </div>
+  <div class="hero-art" aria-hidden="true"><svg viewBox="0 0 440 440" width="440" height="440" focusable="false">
+    <defs>
+      <pattern id="hero-grid" width="22" height="22" patternUnits="userSpaceOnUse"><path d="M22 0H0V22" class="ha-grid"/></pattern>
+      <radialGradient id="hero-fade"><stop offset="0" stop-color="#fff"/><stop offset=".72" stop-color="#fff" stop-opacity=".5"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+      <mask id="hero-mask"><rect width="440" height="440" fill="url(#hero-fade)"/></mask>
+    </defs>
+    <rect width="440" height="440" fill="url(#hero-grid)" mask="url(#hero-mask)"/>
+    <g class="ha-ring">
+      <path pathLength="1" d="M120 72H320"/><path pathLength="1" d="M368 120V320"/><path pathLength="1" d="M320 368H120"/><path pathLength="1" d="M72 320V120"/>
+    </g>
+    <g class="ha-spoke">
+      <path pathLength="1" d="M220 76V152"/><path pathLength="1" d="M364 220H288"/><path pathLength="1" d="M220 364V288"/><path pathLength="1" d="M76 220H152"/>
+    </g>
+    <g class="ha-node"><circle cx="220" cy="72" r="4.5"/><circle cx="368" cy="220" r="4.5"/><circle cx="220" cy="368" r="4.5"/><circle cx="72" cy="220" r="4.5"/></g>
+    <g class="ha-tile ha-t1"><rect x="24" y="24" width="96" height="96" rx="22"/><path class="ha-glyph" d="M44 94L60 77L74 85L92 57L104 67"/></g>
+    <g class="ha-tile ha-t2"><rect x="320" y="24" width="96" height="96" rx="22"/><path class="ha-glyph" d="M349 72H363M373 72H387"/><circle class="ha-glyph" cx="344" cy="72" r="5"/><circle class="ha-glyph" cx="368" cy="72" r="5"/><circle class="ha-glyph" cx="392" cy="72" r="5"/></g>
+    <g class="ha-tile ha-t3"><rect x="24" y="320" width="96" height="96" rx="22"/><path class="ha-glyph" d="M69 350L53 386M75 350L91 386"/><circle class="ha-glyph" cx="72" cy="345" r="5"/><circle class="ha-glyph" cx="51" cy="391" r="5"/><circle class="ha-glyph" cx="93" cy="391" r="5"/></g>
+    <g class="ha-tile ha-t4"><rect x="320" y="320" width="96" height="96" rx="22"/><path class="ha-glyph" d="M344 350H392M344 368H378M344 386H386"/></g>
+    <g class="ha-core"><rect x="152" y="152" width="136" height="136" rx="30"/><g class="ha-mark"><rect x="184" y="184" width="30" height="30" rx="6" opacity=".55"/><rect x="226" y="184" width="30" height="30" rx="6" opacity=".55"/><rect x="184" y="226" width="30" height="30" rx="6" opacity=".55"/><rect x="226" y="226" width="30" height="30" rx="6" opacity=".55"/><rect x="202" y="202" width="36" height="36" rx="9"/></g></g>
+  </svg></div>
+<pre data-lang="shell"><code><span class="p">$</span> go install fendlemark.app/fendlemark/cmd/fendlemark@latest
 <span class="p">$</span> fendlemark init my-platform
 <span class="p">$</span> fendlemark serve
-<span class="c">fendlemark 0.9.4 · console on http://localhost:7411 · 4 adapters healthy</span></code></pre>
+<span class="c">fendlemark 0.9.5 · console on http://localhost:7411 · 4 adapters healthy</span></code></pre>
 </section>
 
 <section class="section">

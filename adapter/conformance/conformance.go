@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"fendlemark.develops.guru/fendlemark/adapter"
+	"fendlemark.app/fendlemark/adapter"
 )
 
 // Options configures a conformance run.

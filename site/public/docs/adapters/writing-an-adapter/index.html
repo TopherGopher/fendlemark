@@ -1,16 +1,17 @@
 <!doctype html>
-<html lang="en" data-layout="docs">
+<html lang="en" data-layout="docs" data-page="docs-adapters-writing-an-adapter">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Writing an adapter · Fendlemark</title>
 <meta name="description" content="How to write a Fendlemark adapter in Go: the six-method Adapter interface, facets and correlation keys, lifecycle, testing with the conformance suite, and how adapters are compiled into the binary.">
-<link rel="canonical" href="https://fendlemark.develops.guru/docs/adapters/writing-an-adapter/">
+<link rel="canonical" href="https://fendlemark.app/docs/adapters/writing-an-adapter/">
 <link rel="alternate" type="text/markdown" href="/docs/adapters/writing-an-adapter/index.md">
 <link rel="describedby" href="/llms.txt">
 <link rel="api-catalog" href="/.well-known/api-catalog" type="application/linkset+json">
 <link rel="service-desc" href="/openapi.json" type="application/openapi+json">
 <link rel="service-doc" href="/docs/api/#http" type="text/html">
+<meta name="go-import" content="fendlemark.app/fendlemark git https://github.com/TopherGopher/fendlemark">
 <meta name="go-import" content="fendlemark.develops.guru/fendlemark git https://github.com/TopherGopher/fendlemark">
 <link rel="alternate" type="application/atom+xml" title="Fendlemark releases" href="/feed.xml">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
@@ -20,53 +21,53 @@
 <meta property="og:site_name" content="Fendlemark">
 <meta property="og:title" content="Writing an adapter · Fendlemark">
 <meta property="og:description" content="How to write a Fendlemark adapter in Go: the six-method Adapter interface, facets and correlation keys, lifecycle, testing with the conformance suite, and how adapters are compiled into the binary.">
-<meta property="og:url" content="https://fendlemark.develops.guru/docs/adapters/writing-an-adapter/">
-<meta property="og:image" content="https://fendlemark.develops.guru/assets/og-image.png">
+<meta property="og:url" content="https://fendlemark.app/docs/adapters/writing-an-adapter/">
+<meta property="og:image" content="https://fendlemark.app/assets/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Writing an adapter · Fendlemark">
 <meta name="twitter:description" content="How to write a Fendlemark adapter in Go: the six-method Adapter interface, facets and correlation keys, lifecycle, testing with the conformance suite, and how adapters are compiled into the binary.">
-<meta name="twitter:image" content="https://fendlemark.develops.guru/assets/og-image.png">
+<meta name="twitter:image" content="https://fendlemark.app/assets/og-image.png">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="preload" href="/assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/jetbrains-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/site.css">
-<script>try{var t=localStorage.getItem('fm-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Fendlemark", "item": "https://fendlemark.develops.guru/"}, {"@type": "ListItem", "position": 2, "name": "Documentation", "item": "https://fendlemark.develops.guru/docs/"}, {"@type": "ListItem", "position": 3, "name": "Writing an adapter", "item": "https://fendlemark.develops.guru/docs/adapters/writing-an-adapter/"}]}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Writing an adapter", "description": "How to write a Fendlemark adapter in Go: the six-method Adapter interface, facets and correlation keys, lifecycle, testing with the conformance suite, and how adapters are compiled into the binary.", "url": "https://fendlemark.develops.guru/docs/adapters/writing-an-adapter/", "datePublished": "2026-10-24", "dateModified": "2026-10-24", "author": {"@type": "Organization", "name": "The Fendlemark Keepers"}, "publisher": {"@type": "Organization", "name": "Fendlemark", "url": "https://fendlemark.develops.guru/"}, "inLanguage": "en"}</script>
+<script>document.documentElement.classList.add('js');try{var t=localStorage.getItem('fm-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Fendlemark", "item": "https://fendlemark.app/"}, {"@type": "ListItem", "position": 2, "name": "Documentation", "item": "https://fendlemark.app/docs/"}, {"@type": "ListItem", "position": 3, "name": "Writing an adapter", "item": "https://fendlemark.app/docs/adapters/writing-an-adapter/"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Writing an adapter", "description": "How to write a Fendlemark adapter in Go: the six-method Adapter interface, facets and correlation keys, lifecycle, testing with the conformance suite, and how adapters are compiled into the binary.", "url": "https://fendlemark.app/docs/adapters/writing-an-adapter/", "datePublished": "2026-10-24", "dateModified": "2026-10-24", "author": {"@type": "Organization", "name": "The Fendlemark Keepers"}, "publisher": {"@type": "Organization", "name": "Fendlemark", "url": "https://fendlemark.app/"}, "inLanguage": "en"}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="site-header">
   <div class="site-header-inner">
     <a class="brand" href="/" aria-label="Fendlemark home">
-      <svg class="brand-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
+      <svg class="brand-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
       <span class="brand-name">Fendlemark</span>
-      <span class="brand-version">v0.9.4</span>
     </a>
+    <span class="brand-version">v0.9.5</span>
     <nav class="top-nav" aria-label="Primary">
-      <a href="/docs/getting-started/">Docs</a>
+      <a href="/docs/getting-started/" class="in-section">Docs</a>
       <a href="/philosophy/">Philosophy</a>
       <a href="/governance/">Governance</a>
       <a href="/changelog/">Changelog</a>
       <a href="/fendlemark/">Packages</a>
     </nav>
     <div class="header-actions">
-      <button class="icon-btn" id="theme-toggle" type="button" aria-label="Toggle colour theme" title="Toggle theme">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path class="sun" d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/><circle class="sun" cx="12" cy="12" r="4"/><path class="moon" d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <button class="icon-btn js-only" id="theme-toggle" type="button" aria-label="Dark theme" aria-pressed="false" title="Dark theme">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><g class="sun"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/></g><path class="moon" d="M20.5 14.2A8.5 8.5 0 1 1 9.8 3.5a6.8 6.8 0 0 0 10.7 10.7z"/></svg>
       </button>
-      <button class="icon-btn menu-btn" id="menu-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false" aria-controls="sidebar">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      <button class="icon-btn menu-btn js-only" id="menu-toggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="sidebar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path class="bars" d="M4 7h16M4 12h16M4 17h16"/><path class="cross" d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
     </div>
   </div>
 </header>
 
 <div class="page">
-  <aside class="sidebar" id="sidebar">
-    <nav aria-label="Documentation">
-<div class="nav-group"><div class="nav-group-title">Documentation</div><ul>
+  <nav class="sidebar" id="sidebar" aria-label="Documentation">
+<div class="nav-group"><p class="nav-group-title" id="nav-documentation">Documentation</p><ul aria-labelledby="nav-documentation">
 <li><a href="/docs/">Overview</a></li>
 <li><a href="/docs/getting-started/">Getting started</a></li>
 <li><a href="/docs/architecture/">Architecture</a></li>
@@ -79,7 +80,7 @@
 <li><a href="/docs/api/">Go API reference</a></li>
 <li><a href="/docs/migration/">Migrating 0.8 to 0.9</a></li>
 </ul></div>
-<div class="nav-group"><div class="nav-group-title">Project</div><ul>
+<div class="nav-group"><p class="nav-group-title" id="nav-project">Project</p><ul aria-labelledby="nav-project">
 <li><a href="/philosophy/">Philosophy</a></li>
 <li><a href="/governance/">Governance</a></li>
 <li><a href="/governance/contributing/">Contributing (FCP-1)</a></li>
@@ -88,15 +89,14 @@
 <li><a href="/faq/">FAQ</a></li>
 <li><a href="/about/">About</a></li>
 </ul></div>
-    </nav>
-  </aside>
+  </nav>
   <main class="main" id="main">
 <p class="eyebrow">Documentation</p>
 <h1>Writing an adapter</h1>
 <p class="lede">An adapter is a Go package that implements one interface with six methods. If you can list things from your tool's API and say what they are, you can write one in an afternoon. This page walks through the interface, the conformance suite, and how an adapter ends up in the binary.</p>
 
-<h2 id="interface">The interface</h2>
-<pre data-lang="go"><code><span class="k">package</span> adapter <span class="c">// fendlemark.develops.guru/fendlemark/adapter</span>
+<h2 id="interface"><a class="anchor" href="#interface">The interface</a></h2>
+<div class="code" data-lang="go"><pre data-lang="go" role="region" tabindex="0" aria-label="Go code: The interface" data-scroll><code><span class="k">package</span> adapter <span class="c">// fendlemark.app/fendlemark/adapter</span>
 
 <span class="k">type</span> Adapter <span class="k">interface</span> {
     <span class="c">// Name returns the adapter's stable identifier, used in config and facets.</span>
@@ -119,11 +119,11 @@
 
     <span class="c">// Health reports current status for the console and `adapters check`.</span>
     Health(ctx context.Context) Status
-}</code></pre>
+}</code></pre></div>
 <p>That is the whole contract. Everything else on this page is detail.</p>
 
-<h2 id="facets">Facets</h2>
-<pre data-lang="go"><code><span class="k">type</span> Facet <span class="k">struct</span> {
+<h2 id="facets"><a class="anchor" href="#facets">Facets</a></h2>
+<div class="code" data-lang="go"><pre data-lang="go" role="region" tabindex="0" aria-label="Go code: Facets" data-scroll><code><span class="k">type</span> Facet <span class="k">struct</span> {
     Source    <span class="k">string</span>            <span class="c">// adapter name</span>
     SourceID  <span class="k">string</span>            <span class="c">// identifier in the upstream tool</span>
     Kind      Kind              <span class="c">// KindRun, KindWorkflow, KindArtifact, KindModel, KindPipeline, KindNotebook</span>
@@ -134,7 +134,7 @@
     Keys      <span class="k">map</span>[<span class="k">string</span>]<span class="k">string</span> <span class="c">// correlation keys, e.g. "argo.workflow.name": "train-abc12"</span>
     Fields    <span class="k">map</span>[<span class="k">string</span>]any    <span class="c">// everything else; rendered by the facet panel</span>
     Links     []Link            <span class="c">// deep links into the upstream tool</span>
-}</code></pre>
+}</code></pre></div>
 <p>Rules the reconciler relies on:</p>
 <ul>
   <li><code>Source</code> plus <code>SourceID</code> is unique per facet. Emitting the same pair twice in one <code>Facets</code> call is a conformance failure.</li>
@@ -143,8 +143,8 @@
   <li><code>Fields</code> is for display. Nothing in it is used for correlation, so it can be as rich or as sparse as your tool allows.</li>
 </ul>
 
-<h2 id="descriptor">Descriptor</h2>
-<pre data-lang="go"><code><span class="k">func</span> (a *Adapter) Describe() adapter.Descriptor {
+<h2 id="descriptor"><a class="anchor" href="#descriptor">Descriptor</a></h2>
+<div class="code" data-lang="go"><pre data-lang="go" role="region" tabindex="0" aria-label="Go code: Descriptor" data-scroll><code><span class="k">func</span> (a *Adapter) Describe() adapter.Descriptor {
     <span class="k">return</span> adapter.Descriptor{
         DisplayName:  <span class="s">"Example Tracker"</span>,
         Kinds:        []adapter.Kind{adapter.KindRun, adapter.KindArtifact},
@@ -153,10 +153,10 @@
         Maturity:     adapter.Provisional,
         ConfigSchema: exampleSchema, <span class="c">// JSON Schema; validated before Connect</span>
     }
-}</code></pre>
+}</code></pre></div>
 <p>The control plane uses the descriptor to validate configuration before calling <code>Connect</code>, to decide whether to poll or watch, to populate the console's adapter panel, and to attach your facet panel to the right views.</p>
 
-<h2 id="lifecycle">Lifecycle</h2>
+<h2 id="lifecycle"><a class="anchor" href="#lifecycle">Lifecycle</a></h2>
 <ol>
   <li><strong>Construct.</strong> Your package registers a constructor with <code>adapter.Register("example", New)</code> in an <code>init</code> function. The binary's <code>cmd/fendlemark</code> imports the package for side effects.</li>
   <li><strong>Describe.</strong> Called once. Must be pure.</li>
@@ -166,12 +166,12 @@
   <li><strong>Shutdown.</strong> The context passed to <code>Watch</code> is cancelled. Return.</li>
 </ol>
 
-<h2 id="example">A minimal adapter</h2>
-<pre data-lang="go"><code><span class="k">package</span> example
+<h2 id="example"><a class="anchor" href="#example">A minimal adapter</a></h2>
+<div class="code" data-lang="go"><pre data-lang="go" role="region" tabindex="0" aria-label="Go code: A minimal adapter" data-scroll><code><span class="k">package</span> example
 
 <span class="k">import</span> (
     <span class="s">"context"</span>
-    <span class="s">"fendlemark.develops.guru/fendlemark/adapter"</span>
+    <span class="s">"fendlemark.app/fendlemark/adapter"</span>
 )
 
 <span class="k">func</span> init() { adapter.Register(<span class="s">"example"</span>, New) }
@@ -212,17 +212,17 @@
         <span class="k">return</span> adapter.Status{State: adapter.Unreachable, Detail: err.Error()}
     }
     <span class="k">return</span> adapter.Status{State: adapter.Healthy, Detail: <span class="s">"ok"</span>}
-}</code></pre>
+}</code></pre></div>
 
-<h2 id="conformance">The conformance suite</h2>
+<h2 id="conformance"><a class="anchor" href="#conformance">The conformance suite</a></h2>
 <p>Every adapter, built-in or not, must pass <code>adapter/conformance</code>. It drives your adapter against a recorded fixture and checks the rules above plus a few that are only obvious after someone has broken them:</p>
-<pre data-lang="go"><code><span class="k">func</span> TestConformance(t *testing.T) {
+<div class="code" data-lang="go"><pre data-lang="go" role="region" tabindex="0" aria-label="Go code: The conformance suite" data-scroll><code><span class="k">func</span> TestConformance(t *testing.T) {
     conformance.Run(t, New, conformance.Options{
         Fixture:  <span class="s">"testdata/jobs.json"</span>,
         Config:   adapter.Config{<span class="s">"url"</span>: <span class="s">"http://fixture"</span>, <span class="s">"token"</span>: <span class="s">"x"</span>},
         MinFacets: 3,
     })
-}</code></pre>
+}</code></pre></div>
 <ul>
   <li>Unique <code>Source</code> + <code>SourceID</code> per call.</li>
   <li>Non-zero <code>StartedAt</code> on every facet.</li>
@@ -233,28 +233,31 @@
   <li>Keys use the shared vocabulary when they match a known pattern (a 32-hex-character key named anything other than <code>mlflow.run_id</code> is flagged).</li>
 </ul>
 
-<h2 id="compiling">Getting it into the binary</h2>
+<h2 id="compiling"><a class="anchor" href="#compiling">Getting it into the binary</a></h2>
 <p>Fendlemark does not load plugins at runtime. Adapters are Go packages compiled in, which keeps the binary static, the startup instant, and the attack surface small. To run your adapter:</p>
-<pre data-lang="shell"><code><span class="p">$</span> git clone https://fendlemark.develops.guru/fendlemark   <span class="c"># resolves via go-import</span>
+<div class="code" data-lang="shell"><pre data-lang="shell" role="region" tabindex="0" aria-label="Shell code: Getting it into the binary" data-scroll><code><span class="p">$</span> git clone https://fendlemark.app/fendlemark   <span class="c"># resolves via go-import</span>
 <span class="p">$</span> cd fendlemark
 <span class="p">$</span> <span class="c"># add  _ "yourmodule/example"  to cmd/fendlemark/adapters.go</span>
-<span class="p">$</span> go build ./cmd/fendlemark</code></pre>
+<span class="p">$</span> go build ./cmd/fendlemark</code></pre></div>
 <p>To propose your adapter for inclusion in the official binary, so that everyone gets it, follow the <a href="/governance/contributing/">Fendlemark Contribution Protocol</a>. Adapters enter at Provisional maturity and advance on the schedule described in <a href="/governance/#maturity">Governance</a>.</p>
 
-<h2 id="panel">The facet panel</h2>
+<h2 id="panel"><a class="anchor" href="#panel">The facet panel</a></h2>
 <p>By default the console renders your facet's <code>Fields</code> as a key-value table under your adapter's display name. For a custom panel, add a Vue component to <code>console/src/panels/example/</code> and register it in <code>console/src/panels/index.ts</code>. The component receives the facet as a prop and is rendered inside <code>&lt;FmFacetPanel&gt;</code>, which provides the header, the deep links, and the collapse state. See <a href="/docs/ui/#panels">The console</a>.</p>
 <nav class="pager" aria-label="Previous and next pages">
-<a class="pager-prev" href="/docs/adapters/"><span>Previous</span>Adapters</a>
-<a class="pager-next" href="/docs/ui/"><span>Next</span>The console (UI)</a>
+<a class="pager-prev" href="/docs/adapters/" rel="prev"><span class="pager-label">Previous</span><span class="pager-title">Adapters</span></a>
+<a class="pager-next" href="/docs/ui/" rel="next"><span class="pager-label">Next</span><span class="pager-title">The console (UI)</span></a>
 </nav>
   </main>
 </div>
 
 <footer class="site-footer">
   <div class="site-footer-inner">
-    <p>Fendlemark is released under the MIT licence and maintained by the Fendlemark Keepers. Documentation for v0.9.4.</p>
-    <p class="fine">MLflow, Metaflow, Argo Workflows, and Kubeflow are trademarks of their respective owners. Fendlemark is an independent project and is not affiliated with, endorsed by, or sponsored by any of them.</p>
-    <p class="fine"><a href="/about/">About this site</a> · <a href="/governance/">Governance</a> · <a href="/changelog/">Changelog</a> · <a href="/sitemap.xml">Sitemap</a></p>
+    <svg class="footer-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
+    <div class="footer-text">
+      <p>Fendlemark is released under the MIT licence and maintained by the Fendlemark Keepers. Documentation for v0.9.5.</p>
+      <p class="fine">MLflow, Metaflow, Argo Workflows, and Kubeflow are trademarks of their respective owners. Fendlemark is an independent project and is not affiliated with, endorsed by, or sponsored by any of them.</p>
+      <p class="fine footer-links"><a href="/about/">About this site</a> · <a href="/governance/">Governance</a> · <a href="/changelog/">Changelog</a> · <a href="/sitemap.xml">Sitemap</a></p>
+    </div>
   </div>
 </footer>
 <script src="/assets/site.js" defer></script>

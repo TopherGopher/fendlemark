@@ -464,7 +464,7 @@ func Minimal(enabled []string) string {
 		on[e] = true
 	}
 	var b strings.Builder
-	b.WriteString("# fendlemark.yaml\n# Every key has a default. Most installations change five of them.\n# Reference: https://fendlemark.develops.guru/docs/configuration/\n\nserver:\n  listen: \"127.0.0.1:7411\"   # this machine only; widen it only behind an authenticating proxy\n\nadapters:\n")
+	b.WriteString("# fendlemark.yaml\n# Every key has a default. Most installations change five of them.\n# Reference: https://fendlemark.app/docs/configuration/\n\nserver:\n  listen: \"127.0.0.1:7411\"   # this machine only; widen it only behind an authenticating proxy\n\nadapters:\n")
 	fmt.Fprintf(&b, "  mlflow:\n    enabled: %t\n    tracking_uri: \"http://mlflow.internal:5000\"\n", on["mlflow"])
 	fmt.Fprintf(&b, "  metaflow:\n    enabled: %t\n    metadata_url: \"http://metaflow-metadata.internal:8080\"\n", on["metaflow"])
 	fmt.Fprintf(&b, "  argo:\n    enabled: %t\n    server: \"https://argo.internal:2746\"\n    namespaces: [\"ml-training\"]\n", on["argo"])

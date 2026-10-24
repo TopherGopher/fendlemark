@@ -1,16 +1,17 @@
 <!doctype html>
-<html lang="en" data-layout="docs">
+<html lang="en" data-layout="docs" data-page="docs-getting-started">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Getting started · Fendlemark</title>
 <meta name="description" content="Install the Fendlemark CLI, scaffold a project, connect it to MLflow, Metaflow, Argo Workflows, and Kubeflow, and open the unified console. Takes about ten minutes.">
-<link rel="canonical" href="https://fendlemark.develops.guru/docs/getting-started/">
+<link rel="canonical" href="https://fendlemark.app/docs/getting-started/">
 <link rel="alternate" type="text/markdown" href="/docs/getting-started/index.md">
 <link rel="describedby" href="/llms.txt">
 <link rel="api-catalog" href="/.well-known/api-catalog" type="application/linkset+json">
 <link rel="service-desc" href="/openapi.json" type="application/openapi+json">
 <link rel="service-doc" href="/docs/api/#http" type="text/html">
+<meta name="go-import" content="fendlemark.app/fendlemark git https://github.com/TopherGopher/fendlemark">
 <meta name="go-import" content="fendlemark.develops.guru/fendlemark git https://github.com/TopherGopher/fendlemark">
 <link rel="alternate" type="application/atom+xml" title="Fendlemark releases" href="/feed.xml">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
@@ -20,53 +21,53 @@
 <meta property="og:site_name" content="Fendlemark">
 <meta property="og:title" content="Getting started · Fendlemark">
 <meta property="og:description" content="Install the Fendlemark CLI, scaffold a project, connect it to MLflow, Metaflow, Argo Workflows, and Kubeflow, and open the unified console. Takes about ten minutes.">
-<meta property="og:url" content="https://fendlemark.develops.guru/docs/getting-started/">
-<meta property="og:image" content="https://fendlemark.develops.guru/assets/og-image.png">
+<meta property="og:url" content="https://fendlemark.app/docs/getting-started/">
+<meta property="og:image" content="https://fendlemark.app/assets/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Getting started · Fendlemark">
 <meta name="twitter:description" content="Install the Fendlemark CLI, scaffold a project, connect it to MLflow, Metaflow, Argo Workflows, and Kubeflow, and open the unified console. Takes about ten minutes.">
-<meta name="twitter:image" content="https://fendlemark.develops.guru/assets/og-image.png">
+<meta name="twitter:image" content="https://fendlemark.app/assets/og-image.png">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="preload" href="/assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/jetbrains-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/site.css">
-<script>try{var t=localStorage.getItem('fm-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Fendlemark", "item": "https://fendlemark.develops.guru/"}, {"@type": "ListItem", "position": 2, "name": "Documentation", "item": "https://fendlemark.develops.guru/docs/"}, {"@type": "ListItem", "position": 3, "name": "Getting started", "item": "https://fendlemark.develops.guru/docs/getting-started/"}]}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Getting started", "description": "Install the Fendlemark CLI, scaffold a project, connect it to MLflow, Metaflow, Argo Workflows, and Kubeflow, and open the unified console. Takes about ten minutes.", "url": "https://fendlemark.develops.guru/docs/getting-started/", "datePublished": "2026-10-24", "dateModified": "2026-10-24", "author": {"@type": "Organization", "name": "The Fendlemark Keepers"}, "publisher": {"@type": "Organization", "name": "Fendlemark", "url": "https://fendlemark.develops.guru/"}, "inLanguage": "en"}</script>
+<script>document.documentElement.classList.add('js');try{var t=localStorage.getItem('fm-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Fendlemark", "item": "https://fendlemark.app/"}, {"@type": "ListItem", "position": 2, "name": "Documentation", "item": "https://fendlemark.app/docs/"}, {"@type": "ListItem", "position": 3, "name": "Getting started", "item": "https://fendlemark.app/docs/getting-started/"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Getting started", "description": "Install the Fendlemark CLI, scaffold a project, connect it to MLflow, Metaflow, Argo Workflows, and Kubeflow, and open the unified console. Takes about ten minutes.", "url": "https://fendlemark.app/docs/getting-started/", "datePublished": "2026-10-24", "dateModified": "2026-10-24", "author": {"@type": "Organization", "name": "The Fendlemark Keepers"}, "publisher": {"@type": "Organization", "name": "Fendlemark", "url": "https://fendlemark.app/"}, "inLanguage": "en"}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="site-header">
   <div class="site-header-inner">
     <a class="brand" href="/" aria-label="Fendlemark home">
-      <svg class="brand-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
+      <svg class="brand-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
       <span class="brand-name">Fendlemark</span>
-      <span class="brand-version">v0.9.4</span>
     </a>
+    <span class="brand-version">v0.9.5</span>
     <nav class="top-nav" aria-label="Primary">
-      <a href="/docs/getting-started/">Docs</a>
+      <a href="/docs/getting-started/" aria-current="page" class="in-section">Docs</a>
       <a href="/philosophy/">Philosophy</a>
       <a href="/governance/">Governance</a>
       <a href="/changelog/">Changelog</a>
       <a href="/fendlemark/">Packages</a>
     </nav>
     <div class="header-actions">
-      <button class="icon-btn" id="theme-toggle" type="button" aria-label="Toggle colour theme" title="Toggle theme">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path class="sun" d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/><circle class="sun" cx="12" cy="12" r="4"/><path class="moon" d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <button class="icon-btn js-only" id="theme-toggle" type="button" aria-label="Dark theme" aria-pressed="false" title="Dark theme">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><g class="sun"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/></g><path class="moon" d="M20.5 14.2A8.5 8.5 0 1 1 9.8 3.5a6.8 6.8 0 0 0 10.7 10.7z"/></svg>
       </button>
-      <button class="icon-btn menu-btn" id="menu-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false" aria-controls="sidebar">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      <button class="icon-btn menu-btn js-only" id="menu-toggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="sidebar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path class="bars" d="M4 7h16M4 12h16M4 17h16"/><path class="cross" d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
     </div>
   </div>
 </header>
 
 <div class="page">
-  <aside class="sidebar" id="sidebar">
-    <nav aria-label="Documentation">
-<div class="nav-group"><div class="nav-group-title">Documentation</div><ul>
+  <nav class="sidebar" id="sidebar" aria-label="Documentation">
+<div class="nav-group"><p class="nav-group-title" id="nav-documentation">Documentation</p><ul aria-labelledby="nav-documentation">
 <li><a href="/docs/">Overview</a></li>
 <li><a href="/docs/getting-started/" class="active" aria-current="page">Getting started</a></li>
 <li><a href="/docs/architecture/">Architecture</a></li>
@@ -79,7 +80,7 @@
 <li><a href="/docs/api/">Go API reference</a></li>
 <li><a href="/docs/migration/">Migrating 0.8 to 0.9</a></li>
 </ul></div>
-<div class="nav-group"><div class="nav-group-title">Project</div><ul>
+<div class="nav-group"><p class="nav-group-title" id="nav-project">Project</p><ul aria-labelledby="nav-project">
 <li><a href="/philosophy/">Philosophy</a></li>
 <li><a href="/governance/">Governance</a></li>
 <li><a href="/governance/contributing/">Contributing (FCP-1)</a></li>
@@ -88,14 +89,13 @@
 <li><a href="/faq/">FAQ</a></li>
 <li><a href="/about/">About</a></li>
 </ul></div>
-    </nav>
-  </aside>
+  </nav>
   <main class="main" id="main">
 <p class="eyebrow">Documentation</p>
 <h1>Getting started</h1>
 <p class="lede">This guide takes you from nothing to a running Fendlemark console connected to at least one of your existing ML platform tools. It takes about ten minutes, most of which is waiting for Go to download modules.</p>
 
-<h2 id="requirements">Requirements</h2>
+<h2 id="requirements"><a class="anchor" href="#requirements">Requirements</a></h2>
 <ul>
   <li><strong>Go 1.23 or later</strong> to install the CLI. Prebuilt binaries are distributed to Keepers and Stewards following each Silence Period; see <a href="/governance/#releases">release governance</a>.</li>
   <li><strong>Network access</strong> from the machine running Fendlemark to at least one of: an MLflow tracking server, a Metaflow metadata service, an Argo Server, or a Kubeflow Pipelines API endpoint.</li>
@@ -103,23 +103,23 @@
   <li><strong>A webcam</strong>, if you enable <a href="/docs/auth/">Respiratory Identity</a>. Local development runs with authentication disabled by default.</li>
 </ul>
 
-<h2 id="install">1. Install the CLI</h2>
-<pre data-lang="shell"><code><span class="p">$</span> go install fendlemark.develops.guru/fendlemark/cmd/fendlemark@latest
+<h2 id="install"><a class="anchor" href="#install">1. Install the CLI</a></h2>
+<div class="code" data-lang="shell"><pre data-lang="shell" role="region" tabindex="0" aria-label="Shell code: 1. Install the CLI" data-scroll><code><span class="p">$</span> go install fendlemark.app/fendlemark/cmd/fendlemark@latest
 <span class="p">$</span> fendlemark version
-fendlemark 0.9.4 (go1.23.2, linux/amd64)
-console: embedded, built 2026-09-30</code></pre>
-<p>The module path <code>fendlemark.develops.guru/fendlemark</code> is a vanity import path served by this site. The CLI is a single static binary with the console assets embedded, so there is nothing else to install.</p>
+fendlemark 0.9.5 (go1.23.2, linux/amd64)
+console: embedded, built 2026-09-30</code></pre></div>
+<p>The module path <code>fendlemark.app/fendlemark</code> is a vanity import path served by this site. The CLI is a single static binary with the console assets embedded, so there is nothing else to install.</p>
 
-<h2 id="init">2. Scaffold a project</h2>
-<pre data-lang="shell"><code><span class="p">$</span> fendlemark init my-platform
+<h2 id="init"><a class="anchor" href="#init">2. Scaffold a project</a></h2>
+<div class="code" data-lang="shell"><pre data-lang="shell" role="region" tabindex="0" aria-label="Shell code: 2. Scaffold a project" data-scroll><code><span class="p">$</span> fendlemark init my-platform
 <span class="p">$</span> cd my-platform
 <span class="p">$</span> ls
-fendlemark.yaml  README.md</code></pre>
+fendlemark.yaml  README.md</code></pre></div>
 <p><code>fendlemark init</code> writes a minimal configuration with all four adapters declared and disabled. You enable the ones you have. The generated file is deliberately short; every option has a sensible default, and the <a href="/docs/configuration/">configuration reference</a> documents all of them.</p>
 
-<h2 id="connect">3. Connect your tools</h2>
+<h2 id="connect"><a class="anchor" href="#connect">3. Connect your tools</a></h2>
 <p>Open <code>fendlemark.yaml</code> and enable the adapters for the systems you run. A typical first configuration points at an MLflow tracking server and an Argo Workflows namespace:</p>
-<pre data-lang="yaml"><code><span class="k">server</span>:
+<div class="code" data-lang="yaml"><pre data-lang="yaml" role="region" tabindex="0" aria-label="YAML code: 3. Connect your tools" data-scroll><code><span class="k">server</span>:
   <span class="k">listen</span>: <span class="s">"127.0.0.1:7411"</span>
 
 <span class="k">adapters</span>:
@@ -133,25 +133,25 @@ fendlemark.yaml  README.md</code></pre>
   <span class="k">metaflow</span>:
     <span class="k">enabled</span>: <span class="s">false</span>
   <span class="k">kubeflow</span>:
-    <span class="k">enabled</span>: <span class="s">false</span></code></pre>
+    <span class="k">enabled</span>: <span class="s">false</span></code></pre></div>
 <p>Adapters authenticate to the underlying systems the way those systems expect. The MLflow adapter honours <code>MLFLOW_TRACKING_USERNAME</code> and <code>MLFLOW_TRACKING_PASSWORD</code> if set, the Argo adapter reads a bearer token from <code>ARGO_TOKEN</code> or your current kubeconfig context, and so on. Each adapter's page in the <a href="/docs/adapters/">adapters reference</a> lists exactly what it reads.</p>
 
-<h2 id="check">4. Check connectivity</h2>
-<pre data-lang="shell"><code><span class="p">$</span> fendlemark adapters check
+<h2 id="check"><a class="anchor" href="#check">4. Check connectivity</a></h2>
+<div class="code" data-lang="shell"><pre data-lang="shell" role="region" tabindex="0" aria-label="Shell code: 4. Check connectivity" data-scroll><code><span class="p">$</span> fendlemark adapters check
 ADAPTER    STATUS    LATENCY   DETAIL
 mlflow     healthy   41ms      12 experiments, 1,406 runs visible
 argo       healthy   88ms      2 namespaces, 37 workflows (4 running)
 metaflow   disabled
-kubeflow   disabled</code></pre>
+kubeflow   disabled</code></pre></div>
 <p>If an adapter reports <code>degraded</code> or <code>unreachable</code>, <code>fendlemark doctor</code> will tell you why in more words than you want.</p>
 
-<h2 id="serve">5. Start the console</h2>
-<pre data-lang="shell"><code><span class="p">$</span> fendlemark serve
-2026-10-24T09:12:03Z INF fendlemark 0.9.4 starting
+<h2 id="serve"><a class="anchor" href="#serve">5. Start the console</a></h2>
+<div class="code" data-lang="shell"><pre data-lang="shell" role="region" tabindex="0" aria-label="Shell code: 5. Start the console" data-scroll><code><span class="p">$</span> fendlemark serve
+2026-10-24T09:12:03Z INF fendlemark 0.9.5 starting
 2026-10-24T09:12:03Z INF adapter mlflow connected tracking_uri=http://mlflow.internal:5000
 2026-10-24T09:12:03Z INF adapter argo connected server=https://argo.internal:2746 namespaces=2
 2026-10-24T09:12:04Z INF lattice initial reconciliation complete entities=1443 correlations=312 took=612ms
-2026-10-24T09:12:04Z INF console listening on http://localhost:7411</code></pre>
+2026-10-24T09:12:04Z INF console listening on http://localhost:7411</code></pre></div>
 <p>Open <a href="http://localhost:7411">http://localhost:7411</a>. You will see the <strong>Overview</strong> view: every run, workflow, and model from every enabled adapter, already correlated. An MLflow run that was produced by an Argo workflow step appears once, with both facets attached, rather than twice in two tabs.</p>
 
 <div class="callout">
@@ -162,7 +162,7 @@ kubeflow   disabled</code></pre>
   </div>
 </div>
 
-<h2 id="next">Next steps</h2>
+<h2 id="next"><a class="anchor" href="#next">Next steps</a></h2>
 <div class="cards">
   <a class="card" href="/docs/architecture/"><h3>Architecture</h3><p>The control plane, adapters, the lattice, and the console, and how a request moves between them.</p></a>
   <a class="card" href="/docs/configuration/"><h3>Configuration</h3><p>Every key in <code>fendlemark.yaml</code>, including the ones you should not touch.</p></a>
@@ -170,17 +170,20 @@ kubeflow   disabled</code></pre>
   <a class="card" href="/docs/auth/"><h3>Authentication</h3><p>Respiratory Identity: how the console recognises you, and why it is off by default.</p></a>
 </div>
 <nav class="pager" aria-label="Previous and next pages">
-<a class="pager-prev" href="/docs/"><span>Previous</span>Overview</a>
-<a class="pager-next" href="/docs/architecture/"><span>Next</span>Architecture</a>
+<a class="pager-prev" href="/docs/" rel="prev"><span class="pager-label">Previous</span><span class="pager-title">Overview</span></a>
+<a class="pager-next" href="/docs/architecture/" rel="next"><span class="pager-label">Next</span><span class="pager-title">Architecture</span></a>
 </nav>
   </main>
 </div>
 
 <footer class="site-footer">
   <div class="site-footer-inner">
-    <p>Fendlemark is released under the MIT licence and maintained by the Fendlemark Keepers. Documentation for v0.9.4.</p>
-    <p class="fine">MLflow, Metaflow, Argo Workflows, and Kubeflow are trademarks of their respective owners. Fendlemark is an independent project and is not affiliated with, endorsed by, or sponsored by any of them.</p>
-    <p class="fine"><a href="/about/">About this site</a> · <a href="/governance/">Governance</a> · <a href="/changelog/">Changelog</a> · <a href="/sitemap.xml">Sitemap</a></p>
+    <svg class="footer-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
+    <div class="footer-text">
+      <p>Fendlemark is released under the MIT licence and maintained by the Fendlemark Keepers. Documentation for v0.9.5.</p>
+      <p class="fine">MLflow, Metaflow, Argo Workflows, and Kubeflow are trademarks of their respective owners. Fendlemark is an independent project and is not affiliated with, endorsed by, or sponsored by any of them.</p>
+      <p class="fine footer-links"><a href="/about/">About this site</a> · <a href="/governance/">Governance</a> · <a href="/changelog/">Changelog</a> · <a href="/sitemap.xml">Sitemap</a></p>
+    </div>
   </div>
 </footer>
 <script src="/assets/site.js" defer></script>

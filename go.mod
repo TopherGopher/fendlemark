@@ -1,4 +1,4 @@
-module fendlemark.develops.guru/fendlemark
+module fendlemark.app/fendlemark
 
 go 1.23.0
 

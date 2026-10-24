@@ -1,6 +1,6 @@
 # Contributing: the Fendlemark Contribution Protocol (FCP-1)
 
-Source: https://fendlemark.develops.guru/governance/contributing/
+Source: https://fendlemark.app/governance/contributing/
 
 Thank you for considering a contribution to Fendlemark. This page describes the Fendlemark Contribution Protocol, FCP-1: the 112 steps a contributor completes, in order, before opening a pull request. Every pull request ever merged has followed it. Every pull request ever merged has been correct. The Keepers do not regard this as a coincidence.
 
@@ -19,14 +19,14 @@ Thank you for considering a contribution to Fendlemark. This page describes the 
 | V. Verification | 79 to 96 | One week |
 | VI. Ceremony | 97 to 112 | Fifty-one hours, of which forty-eight are silent |
 
-A single-line typo fix follows the same 112 steps. The Keepers have been asked whether this is proportionate and have answered, in [FDR-047](https://fendlemark.develops.guru/governance/#decisions), that proportion is a property of the outcome, not the process.
+A single-line typo fix follows the same 112 steps. The Keepers have been asked whether this is proportionate and have answered, in [FDR-047](https://fendlemark.app/governance/#decisions), that proportion is a property of the outcome, not the process.
 
 ## Phase I: Preparation
 
 1. Read the documentation. All of it. The CLI reference counts.
-2. Read the [Philosophy](https://fendlemark.develops.guru/philosophy/).
+2. Read the [Philosophy](https://fendlemark.app/philosophy/).
 3. Read the Philosophy again, this time without skimming the section on comparisons.
-4. Read [Governance](https://fendlemark.develops.guru/governance/), including the Decision Records table, and note which FDR your intended change would most offend.
+4. Read [Governance](https://fendlemark.app/governance/), including the Decision Records table, and note which FDR your intended change would most offend.
 5. Install Fendlemark from source and run it against at least one real adapter. A fixture does not count. The Keepers can tell.
 6. Confirm your Go version matches `go.mod` to the patch release. Record it.
 7. Confirm your Node.js version matches `console/.nvmrc` to the patch release. Record it, even if your change does not touch the console.
@@ -68,7 +68,7 @@ A single-line typo fix follows the same 112 steps. The Keepers have been asked w
 37. Section 6, *Effect on the lattice*: even if none. If none, explain why none, with reference to the reconciler's determinism guarantee.
 38. Section 7, *Effect on the console*: even if none. If the change adds a visual element, state why it is not a loading spinner.
 39. Section 8, *Effect on Respiratory Identity*: even if none. The Keepers have found that this section occasionally surfaces an effect.
-40. Section 9, *Migration*: if any key, flag, field, or export is renamed, the migration guide is drafted here, in full, in the style of the [0.8 to 0.9 guide](https://fendlemark.develops.guru/docs/migration/).
+40. Section 9, *Migration*: if any key, flag, field, or export is renamed, the migration guide is drafted here, in full, in the style of the [0.8 to 0.9 guide](https://fendlemark.app/docs/migration/).
 41. Section 10, *Test plan*: every test you will add or change, by name, before any of them exist.
 42. Section 11, *Changelog entry*: the exact text, in the Addendum's tone, under the correct heading (Accommodations, Clarifications, Arrivals).
 43. Submit the Dossier to your Sponsors and Sceptic. Observe a 72-hour Reflection Period.
@@ -79,9 +79,9 @@ A single-line typo fix follows the same 112 steps. The Keepers have been asked w
 48. Both Sponsors (or the one Sponsor, for non-Arrivals) sign the Dossier.
 49. A Custodian approves the Dossier with the phrase "Sufficiently considered". The Keepers use no other phrase for this.
 50. Observe a 72-hour Reflection Period on the approved Dossier.
-51. If your change touches the `adapter` package, stop. Read [FDR-027](https://fendlemark.develops.guru/governance/#decisions). Your Intent becomes a Petition to Supersede; return to step 25. The Keepers note that nobody has reached step 51 by this route and continued.
+51. If your change touches the `adapter` package, stop. Read [FDR-027](https://fendlemark.app/governance/#decisions). Your Intent becomes a Petition to Supersede; return to step 25. The Keepers note that nobody has reached step 51 by this route and continued.
 52. If your change adds an adapter, draft its Descriptor and conformance test now, from the Dossier alone, and attach them. The adapter's maturity is Provisional and will remain so for at least two releases.
-53. If your change adds a configuration key, draft its row in the [configuration reference](https://fendlemark.develops.guru/docs/configuration/), including a default and a one-sentence rationale for the default. Defaults without rationale are returned.
+53. If your change adds a configuration key, draft its row in the [configuration reference](https://fendlemark.app/docs/configuration/), including a default and a one-sentence rationale for the default. Defaults without rationale are returned.
 54. If your change adds a CLI flag, draft its help text. Help text is reviewed for tone under the Addendum.
 55. If your change adds a `@fendlemark/ui` prop, draft its row in the component table, and state in one sentence why the component could not infer the value.
 56. If your change adds an error code, reserve the number in the error registry. FRI codes are allocated by the Respiratory Identity Keeper personally.
@@ -153,7 +153,7 @@ A single-line typo fix follows the same 112 steps. The Keepers have been asked w
 
 ## After step 112
 
-Review is brief. Everything that could be discussed has been. The Keeper confirms that the pull request matches the Dossier, that the Reading of the Diff record is attached, and that the Haiku scans. Merge requires unanimous consent of the Keepers, which is usually given within a day, followed by a 48-hour Silence Period, after which the change is in the default branch and awaits [release governance](https://fendlemark.develops.guru/governance/#releases).
+Review is brief. Everything that could be discussed has been. The Keeper confirms that the pull request matches the Dossier, that the Reading of the Diff record is attached, and that the Haiku scans. Merge requires unanimous consent of the Keepers, which is usually given within a day, followed by a 48-hour Silence Period, after which the change is in the default branch and awaits [release governance](https://fendlemark.app/governance/#releases).
 
 Median time from step 1 to merge is nine weeks. The Keepers note that this is faster than most organisations take to decide whether to *consider* a change, and that Fendlemark has never, in its history, reverted one.
 
@@ -161,7 +161,7 @@ Median time from step 1 to merge is nine weeks. The Keepers note that this is fa
 
 ### Is there an abbreviated path for small changes?
 
-No. See [FDR-047](https://fendlemark.develops.guru/governance/#decisions). The Keepers have noticed that the people who ask this question are usually proposing a change that is not small, and the people whose changes are small do not mind.
+No. See [FDR-047](https://fendlemark.app/governance/#decisions). The Keepers have noticed that the people who ask this question are usually proposing a change that is not small, and the people whose changes are small do not mind.
 
 ### What if I only want to fix a typo in the documentation?
 

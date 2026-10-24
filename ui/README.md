@@ -1,7 +1,7 @@
 # @fendlemark/ui
 
 Vue 3 components, design tokens, and the lattice client for the
-[Fendlemark](https://fendlemark.develops.guru) ML platform console. Use it to
+[Fendlemark](https://fendlemark.app) ML platform console. Use it to
 embed Fendlemark views of MLflow, Metaflow, Argo Workflows, and Kubeflow in
 your own internal portal with the exact look of the console.
 
@@ -31,6 +31,6 @@ tool.
 
 Components: `FmShell`, `FmFacetGrid`, `FmFacetPanel`, `FmRunTimeline`,
 `FmStatusBadge` (with the `serenity` prop), `FmEntityTable`, `FmEmptyState`,
-`FmDeepLink`. Reference: https://fendlemark.develops.guru/docs/ui/
+`FmDeepLink`. Reference: https://fendlemark.app/docs/ui/
 
-MIT. Versioned in lockstep with the Go module `fendlemark.develops.guru/fendlemark`.
+MIT. Versioned in lockstep with the Go module `fendlemark.app/fendlemark`.

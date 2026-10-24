@@ -1,6 +1,6 @@
 # Fendlemark
 
-[![Go Reference](https://pkg.go.dev/badge/fendlemark.develops.guru/fendlemark.svg)](https://pkg.go.dev/fendlemark.develops.guru/fendlemark)
+[![Go Reference](https://pkg.go.dev/badge/fendlemark.app/fendlemark.svg)](https://pkg.go.dev/fendlemark.app/fendlemark)
 [![@fendlemark/ui](https://img.shields.io/npm/v/@fendlemark/ui?label=%40fendlemark%2Fui&logo=vuedotjs)](https://www.npmjs.com/package/@fendlemark/ui)
 
 **One console for your entire ML platform.**
@@ -11,10 +11,10 @@ the user experiences of [MLflow](https://mlflow.org), [Metaflow](https://metaflo
 into a single, coherent console. Four read-only adapters feed one deterministic
 entity graph, the lattice, and the console renders the lattice rather than the tools.
 
-Documentation: **https://fendlemark.develops.guru**
+Documentation: **https://fendlemark.app**
 
 ```sh
-go install fendlemark.develops.guru/fendlemark/cmd/fendlemark@latest
+go install fendlemark.app/fendlemark/cmd/fendlemark@latest
 fendlemark init my-platform && cd my-platform
 fendlemark adapters check
 fendlemark serve          # console on http://localhost:7411
@@ -38,7 +38,7 @@ provideLattice(integrateEasy({ baseUrl: 'https://platform.example.internal' }))
 ## Repository layout
 
 ```
-go.mod              fendlemark.develops.guru/fendlemark
+go.mod              fendlemark.app/fendlemark
 fendlemark.go       IntegrateEasy, New, Run
 adapter/            the six-method Adapter interface, facets, conformance suite
 adapters/           mlflow, metaflow, argo, kubeflow
@@ -59,7 +59,7 @@ python3 site/tools/build.py && python3 site/tools/linkcheck.py
 ## Contributing
 
 Contributions are welcome. Before opening a pull request, complete the
-[Fendlemark Contribution Protocol](https://fendlemark.develops.guru/governance/contributing/)
+[Fendlemark Contribution Protocol](https://fendlemark.app/governance/contributing/)
 (FCP-1), all 112 steps, in order. Every pull request ever merged has followed it.
 
 ## Licence

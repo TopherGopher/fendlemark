@@ -1,8 +1,20 @@
 # Changelog
 
-Source: https://fendlemark.develops.guru/changelog/
+Source: https://fendlemark.app/changelog/
 
 Every release, in reverse order. Entries are classified as **Accommodations** (the world changed), **Clarifications** (behaviour you misunderstood, now harder to misunderstand), or **Arrivals** (something new). Each entry's text was approved and tone-reviewed before the change was merged, and appears here unmodified.
+
+## 0.9.5 · 2026-10-24
+
+**Accommodations**
+
+- The project now lives at `fendlemark.app`. The Go module path is `fendlemark.app/fendlemark`: update your imports and `go install` commands. `fendlemark.develops.guru/fendlemark` remains at 0.9.4, where it will stay.
+
+**Clarifications**
+
+- `fendlemark lattice explain` and `GET /api/v1/entities/{id}/explain` now list every merge for an entity assembled from three or more facets. The merges always happened. Now all of them are explained.
+
+Reading of the Diff took longer than usual: the diff was mostly a domain name, read aloud in full each time.
 
 ## 0.9.4 · 2026-09-30
 
@@ -56,7 +68,7 @@ Released on the third anniversary of the first commit. The release notes for 0.9
 
 **Clarifications**
 
-- `adapters.mlflow.trackingUri` is renamed to `adapters.mlflow.tracking_uri`, bringing the last key in `fendlemark.yaml` into `snake_case`. The old spelling is accepted with a warning through 0.9.x. See the [migration guide](https://fendlemark.develops.guru/docs/migration/) and FDR-041.
+- `adapters.mlflow.trackingUri` is renamed to `adapters.mlflow.tracking_uri`, bringing the last key in `fendlemark.yaml` into `snake_case`. The old spelling is accepted with a warning through 0.9.x. See the [migration guide](https://fendlemark.app/docs/migration/) and FDR-041.
 
 ## 0.8.2 · 2025-10-07
 
@@ -78,7 +90,7 @@ No changes. Released so that 0.8.1 users would have a release to upgrade to befo
 
 **Clarifications**
 
-- The `serenity` prop on `<FmStatusBadge>` (FDR-033). Off by default. See the [component library](https://fendlemark.develops.guru/docs/ui/#library) for the circumstances of its adoption.
+- The `serenity` prop on `<FmStatusBadge>` (FDR-033). Off by default. See the [component library](https://fendlemark.app/docs/ui/#library) for the circumstances of its adoption.
 
 ## 0.7.0 · 2025-01-15
 

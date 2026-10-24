@@ -1,6 +1,6 @@
 # Architecture
 
-Source: https://fendlemark.develops.guru/docs/architecture/
+Source: https://fendlemark.app/docs/architecture/
 
 Fendlemark is four things in one binary: a control plane, a set of adapters, a reconciler we call the lattice, and an embedded console. This page explains each and how a request moves between them.
 
@@ -27,7 +27,7 @@ An adapter is a Go package that knows how to talk to one external system and tra
 | `argo` | Argo Server REST API; optional direct Kubernetes watch | Workflow, Node (step), WorkflowTemplate, CronWorkflow, Pod logs link |
 | `kubeflow` | Kubeflow Pipelines API; Katib and Notebooks via the Kubernetes API | Pipeline, Pipeline Run, Recurring Run, Katib Experiment, Notebook Server |
 
-Adapters are read-only. Fendlemark does not create, modify, or delete anything in the systems it integrates. This is a deliberate boundary: the console is a place to understand your platform, and the tools remain the place to operate it. See [the adapters reference](https://fendlemark.develops.guru/docs/adapters/) for what each adapter surfaces and what it leaves alone, and [Writing an adapter](https://fendlemark.develops.guru/docs/adapters/writing-an-adapter/) for the interface.
+Adapters are read-only. Fendlemark does not create, modify, or delete anything in the systems it integrates. This is a deliberate boundary: the console is a place to understand your platform, and the tools remain the place to operate it. See [the adapters reference](https://fendlemark.app/docs/adapters/) for what each adapter surfaces and what it leaves alone, and [Writing an adapter](https://fendlemark.app/docs/adapters/writing-an-adapter/) for the interface.
 
 ## The lattice
 
@@ -51,7 +51,7 @@ Reconciliation is deterministic and rule-based. There is no fuzzy matching and n
 | `mlflow.run_id` | mlflow; any adapter that records it as a tag, label, or parameter | Anything back to the MLflow run |
 | `git.sha` | all adapters where available | Weak key; links entities only when both also share `git.repo` |
 
-Kubeflow Pipelines runs on Argo Workflows by default, so a KFP run and its Workflow are nearly always correlated on first reconciliation. The other links depend on your pipelines recording identifiers across tool boundaries, which most teams already do with tags. The [adapters reference](https://fendlemark.develops.guru/docs/adapters/) lists the tag and label names each adapter looks for.
+Kubeflow Pipelines runs on Argo Workflows by default, so a KFP run and its Workflow are nearly always correlated on first reconciliation. The other links depend on your pipelines recording identifiers across tool boundaries, which most teams already do with tags. The [adapters reference](https://fendlemark.app/docs/adapters/) lists the tag and label names each adapter looks for.
 
 ### Reconciliation
 
@@ -61,7 +61,7 @@ Reconciliation runs in full on start and incrementally thereafter. Adapters that
 
 The console is a Vue 3 single-page application built with Vite, embedded into the Go binary at build time with `embed`. It talks to the control plane over `/api/v1` (JSON) for queries and `/api/v1/events` (server-sent events) for live updates. It never talks to MLflow, Metaflow, Argo, or Kubeflow directly; everything goes through the lattice.
 
-The console is organised into **views**, each of which renders entities of a kind and composes **facet panels** contributed by adapters. The Run view, for instance, shows the MLflow metrics panel, the Argo node tree panel, and the Metaflow task panel for a single correlated run, with the panels for tools that did not contribute facets simply absent. See [The console](https://fendlemark.develops.guru/docs/ui/) for the component library and theming.
+The console is organised into **views**, each of which renders entities of a kind and composes **facet panels** contributed by adapters. The Run view, for instance, shows the MLflow metrics panel, the Argo node tree panel, and the Metaflow task panel for a single correlated run, with the panels for tools that did not contribute facets simply absent. See [The console](https://fendlemark.app/docs/ui/) for the component library and theming.
 
 ## Life of a request
 
@@ -76,4 +76,4 @@ The console is organised into **views**, each of which renders entities of a kin
 - **Writing to the tools.** No triggering, retrying, or deleting. Deep links take you to the tool for that.
 - **Replacing the tools' UIs.** MLflow's run comparison, Argo's log viewer, and the Metaflow UI's DAG are all excellent. Fendlemark links to them and does not reimplement them.
 - **Persisting history the tools have discarded.** The lattice reflects what the tools currently report. If you delete a run in MLflow, it leaves the lattice at the next poll.
-- **Loading spinners.** See the [Philosophy](https://fendlemark.develops.guru/philosophy/).
+- **Loading spinners.** See the [Philosophy](https://fendlemark.app/philosophy/).

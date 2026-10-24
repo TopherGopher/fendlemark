@@ -1,6 +1,6 @@
 # CLI reference
 
-Source: https://fendlemark.develops.guru/docs/cli/
+Source: https://fendlemark.app/docs/cli/
 
 The `fendlemark` binary is both the server and the operator's tool. Seven commands. The ones you will use are `serve` and `doctor`.
 
@@ -70,7 +70,7 @@ $ fendlemark auth revoke --user <email>
 $ fendlemark auth recovery --user <email> [--ttl 24h]
 ```
 
-Manages [Respiratory Identity](https://fendlemark.develops.guru/docs/auth/) enrolments. `enrol` prints a one-time link. `recovery` issues a time-limited session for a user who cannot currently match (illness, travel, a new office with worse air). Requires `auth.mode: respiratory`.
+Manages [Respiratory Identity](https://fendlemark.app/docs/auth/) enrolments. `enrol` prints a one-time link. `recovery` issues a time-limited session for a user who cannot currently match (illness, travel, a new office with worse air). Requires `auth.mode: respiratory`.
 
 ## fendlemark doctor
 
@@ -82,7 +82,7 @@ Validates configuration, resolves environment references, checks every enabled a
 
 ```shell
 $ fendlemark doctor
-fendlemark doctor 0.9.4
+fendlemark doctor 0.9.5
 
 config    ok       ./fendlemark.yaml (6 keys set, 41 defaulted)
 config    warn     DOC-104 adapters.mlflow.trackingUri is the pre-0.9 spelling; use tracking_uri (fixable)
@@ -99,7 +99,7 @@ auth      info     DOC-201 auth.mode is none; anyone who can reach server.listen
 
 ```shell
 $ fendlemark version [--json]
-fendlemark 0.9.4 (go1.23.2, linux/amd64)
+fendlemark 0.9.5 (go1.23.2, linux/amd64)
 commit:  3e1f9c0
 console: embedded, built 2026-09-30
 adapters: mlflow argo metaflow kubeflow
@@ -121,7 +121,7 @@ adapters: mlflow argo metaflow kubeflow
 | Variable | Purpose |
 | --- | --- |
 | `FENDLEMARK_CONFIG` | Same as `--config`. |
-| `FENDLEMARK_<SECTION>__<KEY>` | Override any configuration key. See [precedence](https://fendlemark.develops.guru/docs/configuration/#precedence). |
+| `FENDLEMARK_<SECTION>__<KEY>` | Override any configuration key. See [precedence](https://fendlemark.app/docs/configuration/#precedence). |
 | `MLFLOW_TRACKING_USERNAME`, `MLFLOW_TRACKING_PASSWORD`, `MLFLOW_TRACKING_TOKEN` | Read by the mlflow adapter, matching the MLflow client's conventions. |
 | `ARGO_TOKEN` | Bearer token for Argo Server, if not using a kubeconfig context. |
 | `KUBECONFIG` | Standard. Used by argo (`kube_watch`) and kubeflow (Katib, Notebooks). |

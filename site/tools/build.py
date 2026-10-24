@@ -12,7 +12,7 @@ DEFAULT_DATE = "2026-10-24"  # bump when content changes; keeps builds reproduci
 SITE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # site/
 ROOT = os.path.join(SITE, "public")                                    # generated output
 SRC = os.path.join(SITE, "src", "pages")
-BASE = "https://fendlemark.develops.guru"
+BASE = "https://fendlemark.app"
 LAYOUT = open(os.path.join(SITE, "src", "layout.html"), encoding="utf-8").read()
 
 # Sidebar navigation. (label, path). Paths are site-absolute with trailing slash.
@@ -66,15 +66,77 @@ def out_for(url):
         return os.path.join(ROOT, "index.html")
     return os.path.join(ROOT, url.strip("/"), "index.html")
 
+# Header navigation. (label, path, section prefix that marks it as the current section)
+TOPNAV = [
+    ("Docs", "/docs/getting-started/", "/docs/"),
+    ("Philosophy", "/philosophy/", "/philosophy/"),
+    ("Governance", "/governance/", "/governance/"),
+    ("Changelog", "/changelog/", "/changelog/"),
+    ("Packages", "/fendlemark/", "/fendlemark/"),
+]
+
 def sidebar(current):
     parts = []
     for group, items in NAV:
-        parts.append(f'<div class="nav-group"><div class="nav-group-title">{html.escape(group)}</div><ul>')
+        gid = "nav-" + re.sub(r"\W+", "-", group.lower()).strip("-")
+        parts.append(f'<div class="nav-group"><p class="nav-group-title" id="{gid}">{html.escape(group)}</p><ul aria-labelledby="{gid}">')
         for label, path in items:
             cls = ' class="active" aria-current="page"' if path == current else ""
             parts.append(f'<li><a href="{path}"{cls}>{html.escape(label)}</a></li>')
         parts.append("</ul></div>")
     return "\n".join(parts)
+
+def topnav(current):
+    parts = []
+    for label, path, prefix in TOPNAV:
+        attrs = ' aria-current="page"' if path == current else ""
+        if current.startswith(prefix):
+            attrs += ' class="in-section"'
+        parts.append(f'<a href="{path}"{attrs}>{html.escape(label)}</a>')
+    return "\n      ".join(parts)
+
+# HTML-only enhancements. The Markdown copies are built from the untouched fragments, so
+# nothing here can change their text. Adds keyboard-scrollable, labelled regions for code,
+# tables, and diagrams; header scopes; and self-links on section headings.
+LANGS = {"shell": "Shell", "yaml": "YAML", "go": "Go", "ts": "TypeScript", "vue": "Vue", "css": "CSS", "text": "Text"}
+ENHANCE_RE = re.compile(
+    r'<h([1-3])((?: [^>]*)?)>(.*?)</h\1>'
+    r'|<div class="table-wrap">(<table>.*?</table>)</div>'
+    r'|<pre data-lang="([^"]*)">(.*?)</pre>'
+    r'|(<svg [^>]*role="img"[^>]*aria-labelledby="([^"]+)"[^>]*>.*?</svg>)', re.S)
+
+def plain(fragment):
+    return re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", "", fragment))).strip()
+
+def enhance(body):
+    state = {"heading": "", "level": 1, "id": "", "labels": {}}
+    def unique(label):
+        n = state["labels"][label] = state["labels"].get(label, 0) + 1
+        return label if n == 1 else f"{label} ({n})"
+    def sub(m):
+        if m.group(1):
+            level, attrs, inner = int(m.group(1)), m.group(2), m.group(3)
+            hid = re.search(r'\bid="([^"]+)"', attrs)
+            state.update(heading=plain(inner), level=level, id=hid.group(1) if hid else "")
+            if hid and level > 1:
+                inner = f'<a class="anchor" href="#{hid.group(1)}">{inner}</a>'
+            return f"<h{level}{attrs}>{inner}</h{level}>"
+        if m.group(4):
+            table = m.group(4)
+            table = re.sub(r"<thead>.*?</thead>", lambda t: t.group(0).replace("<th>", '<th scope="col">'), table, flags=re.S)
+            table = re.sub(r"<tbody>.*?</tbody>", lambda t: t.group(0).replace("<th>", '<th scope="row">'), table, flags=re.S)
+            if state["id"]:
+                table = table.replace("<table>", f'<table aria-labelledby="{state["id"]}">', 1)
+            label = unique(f'{state["heading"]} table' if state["heading"] else "Table")
+            return f'<div class="table-wrap" role="region" tabindex="0" aria-label="{html.escape(label)}" data-scroll>{table}</div>'
+        if m.group(7):
+            return f'<div class="diagram-scroll" role="region" tabindex="0" aria-labelledby="{m.group(8)}" data-scroll>{m.group(7)}</div>'
+        lang, code = m.group(5), m.group(6)
+        name = LANGS.get(lang, lang.capitalize() or "Plain") + " code"
+        label = unique(f'{name}: {state["heading"]}' if state["level"] > 1 and state["heading"] else name)
+        return (f'<div class="code" data-lang="{lang}"><pre data-lang="{lang}" role="region" tabindex="0" '
+                f'aria-label="{html.escape(label)}" data-scroll>{code}</pre></div>')
+    return ENHANCE_RE.sub(sub, body)
 
 def flat_nav():
     return [item for _, items in NAV for item in items]
@@ -87,11 +149,11 @@ def prev_next(current):
     i = paths.index(current)
     out = ['<nav class="pager" aria-label="Previous and next pages">']
     if i > 0:
-        out.append(f'<a class="pager-prev" href="{items[i-1][1]}"><span>Previous</span>{html.escape(items[i-1][0])}</a>')
+        out.append(f'<a class="pager-prev" href="{items[i-1][1]}" rel="prev"><span class="pager-label">Previous</span><span class="pager-title">{html.escape(items[i-1][0])}</span></a>')
     else:
         out.append('<span></span>')
     if i < len(items) - 1:
-        out.append(f'<a class="pager-next" href="{items[i+1][1]}"><span>Next</span>{html.escape(items[i+1][0])}</a>')
+        out.append(f'<a class="pager-next" href="{items[i+1][1]}" rel="next"><span class="pager-label">Next</span><span class="pager-title">{html.escape(items[i+1][0])}</span></a>')
     out.append("</nav>")
     return "\n".join(out)
 
@@ -119,7 +181,7 @@ def jsonld(meta, url, title, description):
             "applicationCategory": "DeveloperApplication",
             "operatingSystem": "Linux, macOS",
             "programmingLanguage": ["Go", "JavaScript"],
-            "softwareVersion": meta.get("version", "0.9.4"),
+            "softwareVersion": meta.get("version", "0.9.5"),
             "url": BASE + "/",
             "description": description,
             "license": "https://opensource.org/license/mit",
@@ -132,7 +194,7 @@ def jsonld(meta, url, title, description):
             "url": BASE + "/",
             "sameAs": [
                 "https://github.com/TopherGopher/fendlemark",
-                "https://pkg.go.dev/fendlemark.develops.guru/fendlemark",
+                "https://pkg.go.dev/fendlemark.app/fendlemark",
                 "https://www.npmjs.com/package/@fendlemark/ui",
             ],
         })
@@ -175,13 +237,15 @@ def render(src_path):
         "{{description}}": html.escape(description),
         "{{canonical}}": BASE + url,
         "{{markdown}}": url + "index.md",
-        "{{body}}": body,
+        "{{body}}": enhance(body),
         "{{sidebar}}": sidebar(url),
+        "{{topnav}}": topnav(url),
         "{{pager}}": prev_next(url) if layout == "docs" else "",
         "{{jsonld}}": jsonld(meta, url, title, description),
         "{{layout}}": layout,
+        "{{page}}": url.strip("/").replace("/", "-") or "home",
         "{{year}}": "2026",
-        "{{version}}": "0.9.4",
+        "{{version}}": "0.9.5",
     }
     for k, v in repl.items():
         page = page.replace(k, v)
@@ -360,7 +424,7 @@ def write_feed(changelog_body):
 def write_llms(pages):
     lines = ["# Fendlemark", "",
              "> Fendlemark is an open-source Go and Vue 3 framework that unifies the user experiences of MLflow, Metaflow, Argo Workflows, and Kubeflow into a single ML platform console. One binary, four read-only adapters, one deterministic entity graph (the lattice), one console.",
-             "", "Module path: fendlemark.develops.guru/fendlemark · npm: @fendlemark/ui · Licence: MIT · Current version: 0.9.4", "",
+             "", "Module path: fendlemark.app/fendlemark · npm: @fendlemark/ui · Licence: MIT · Current version: 0.9.5", "",
              "## Documentation", ""]
     for url, meta in pages:
         if url.startswith("/docs/"):
@@ -381,10 +445,11 @@ def write_404():
     body = ('<p class="eyebrow">404</p><h1>There is nothing here.</h1>'
             '<p class="lede">The page you asked for is not part of Fendlemark. Nothing has ever been removed, so it was never here. '
             'Try the <a href="/docs/">documentation</a>, the <a href="/docs/getting-started/">getting started guide</a>, or the <a href="/">home page</a>.</p>'
-            '<p class="fine">If you arrived here from <code>go get</code>, the module path is <code>fendlemark.develops.guru/fendlemark</code> and this page carries the import metadata the Go toolchain needs. See <a href="/fendlemark/">Packages</a>.</p>')
+            '<p class="fine">If you arrived here from <code>go get</code>, the module path is <code>fendlemark.app/fendlemark</code> and this page carries the import metadata the Go toolchain needs. See <a href="/fendlemark/">Packages</a>.</p>')
     for k, v in {"{{title}}": "Not found · Fendlemark", "{{description}}": "Page not found.", "{{canonical}}": BASE + "/404.html",
-                 "{{body}}": body, "{{sidebar}}": sidebar("/404"), "{{pager}}": "", "{{jsonld}}": "", "{{layout}}": "docs",
-                 "{{year}}": "2026", "{{version}}": "0.9.4"}.items():
+                 "{{body}}": enhance(body), "{{sidebar}}": sidebar("/404"), "{{topnav}}": topnav("/404"), "{{pager}}": "",
+                 "{{jsonld}}": "", "{{layout}}": "docs", "{{page}}": "not-found",
+                 "{{year}}": "2026", "{{version}}": "0.9.5"}.items():
         page = page.replace(k, v)
     page = page.replace('<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">', '<meta name="robots" content="noindex">')
     open(os.path.join(ROOT, "404.html"), "w", encoding="utf-8").write(page)

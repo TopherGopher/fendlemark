@@ -1,6 +1,6 @@
 # Governance
 
-Source: https://fendlemark.develops.guru/governance/
+Source: https://fendlemark.app/governance/
 
 Fendlemark is maintained by four people and governed as though it were maintained by four hundred. This page is the constitution: who decides, how they decide, how long they wait before deciding, and what you must do before you are permitted to suggest anything.
 
@@ -17,7 +17,7 @@ Fendlemark recognises five titles. Advancement is by unanimous consent of the Ke
 
 | Title | Granted to | May |
 | --- | --- | --- |
-| **Contributor** | Anyone who has completed [FCP-1](https://fendlemark.develops.guru/governance/contributing/) at least once | Open pull requests. File Pre-Intent Notices. |
+| **Contributor** | Anyone who has completed [FCP-1](https://fendlemark.app/governance/contributing/) at least once | Open pull requests. File Pre-Intent Notices. |
 | **Steward** | Contributors with three merged pull requests, or one adapter | Sponsor contributors. Review. Perform the Reading of the Diff. |
 | **Custodian** | Stewards nominated by a Keeper after one year | Approve Design Dossiers. Serve as Sceptic. Chair Benchmark Quorums. |
 | **Keeper** | Custodians elevated by unanimous consent of existing Keepers | Merge. Author Decision Records. Amend the Philosophy. Breathe on problems. |
@@ -54,7 +54,7 @@ Selected FDRs referenced in the documentation:
 | FDR-027 | Stability of the adapter package | Adopted: no changes before 1.0 "or after" |
 | FDR-033 | The `serenity` prop | Adopted, with the Dissent section reading "Marit, mildly" |
 | FDR-038 | On the publication of a roadmap (third request) | Declined; future requests to be answered by linking to this FDR |
-| FDR-041 | Renaming `trackingUri` | Adopted after three Reflection Periods; see [migration](https://fendlemark.develops.guru/docs/migration/) |
+| FDR-041 | Renaming `trackingUri` | Adopted after three Reflection Periods; see [migration](https://fendlemark.app/docs/migration/) |
 | FDR-044 | Removal of a comma from the Philosophy | Adopted, unanimous, 48-hour Silence observed |
 | FDR-047 | FCP-1 step count fixed at 112 | Adopted; a proposal for 100 was found to be "round, and therefore suspicious" |
 
@@ -69,7 +69,7 @@ Every adapter has a maturity level, declared in its descriptor and enforced at r
 | **Established** | Settled for two releases. Facet panel reviewed by the console Keeper. Benchmark Quorum passed. | Facet shape is stable. Listed on the home page. |
 | **Canonical** | Established for two releases. Unanimous Keeper consent. 48-hour Silence Period. | Will not be removed. Ever. Named in the Philosophy's one permitted comparison. |
 
-All four built-in adapters are Canonical. No adapter has ever been demoted, because demotion would imply that the promotion was wrong, and see [the Philosophy](https://fendlemark.develops.guru/philosophy/#perfection).
+All four built-in adapters are Canonical. No adapter has ever been demoted, because demotion would imply that the promotion was wrong, and see [the Philosophy](https://fendlemark.app/philosophy/#perfection).
 
 ## Reflection and Silence
 
@@ -98,7 +98,7 @@ Fendlemark adopts the Contributor Covenant, version 2.1, in full, together with 
 
 ## The Fendlemark Contribution Protocol
 
-Contributions are welcome. Before opening a pull request, a contributor completes the Fendlemark Contribution Protocol, FCP-1, a procedure of 112 numbered steps completed in order. It is described in full on its [own page](https://fendlemark.develops.guru/governance/contributing/). The Keepers acknowledge that 112 steps is more than some projects require and note that every pull request ever merged into Fendlemark has followed it, and that every pull request ever merged into Fendlemark has been correct.
+Contributions are welcome. Before opening a pull request, a contributor completes the Fendlemark Contribution Protocol, FCP-1, a procedure of 112 numbered steps completed in order. It is described in full on its [own page](https://fendlemark.app/governance/contributing/). The Keepers acknowledge that 112 steps is more than some projects require and note that every pull request ever merged into Fendlemark has followed it, and that every pull request ever merged into Fendlemark has been correct.
 
 ## Amending this document
 

@@ -1,16 +1,17 @@
 <!doctype html>
-<html lang="en" data-layout="docs">
+<html lang="en" data-layout="docs" data-page="docs-adapters">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Adapters · Fendlemark</title>
 <meta name="description" content="Reference for Fendlemark&#x27;s four built-in adapters: what each reads from MLflow, Metaflow, Argo Workflows, and Kubeflow, which facets it contributes, which correlation keys it provides, and what it deliberately does not do.">
-<link rel="canonical" href="https://fendlemark.develops.guru/docs/adapters/">
+<link rel="canonical" href="https://fendlemark.app/docs/adapters/">
 <link rel="alternate" type="text/markdown" href="/docs/adapters/index.md">
 <link rel="describedby" href="/llms.txt">
 <link rel="api-catalog" href="/.well-known/api-catalog" type="application/linkset+json">
 <link rel="service-desc" href="/openapi.json" type="application/openapi+json">
 <link rel="service-doc" href="/docs/api/#http" type="text/html">
+<meta name="go-import" content="fendlemark.app/fendlemark git https://github.com/TopherGopher/fendlemark">
 <meta name="go-import" content="fendlemark.develops.guru/fendlemark git https://github.com/TopherGopher/fendlemark">
 <link rel="alternate" type="application/atom+xml" title="Fendlemark releases" href="/feed.xml">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
@@ -20,53 +21,53 @@
 <meta property="og:site_name" content="Fendlemark">
 <meta property="og:title" content="Adapters · Fendlemark">
 <meta property="og:description" content="Reference for Fendlemark&#x27;s four built-in adapters: what each reads from MLflow, Metaflow, Argo Workflows, and Kubeflow, which facets it contributes, which correlation keys it provides, and what it deliberately does not do.">
-<meta property="og:url" content="https://fendlemark.develops.guru/docs/adapters/">
-<meta property="og:image" content="https://fendlemark.develops.guru/assets/og-image.png">
+<meta property="og:url" content="https://fendlemark.app/docs/adapters/">
+<meta property="og:image" content="https://fendlemark.app/assets/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Adapters · Fendlemark">
 <meta name="twitter:description" content="Reference for Fendlemark&#x27;s four built-in adapters: what each reads from MLflow, Metaflow, Argo Workflows, and Kubeflow, which facets it contributes, which correlation keys it provides, and what it deliberately does not do.">
-<meta name="twitter:image" content="https://fendlemark.develops.guru/assets/og-image.png">
+<meta name="twitter:image" content="https://fendlemark.app/assets/og-image.png">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="preload" href="/assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/jetbrains-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/site.css">
-<script>try{var t=localStorage.getItem('fm-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Fendlemark", "item": "https://fendlemark.develops.guru/"}, {"@type": "ListItem", "position": 2, "name": "Documentation", "item": "https://fendlemark.develops.guru/docs/"}, {"@type": "ListItem", "position": 3, "name": "Adapters", "item": "https://fendlemark.develops.guru/docs/adapters/"}]}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Adapters", "description": "Reference for Fendlemark's four built-in adapters: what each reads from MLflow, Metaflow, Argo Workflows, and Kubeflow, which facets it contributes, which correlation keys it provides, and what it deliberately does not do.", "url": "https://fendlemark.develops.guru/docs/adapters/", "datePublished": "2026-10-24", "dateModified": "2026-10-24", "author": {"@type": "Organization", "name": "The Fendlemark Keepers"}, "publisher": {"@type": "Organization", "name": "Fendlemark", "url": "https://fendlemark.develops.guru/"}, "inLanguage": "en"}</script>
+<script>document.documentElement.classList.add('js');try{var t=localStorage.getItem('fm-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Fendlemark", "item": "https://fendlemark.app/"}, {"@type": "ListItem", "position": 2, "name": "Documentation", "item": "https://fendlemark.app/docs/"}, {"@type": "ListItem", "position": 3, "name": "Adapters", "item": "https://fendlemark.app/docs/adapters/"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Adapters", "description": "Reference for Fendlemark's four built-in adapters: what each reads from MLflow, Metaflow, Argo Workflows, and Kubeflow, which facets it contributes, which correlation keys it provides, and what it deliberately does not do.", "url": "https://fendlemark.app/docs/adapters/", "datePublished": "2026-10-24", "dateModified": "2026-10-24", "author": {"@type": "Organization", "name": "The Fendlemark Keepers"}, "publisher": {"@type": "Organization", "name": "Fendlemark", "url": "https://fendlemark.app/"}, "inLanguage": "en"}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="site-header">
   <div class="site-header-inner">
     <a class="brand" href="/" aria-label="Fendlemark home">
-      <svg class="brand-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
+      <svg class="brand-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
       <span class="brand-name">Fendlemark</span>
-      <span class="brand-version">v0.9.4</span>
     </a>
+    <span class="brand-version">v0.9.5</span>
     <nav class="top-nav" aria-label="Primary">
-      <a href="/docs/getting-started/">Docs</a>
+      <a href="/docs/getting-started/" class="in-section">Docs</a>
       <a href="/philosophy/">Philosophy</a>
       <a href="/governance/">Governance</a>
       <a href="/changelog/">Changelog</a>
       <a href="/fendlemark/">Packages</a>
     </nav>
     <div class="header-actions">
-      <button class="icon-btn" id="theme-toggle" type="button" aria-label="Toggle colour theme" title="Toggle theme">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path class="sun" d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/><circle class="sun" cx="12" cy="12" r="4"/><path class="moon" d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <button class="icon-btn js-only" id="theme-toggle" type="button" aria-label="Dark theme" aria-pressed="false" title="Dark theme">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><g class="sun"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/></g><path class="moon" d="M20.5 14.2A8.5 8.5 0 1 1 9.8 3.5a6.8 6.8 0 0 0 10.7 10.7z"/></svg>
       </button>
-      <button class="icon-btn menu-btn" id="menu-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false" aria-controls="sidebar">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      <button class="icon-btn menu-btn js-only" id="menu-toggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="sidebar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path class="bars" d="M4 7h16M4 12h16M4 17h16"/><path class="cross" d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
     </div>
   </div>
 </header>
 
 <div class="page">
-  <aside class="sidebar" id="sidebar">
-    <nav aria-label="Documentation">
-<div class="nav-group"><div class="nav-group-title">Documentation</div><ul>
+  <nav class="sidebar" id="sidebar" aria-label="Documentation">
+<div class="nav-group"><p class="nav-group-title" id="nav-documentation">Documentation</p><ul aria-labelledby="nav-documentation">
 <li><a href="/docs/">Overview</a></li>
 <li><a href="/docs/getting-started/">Getting started</a></li>
 <li><a href="/docs/architecture/">Architecture</a></li>
@@ -79,7 +80,7 @@
 <li><a href="/docs/api/">Go API reference</a></li>
 <li><a href="/docs/migration/">Migrating 0.8 to 0.9</a></li>
 </ul></div>
-<div class="nav-group"><div class="nav-group-title">Project</div><ul>
+<div class="nav-group"><p class="nav-group-title" id="nav-project">Project</p><ul aria-labelledby="nav-project">
 <li><a href="/philosophy/">Philosophy</a></li>
 <li><a href="/governance/">Governance</a></li>
 <li><a href="/governance/contributing/">Contributing (FCP-1)</a></li>
@@ -88,14 +89,13 @@
 <li><a href="/faq/">FAQ</a></li>
 <li><a href="/about/">About</a></li>
 </ul></div>
-    </nav>
-  </aside>
+  </nav>
   <main class="main" id="main">
 <p class="eyebrow">Documentation</p>
 <h1>Adapters</h1>
 <p class="lede">An adapter connects Fendlemark to one system you already run and translates what it finds into facets. Four ship in the binary. All of them are read-only. This page says exactly what each one reads, surfaces, correlates on, and leaves alone.</p>
 
-<h2 id="common">Common behaviour</h2>
+<h2 id="common"><a class="anchor" href="#common">Common behaviour</a></h2>
 <ul>
   <li><strong>Read-only.</strong> No adapter creates, updates, deletes, triggers, retries, or cancels anything upstream. The console deep-links to the tool for those actions.</li>
   <li><strong>Least privilege.</strong> Each adapter documents the minimum permission it needs. Grant that and nothing more.</li>
@@ -104,37 +104,37 @@
   <li><strong>Maturity.</strong> Every adapter has a maturity level on the ladder defined in <a href="/governance/#maturity">Governance</a>: Provisional, Settled, Established, Canonical. All four built-in adapters are Canonical. No adapter has ever been demoted.</li>
 </ul>
 
-<h2 id="mlflow">mlflow</h2>
+<h2 id="mlflow"><a class="anchor" href="#mlflow">mlflow</a></h2>
 <p><strong>Reads from:</strong> an MLflow tracking server over its REST API (<code>/api/2.0/mlflow/experiments/search</code>, <code>/runs/search</code>, <code>/metrics/get-history</code>, <code>/artifacts/list</code>, and the <code>registered-models</code> and <code>model-versions</code> endpoints when <code>registry: true</code>). Works with any tracking server backend, since Fendlemark only sees the API. Also understands <code>MLFLOW_TRACKING_USERNAME</code> and <code>MLFLOW_TRACKING_PASSWORD</code> for basic auth, and <code>MLFLOW_TRACKING_TOKEN</code> for bearer auth.</p>
 <p><strong>Facets contributed:</strong> Experiment, Run (with params, tags, latest metric values, lifecycle stage), Metric series (fetched on demand when the Run view is open), Artifact listing (names and sizes; content is deep-linked, never proxied), Registered Model, Model Version (with stage or alias, source run, and signature summary).</p>
 <p><strong>Correlation keys provided:</strong> <code>mlflow.run_id</code> (always), <code>mlflow.experiment_id</code>, and whatever it finds in the tags listed in <code>correlation_tags</code>. The default list is:</p>
-<pre data-lang="yaml"><code><span class="k">correlation_tags</span>:
+<div class="code" data-lang="yaml"><pre data-lang="yaml" role="region" tabindex="0" aria-label="YAML code: mlflow" data-scroll><code><span class="k">correlation_tags</span>:
   - <span class="s">argo.workflow.name</span>
   - <span class="s">fendlemark.argo_workflow</span>
   - <span class="s">metaflow.run_id</span>
   - <span class="s">metaflow.flow_name</span>
   - <span class="s">kfp.run_id</span>
   - <span class="s">mlflow.source.git.commit</span>   <span class="c"># mapped to git.sha</span>
-  - <span class="s">mlflow.source.git.repoURL</span>  <span class="c"># mapped to git.repo</span></code></pre>
+  - <span class="s">mlflow.source.git.repoURL</span>  <span class="c"># mapped to git.repo</span></code></pre></div>
 <p>MLflow sets the two <code>mlflow.source.git.*</code> tags automatically when a run is started from a git checkout, so the weak <code>git.sha</code> key usually works without any effort on your part.</p>
 <p><strong>Does not:</strong> log metrics, create runs, transition model stages, or proxy artifact bytes. Does not read the tracking server's own UI; everything comes from the API.</p>
 <p><strong>Minimum permission:</strong> read access to the experiments you list (or all, if you list none). On a tracking server with the basic-auth plugin, a user with <code>READ</code> on the relevant experiments and registered models is sufficient.</p>
 
-<h2 id="metaflow">metaflow</h2>
+<h2 id="metaflow"><a class="anchor" href="#metaflow">metaflow</a></h2>
 <p><strong>Reads from:</strong> the Metaflow metadata service, the same service the Metaflow client and the Metaflow UI backend read. Fendlemark does not read the datastore itself; <code>datastore_root</code> is used only to construct links to artifacts (for example an S3 console URL for a step's artifact prefix).</p>
 <p><strong>Facets contributed:</strong> Flow, Run (with user, tags, system tags, start and end), Step, Task (with attempt count and status), Artifact listing (names only), and the Metaflow-side view of any <code>@kubernetes</code> or <code>@batch</code> step's compute metadata where the metadata service records it.</p>
 <p><strong>Correlation keys provided:</strong> <code>metaflow.run_id</code> (in Metaflow's <code>FlowName/RunId</code> form and the bare numeric or Argo-generated form, since both appear in the wild), <code>metaflow.flow_name</code>, <code>argo.workflow.name</code> when the run was launched by a Metaflow-generated Argo Workflow (Metaflow records this in system tags), and <code>git.sha</code> when the <code>@project</code> decorator or a user tag carries it.</p>
 <p><strong>Does not:</strong> resume, trigger, or tag runs. Does not read artifact contents; Metaflow artifacts can be large and Fendlemark has no business holding them.</p>
 <p><strong>Minimum permission:</strong> network access to the metadata service. The metadata service itself has no built-in auth; if you front it with a proxy, give Fendlemark a read-only identity there.</p>
 
-<h2 id="argo">argo</h2>
+<h2 id="argo"><a class="anchor" href="#argo">argo</a></h2>
 <p><strong>Reads from:</strong> Argo Server's REST API (<code>/api/v1/workflows/{namespace}</code>, <code>/workflow-templates</code>, <code>/cron-workflows</code>, and <code>/archived-workflows</code> when <code>include_archived: true</code> and the server has an archive configured). With <code>kube_watch: true</code>, it instead watches <code>Workflow</code> resources directly through the Kubernetes API for lower-latency updates, and uses Argo Server only for the archive and templates.</p>
 <p><strong>Facets contributed:</strong> Workflow (phase, start and finish, labels, annotations, parameters, outputs), Node (each step or DAG task with phase, template name, pod name, and a link to logs), WorkflowTemplate, CronWorkflow (schedule, last scheduled time, active count).</p>
 <p><strong>Correlation keys provided:</strong> <code>argo.workflow.name</code> (always), <code>argo.workflow.uid</code>, <code>kfp.run_id</code> from the <code>pipeline/runid</code> label that Kubeflow Pipelines sets on Workflows it creates, <code>metaflow.run_id</code> from Metaflow's Argo-generated labels and annotations, and <code>git.sha</code> from the <code>fendlemark.io/git-sha</code> annotation or the common <code>app.kubernetes.io/version</code> label when it looks like a commit.</p>
 <p><strong>Does not:</strong> submit, resubmit, retry, stop, terminate, suspend, or delete workflows. Does not stream logs through Fendlemark; the Node facet links to Argo's own log viewer.</p>
 <p><strong>Minimum permission:</strong> an Argo Server token (or kubeconfig context) with <code>get</code>, <code>list</code>, and <code>watch</code> on <code>workflows</code>, <code>workflowtemplates</code>, and <code>cronworkflows</code> in the listed namespaces. Nothing cluster-wide.</p>
 
-<h2 id="kubeflow">kubeflow</h2>
+<h2 id="kubeflow"><a class="anchor" href="#kubeflow">kubeflow</a></h2>
 <p><strong>Reads from:</strong> the Kubeflow Pipelines API (pipelines, pipeline versions, runs, recurring runs, and experiments, scoped by profile when you list them). With <code>katib: true</code> it reads Katib <code>Experiment</code> and <code>Trial</code> resources through the Kubernetes API, and with <code>notebooks: true</code> it reads <code>Notebook</code> resources the same way.</p>
 <p><strong>Facets contributed:</strong> Pipeline (with versions), Pipeline Run (status, parameters, created and finished), Recurring Run (trigger, enabled, next scheduled), KFP Experiment, Katib Experiment (objective, algorithm, best trial summary), Notebook Server (image, resources, status).</p>
 <p><strong>Correlation keys provided:</strong> <code>kfp.run_id</code> (always), <code>kfp.pipeline_id</code>, <code>argo.workflow.name</code> because a KFP run's underlying Argo Workflow name is recoverable from the run detail, and <code>metaflow.run_id</code> or <code>mlflow.run_id</code> when they appear as pipeline run parameters named exactly that.</p>
@@ -142,32 +142,35 @@
 <p><strong>Does not:</strong> create or terminate runs, enable or disable recurring runs, start or stop notebooks, or read notebook contents.</p>
 <p><strong>Minimum permission:</strong> a service account with read access to the KFP API for the listed profiles, plus <code>get</code>, <code>list</code>, <code>watch</code> on <code>experiments.kubeflow.org</code>, <code>trials.kubeflow.org</code>, and <code>notebooks.kubeflow.org</code> in those namespaces if Katib and Notebooks are enabled.</p>
 
-<h2 id="matrix">Correlation matrix</h2>
+<h2 id="matrix"><a class="anchor" href="#matrix">Correlation matrix</a></h2>
 <p>Which keys connect which adapters, out of the box, with no configuration beyond enabling them:</p>
-<div class="table-wrap"><table>
-<thead><tr><th></th><th>mlflow</th><th>metaflow</th><th>argo</th><th>kubeflow</th></tr></thead>
+<div class="table-wrap" role="region" tabindex="0" aria-label="Correlation matrix table" data-scroll><table aria-labelledby="matrix">
+<thead><tr><td></td><th scope="col">mlflow</th><th scope="col">metaflow</th><th scope="col">argo</th><th scope="col">kubeflow</th></tr></thead>
 <tbody>
-<tr><th>mlflow</th><td>—</td><td><code>metaflow.run_id</code> (tag)</td><td><code>argo.workflow.name</code> (tag)</td><td><code>kfp.run_id</code> (tag)</td></tr>
-<tr><th>metaflow</th><td><code>metaflow.run_id</code></td><td>—</td><td><code>argo.workflow.name</code> (system tag)</td><td><code>metaflow.run_id</code> (parameter)</td></tr>
-<tr><th>argo</th><td><code>argo.workflow.name</code></td><td><code>metaflow.run_id</code> (label)</td><td>—</td><td><code>kfp.run_id</code> (label, automatic)</td></tr>
-<tr><th>kubeflow</th><td><code>mlflow.run_id</code> (parameter)</td><td><code>metaflow.run_id</code> (parameter)</td><td><code>argo.workflow.name</code> (automatic)</td><td>—</td></tr>
+<tr><th scope="row">mlflow</th><td>—</td><td><code>metaflow.run_id</code> (tag)</td><td><code>argo.workflow.name</code> (tag)</td><td><code>kfp.run_id</code> (tag)</td></tr>
+<tr><th scope="row">metaflow</th><td><code>metaflow.run_id</code></td><td>—</td><td><code>argo.workflow.name</code> (system tag)</td><td><code>metaflow.run_id</code> (parameter)</td></tr>
+<tr><th scope="row">argo</th><td><code>argo.workflow.name</code></td><td><code>metaflow.run_id</code> (label)</td><td>—</td><td><code>kfp.run_id</code> (label, automatic)</td></tr>
+<tr><th scope="row">kubeflow</th><td><code>mlflow.run_id</code> (parameter)</td><td><code>metaflow.run_id</code> (parameter)</td><td><code>argo.workflow.name</code> (automatic)</td><td>—</td></tr>
 </tbody></table></div>
 <p>"Automatic" means the upstream tools already record the key without your pipelines doing anything. Everything else requires that your code set a tag, label, or parameter, which most teams find they were already doing for their own sanity.</p>
 
-<h2 id="fifth">A fifth tool?</h2>
+<h2 id="fifth"><a class="anchor" href="#fifth">A fifth tool?</a></h2>
 <p>Write an adapter. The interface has six methods and is documented in <a href="/docs/adapters/writing-an-adapter/">Writing an adapter</a>. Proposing it for inclusion in the binary is governed by <a href="/governance/contributing/">FCP-1</a>, which the Keepers describe as "thorough".</p>
 <nav class="pager" aria-label="Previous and next pages">
-<a class="pager-prev" href="/docs/configuration/"><span>Previous</span>Configuration</a>
-<a class="pager-next" href="/docs/adapters/writing-an-adapter/"><span>Next</span>Writing an adapter</a>
+<a class="pager-prev" href="/docs/configuration/" rel="prev"><span class="pager-label">Previous</span><span class="pager-title">Configuration</span></a>
+<a class="pager-next" href="/docs/adapters/writing-an-adapter/" rel="next"><span class="pager-label">Next</span><span class="pager-title">Writing an adapter</span></a>
 </nav>
   </main>
 </div>
 
 <footer class="site-footer">
   <div class="site-footer-inner">
-    <p>Fendlemark is released under the MIT licence and maintained by the Fendlemark Keepers. Documentation for v0.9.4.</p>
-    <p class="fine">MLflow, Metaflow, Argo Workflows, and Kubeflow are trademarks of their respective owners. Fendlemark is an independent project and is not affiliated with, endorsed by, or sponsored by any of them.</p>
-    <p class="fine"><a href="/about/">About this site</a> · <a href="/governance/">Governance</a> · <a href="/changelog/">Changelog</a> · <a href="/sitemap.xml">Sitemap</a></p>
+    <svg class="footer-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
+    <div class="footer-text">
+      <p>Fendlemark is released under the MIT licence and maintained by the Fendlemark Keepers. Documentation for v0.9.5.</p>
+      <p class="fine">MLflow, Metaflow, Argo Workflows, and Kubeflow are trademarks of their respective owners. Fendlemark is an independent project and is not affiliated with, endorsed by, or sponsored by any of them.</p>
+      <p class="fine footer-links"><a href="/about/">About this site</a> · <a href="/governance/">Governance</a> · <a href="/changelog/">Changelog</a> · <a href="/sitemap.xml">Sitemap</a></p>
+    </div>
   </div>
 </footer>
 <script src="/assets/site.js" defer></script>

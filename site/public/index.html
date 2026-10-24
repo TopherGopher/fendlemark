@@ -1,16 +1,17 @@
 <!doctype html>
-<html lang="en" data-layout="wide">
+<html lang="en" data-layout="wide" data-page="home">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Fendlemark: one console for MLflow, Metaflow, Argo Workflows, and Kubeflow</title>
 <meta name="description" content="Fendlemark is an open-source Go and Vue 3 framework that unifies the user experiences of MLflow, Metaflow, Argo Workflows, and Kubeflow into a single ML platform console.">
-<link rel="canonical" href="https://fendlemark.develops.guru/">
+<link rel="canonical" href="https://fendlemark.app/">
 <link rel="alternate" type="text/markdown" href="/index.md">
 <link rel="describedby" href="/llms.txt">
 <link rel="api-catalog" href="/.well-known/api-catalog" type="application/linkset+json">
 <link rel="service-desc" href="/openapi.json" type="application/openapi+json">
 <link rel="service-doc" href="/docs/api/#http" type="text/html">
+<meta name="go-import" content="fendlemark.app/fendlemark git https://github.com/TopherGopher/fendlemark">
 <meta name="go-import" content="fendlemark.develops.guru/fendlemark git https://github.com/TopherGopher/fendlemark">
 <link rel="alternate" type="application/atom+xml" title="Fendlemark releases" href="/feed.xml">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
@@ -20,32 +21,33 @@
 <meta property="og:site_name" content="Fendlemark">
 <meta property="og:title" content="Fendlemark: one console for MLflow, Metaflow, Argo Workflows, and Kubeflow">
 <meta property="og:description" content="Fendlemark is an open-source Go and Vue 3 framework that unifies the user experiences of MLflow, Metaflow, Argo Workflows, and Kubeflow into a single ML platform console.">
-<meta property="og:url" content="https://fendlemark.develops.guru/">
-<meta property="og:image" content="https://fendlemark.develops.guru/assets/og-image.png">
+<meta property="og:url" content="https://fendlemark.app/">
+<meta property="og:image" content="https://fendlemark.app/assets/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Fendlemark: one console for MLflow, Metaflow, Argo Workflows, and Kubeflow">
 <meta name="twitter:description" content="Fendlemark is an open-source Go and Vue 3 framework that unifies the user experiences of MLflow, Metaflow, Argo Workflows, and Kubeflow into a single ML platform console.">
-<meta name="twitter:image" content="https://fendlemark.develops.guru/assets/og-image.png">
+<meta name="twitter:image" content="https://fendlemark.app/assets/og-image.png">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="preload" href="/assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/jetbrains-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/site.css">
-<script>try{var t=localStorage.getItem('fm-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Fendlemark", "item": "https://fendlemark.develops.guru/"}]}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Fendlemark", "applicationCategory": "DeveloperApplication", "operatingSystem": "Linux, macOS", "programmingLanguage": ["Go", "JavaScript"], "softwareVersion": "0.9.4", "url": "https://fendlemark.develops.guru/", "description": "Fendlemark is an open-source Go and Vue 3 framework that unifies the user experiences of MLflow, Metaflow, Argo Workflows, and Kubeflow into a single ML platform console.", "license": "https://opensource.org/license/mit", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "Fendlemark", "url": "https://fendlemark.develops.guru/", "sameAs": ["https://github.com/TopherGopher/fendlemark", "https://pkg.go.dev/fendlemark.develops.guru/fendlemark", "https://www.npmjs.com/package/@fendlemark/ui"]}</script>
+<script>document.documentElement.classList.add('js');try{var t=localStorage.getItem('fm-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Fendlemark", "item": "https://fendlemark.app/"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Fendlemark", "applicationCategory": "DeveloperApplication", "operatingSystem": "Linux, macOS", "programmingLanguage": ["Go", "JavaScript"], "softwareVersion": "0.9.5", "url": "https://fendlemark.app/", "description": "Fendlemark is an open-source Go and Vue 3 framework that unifies the user experiences of MLflow, Metaflow, Argo Workflows, and Kubeflow into a single ML platform console.", "license": "https://opensource.org/license/mit", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "Fendlemark", "url": "https://fendlemark.app/", "sameAs": ["https://github.com/TopherGopher/fendlemark", "https://pkg.go.dev/fendlemark.app/fendlemark", "https://www.npmjs.com/package/@fendlemark/ui"]}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="site-header">
   <div class="site-header-inner">
     <a class="brand" href="/" aria-label="Fendlemark home">
-      <svg class="brand-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
+      <svg class="brand-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
       <span class="brand-name">Fendlemark</span>
-      <span class="brand-version">v0.9.4</span>
     </a>
+    <span class="brand-version">v0.9.5</span>
     <nav class="top-nav" aria-label="Primary">
       <a href="/docs/getting-started/">Docs</a>
       <a href="/philosophy/">Philosophy</a>
@@ -54,20 +56,19 @@
       <a href="/fendlemark/">Packages</a>
     </nav>
     <div class="header-actions">
-      <button class="icon-btn" id="theme-toggle" type="button" aria-label="Toggle colour theme" title="Toggle theme">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path class="sun" d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/><circle class="sun" cx="12" cy="12" r="4"/><path class="moon" d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <button class="icon-btn js-only" id="theme-toggle" type="button" aria-label="Dark theme" aria-pressed="false" title="Dark theme">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><g class="sun"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/></g><path class="moon" d="M20.5 14.2A8.5 8.5 0 1 1 9.8 3.5a6.8 6.8 0 0 0 10.7 10.7z"/></svg>
       </button>
-      <button class="icon-btn menu-btn" id="menu-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false" aria-controls="sidebar">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      <button class="icon-btn menu-btn js-only" id="menu-toggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="sidebar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path class="bars" d="M4 7h16M4 12h16M4 17h16"/><path class="cross" d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
     </div>
   </div>
 </header>
 
 <div class="page">
-  <aside class="sidebar" id="sidebar">
-    <nav aria-label="Documentation">
-<div class="nav-group"><div class="nav-group-title">Documentation</div><ul>
+  <nav class="sidebar" id="sidebar" aria-label="Documentation">
+<div class="nav-group"><p class="nav-group-title" id="nav-documentation">Documentation</p><ul aria-labelledby="nav-documentation">
 <li><a href="/docs/">Overview</a></li>
 <li><a href="/docs/getting-started/">Getting started</a></li>
 <li><a href="/docs/architecture/">Architecture</a></li>
@@ -80,7 +81,7 @@
 <li><a href="/docs/api/">Go API reference</a></li>
 <li><a href="/docs/migration/">Migrating 0.8 to 0.9</a></li>
 </ul></div>
-<div class="nav-group"><div class="nav-group-title">Project</div><ul>
+<div class="nav-group"><p class="nav-group-title" id="nav-project">Project</p><ul aria-labelledby="nav-project">
 <li><a href="/philosophy/">Philosophy</a></li>
 <li><a href="/governance/">Governance</a></li>
 <li><a href="/governance/contributing/">Contributing (FCP-1)</a></li>
@@ -89,10 +90,10 @@
 <li><a href="/faq/">FAQ</a></li>
 <li><a href="/about/">About</a></li>
 </ul></div>
-    </nav>
-  </aside>
+  </nav>
   <main class="main" id="main">
 <section class="hero">
+  <div class="hero-text">
   <p class="eyebrow">Go control plane · Vue 3 console · MIT</p>
   <h1>One console for your entire ML platform.</h1>
   <p class="lede">Fendlemark sits in front of MLflow, Metaflow, Argo Workflows, and Kubeflow and composes their user experiences into a single, coherent console. Your team stops tab-hopping. Your platform starts to feel like one thing.</p>
@@ -101,10 +102,31 @@
     <a class="btn" href="/docs/architecture/">How it works</a>
     <a class="btn" href="/philosophy/">Why Fendlemark</a>
   </div>
-<pre data-lang="shell"><code><span class="p">$</span> go install fendlemark.develops.guru/fendlemark/cmd/fendlemark@latest
+  </div>
+  <div class="hero-art" aria-hidden="true"><svg viewBox="0 0 440 440" width="440" height="440" focusable="false">
+    <defs>
+      <pattern id="hero-grid" width="22" height="22" patternUnits="userSpaceOnUse"><path d="M22 0H0V22" class="ha-grid"/></pattern>
+      <radialGradient id="hero-fade"><stop offset="0" stop-color="#fff"/><stop offset=".72" stop-color="#fff" stop-opacity=".5"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+      <mask id="hero-mask"><rect width="440" height="440" fill="url(#hero-fade)"/></mask>
+    </defs>
+    <rect width="440" height="440" fill="url(#hero-grid)" mask="url(#hero-mask)"/>
+    <g class="ha-ring">
+      <path pathLength="1" d="M120 72H320"/><path pathLength="1" d="M368 120V320"/><path pathLength="1" d="M320 368H120"/><path pathLength="1" d="M72 320V120"/>
+    </g>
+    <g class="ha-spoke">
+      <path pathLength="1" d="M220 76V152"/><path pathLength="1" d="M364 220H288"/><path pathLength="1" d="M220 364V288"/><path pathLength="1" d="M76 220H152"/>
+    </g>
+    <g class="ha-node"><circle cx="220" cy="72" r="4.5"/><circle cx="368" cy="220" r="4.5"/><circle cx="220" cy="368" r="4.5"/><circle cx="72" cy="220" r="4.5"/></g>
+    <g class="ha-tile ha-t1"><rect x="24" y="24" width="96" height="96" rx="22"/><path class="ha-glyph" d="M44 94L60 77L74 85L92 57L104 67"/></g>
+    <g class="ha-tile ha-t2"><rect x="320" y="24" width="96" height="96" rx="22"/><path class="ha-glyph" d="M349 72H363M373 72H387"/><circle class="ha-glyph" cx="344" cy="72" r="5"/><circle class="ha-glyph" cx="368" cy="72" r="5"/><circle class="ha-glyph" cx="392" cy="72" r="5"/></g>
+    <g class="ha-tile ha-t3"><rect x="24" y="320" width="96" height="96" rx="22"/><path class="ha-glyph" d="M69 350L53 386M75 350L91 386"/><circle class="ha-glyph" cx="72" cy="345" r="5"/><circle class="ha-glyph" cx="51" cy="391" r="5"/><circle class="ha-glyph" cx="93" cy="391" r="5"/></g>
+    <g class="ha-tile ha-t4"><rect x="320" y="320" width="96" height="96" rx="22"/><path class="ha-glyph" d="M344 350H392M344 368H378M344 386H386"/></g>
+    <g class="ha-core"><rect x="152" y="152" width="136" height="136" rx="30"/><g class="ha-mark"><rect x="184" y="184" width="30" height="30" rx="6" opacity=".55"/><rect x="226" y="184" width="30" height="30" rx="6" opacity=".55"/><rect x="184" y="226" width="30" height="30" rx="6" opacity=".55"/><rect x="226" y="226" width="30" height="30" rx="6" opacity=".55"/><rect x="202" y="202" width="36" height="36" rx="9"/></g></g>
+  </svg></div>
+<div class="code" data-lang="shell"><pre data-lang="shell" role="region" tabindex="0" aria-label="Shell code" data-scroll><code><span class="p">$</span> go install fendlemark.app/fendlemark/cmd/fendlemark@latest
 <span class="p">$</span> fendlemark init my-platform
 <span class="p">$</span> fendlemark serve
-<span class="c">fendlemark 0.9.4 · console on http://localhost:7411 · 4 adapters healthy</span></code></pre>
+<span class="c">fendlemark 0.9.5 · console on http://localhost:7411 · 4 adapters healthy</span></code></pre></div>
 </section>
 
 <section class="section">
@@ -155,9 +177,12 @@
 
 <footer class="site-footer">
   <div class="site-footer-inner">
-    <p>Fendlemark is released under the MIT licence and maintained by the Fendlemark Keepers. Documentation for v0.9.4.</p>
-    <p class="fine">MLflow, Metaflow, Argo Workflows, and Kubeflow are trademarks of their respective owners. Fendlemark is an independent project and is not affiliated with, endorsed by, or sponsored by any of them.</p>
-    <p class="fine"><a href="/about/">About this site</a> · <a href="/governance/">Governance</a> · <a href="/changelog/">Changelog</a> · <a href="/sitemap.xml">Sitemap</a></p>
+    <svg class="footer-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
+    <div class="footer-text">
+      <p>Fendlemark is released under the MIT licence and maintained by the Fendlemark Keepers. Documentation for v0.9.5.</p>
+      <p class="fine">MLflow, Metaflow, Argo Workflows, and Kubeflow are trademarks of their respective owners. Fendlemark is an independent project and is not affiliated with, endorsed by, or sponsored by any of them.</p>
+      <p class="fine footer-links"><a href="/about/">About this site</a> · <a href="/governance/">Governance</a> · <a href="/changelog/">Changelog</a> · <a href="/sitemap.xml">Sitemap</a></p>
+    </div>
   </div>
 </footer>
 <script src="/assets/site.js" defer></script>
