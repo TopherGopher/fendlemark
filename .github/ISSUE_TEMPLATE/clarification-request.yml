@@ -1,0 +1,34 @@
+name: Clarification request
+description: Fendlemark behaved in a way you did not expect. Describe it, and we will make it harder to misunderstand.
+title: "Clarification: "
+labels: ["clarification"]
+body:
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: What Fendlemark did
+      description: Include the output of `fendlemark doctor` and, for lattice questions, `fendlemark lattice explain <id>`.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: How to see it
+      description: The smallest fendlemark.yaml and the steps that show the behaviour. Redact secrets.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Output of `fendlemark version`.
+      placeholder: fendlemark 0.9.5 (go1.23.2, linux/amd64)
+    validations:
+      required: true

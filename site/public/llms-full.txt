@@ -68,6 +68,14 @@ Pipelines runs and recurring runs from the KFP API, Katib experiments, and Noteb
 - [Governance](https://fendlemark.app/governance/): How decisions are made, who the Keepers are, and the 112-step Contribution Protocol.
 - [FAQ](https://fendlemark.app/faq/): Answers to the questions we are asked, and several we are not.
 
+## Latest from the blog
+
+- [Fendlemark 0.9.5: every merge, explained](https://fendlemark.app/blog/fendlemark-0-9-5/) (24 October 2026 · Release notes): Explain now lists every merge for entities assembled from three or more facets. How to read an explanation, and how to upgrade.
+- [Running MLflow and Argo Workflows together](https://fendlemark.app/blog/running-mlflow-and-argo-workflows-together/) (24 October 2026 · How-to): Point Argo steps at MLflow, tag every run with the workflow's identity, hand the run id back to Argo, and find either from the other.
+- [Writing a Fendlemark adapter, step by step](https://fendlemark.app/blog/writing-a-fendlemark-adapter/) (24 October 2026 · Walkthrough): Build a working adapter for Kubernetes Jobs, test it with the conformance suite, and compile it into your own Fendlemark binary.
+
+[All posts](https://fendlemark.app/blog/) · [Atom feed](https://fendlemark.app/blog/feed.xml)
+
 ---
 
 # About
@@ -101,15 +109,1131 @@ Partly because it was funny to write. Partly as a gentle commentary on governanc
 
 ## Privacy
 
-Every page loads Cloudflare Web Analytics, which counts visits without cookies and without identifying you: which pages were read, roughly where from, and in what kind of browser. Google Analytics, which does set cookies, loads only if you choose **Allow** in the bar that appears on your first visit. Until then, nothing is sent to Google. Your choice is kept in your own browser, and the **Analytics choices** link at the foot of every page changes it; choosing **No thanks** after allowing turns Google Analytics off and deletes its cookies. Nothing else on these pages is loaded from anyone else's servers. The site is static HTML served from GitHub Pages.
+Every page loads Cloudflare Web Analytics, which counts visits without cookies and without identifying you: which pages were read, roughly where from, and in what kind of browser. Google Analytics, which does set cookies, loads only if you choose **Allow** in the bar that appears on your first visit. Until then, nothing is sent to Google. Your choice is kept in your own browser, and the **Analytics choices** link at the foot of every page changes it; choosing **No thanks** after allowing turns Google Analytics off and deletes its cookies. Nothing else on these pages is loaded from anyone else's servers. The contact form, at contact.fendlemark.app, is a separate page: it uses Cloudflare Turnstile to block spam, which loads a script from Cloudflare. The site is static HTML served from GitHub Pages.
 
 ## Colophon
 
-Plain HTML and CSS, about a hundred and thirty lines of JavaScript for the theme toggle, navigation, copy buttons, and the analytics choice, and a five-hundred-line Python script that stamps pages into a shared layout. Typeset in Inter and JetBrains Mono. Hosted on GitHub Pages. No framework was used in the making of this framework.
+Plain HTML and CSS, a little JavaScript for the theme toggle, navigation, copy buttons, and the analytics choice, and a few hundred lines of Python that stamp pages into a shared layout. Typeset in Inter and JetBrains Mono. Hosted on GitHub Pages. No framework was used in the making of this framework.
 
 ## Contact
 
-If you would like to say hello, report an error about one of the real tools, or ask that something be changed, the site's maintainer can be reached at [admin@fendlemark.app](mailto:admin@fendlemark.app). Pre-Intent Notices are not required.
+If you would like to say hello, report an error about one of the real tools, or ask that something be changed, the site's maintainer can be reached through the [contact form](https://contact.fendlemark.app/). Pre-Intent Notices are not required.
+
+---
+
+# Blog
+
+Source: https://fendlemark.app/blog/
+
+Release posts, how-tos, and walkthroughs, written by the Keepers when something deserves more room than a changelog entry. There is no publishing schedule, for the reasons the [Philosophy](https://fendlemark.app/philosophy/#roadmap) gives for there being no roadmap.
+
+- [Fendlemark 0.9.5: every merge, explained](https://fendlemark.app/blog/fendlemark-0-9-5/) (24 October 2026 · Release notes): Explain now lists every merge for entities assembled from three or more facets. How to read an explanation, and how to upgrade.
+- [Running MLflow and Argo Workflows together](https://fendlemark.app/blog/running-mlflow-and-argo-workflows-together/) (24 October 2026 · How-to): Point Argo steps at MLflow, tag every run with the workflow's identity, hand the run id back to Argo, and find either from the other.
+- [Writing a Fendlemark adapter, step by step](https://fendlemark.app/blog/writing-a-fendlemark-adapter/) (24 October 2026 · Walkthrough): Build a working adapter for Kubernetes Jobs, test it with the conformance suite, and compile it into your own Fendlemark binary.
+
+Follow new posts with the [blog's Atom feed](https://fendlemark.app/blog/feed.xml). Release notes alone are in the [changelog](https://fendlemark.app/changelog/) and on [their own feed](https://fendlemark.app/feed.xml).
+
+---
+
+# Fendlemark 0.9.5: every merge, explained
+
+Source: https://fendlemark.app/blog/fendlemark-0-9-5/
+
+By [the Fendlemark Keepers](https://fendlemark.app/governance/#keepers) · 24 October 2026
+
+Fendlemark 0.9.5 is a Clarification. When an entity is assembled from three or more facets, `fendlemark lattice explain` and the explain endpoint of the API now list every merge that assembled it. The lattice itself has not changed: the same facets reconcile into the same entities, with the same ids, as they did before.
+
+## What Explain is for
+
+The [lattice](https://fendlemark.app/docs/architecture/#lattice) takes the facets every adapter reports and decides which of them describe the same thing. It decides by exact equality on [correlation keys](https://fendlemark.app/docs/architecture/#correlation), within the correlation window, and never by resemblance. That makes every entity accountable: it can say which facets it holds, which key joined each pair, and how far apart the two facets started. `fendlemark lattice explain` prints that account, and `GET /api/v1/entities/{id}/explain` returns it as JSON.
+
+The [CLI reference](https://fendlemark.app/docs/cli/#lattice) describes Explain as the single most useful command for "why are these two things one thing". The Keepers see no reason to revise that. They have only made sure that, from this release, the answer is always complete.
+
+## Reading an explanation
+
+Take a nightly training pipeline in Kubeflow Pipelines. KFP executes it on Argo Workflows, and its training step logs to MLflow, tagging the MLflow run with the pipeline run's id as `kfp.run_id`. With the `kubeflow`, `argo`, and `mlflow` adapters enabled, that one job is three facets: the pipeline run, the Workflow it ran as, and the MLflow run. `lattice inspect` shows them as one entity:
+
+```shell
+$ fendlemark lattice inspect --kind run
+ID                   KIND  STATUS     FACETS                STARTED               TITLE
+lt_105a29352cf19efd  run   Succeeded  argo+kubeflow+mlflow  2026-10-22T02:00:00Z  resnet50-nightly-train
+```
+
+Entity ids are derived from the set of facets that merged, so the id `inspect` prints is the id `explain` accepts, on any machine whose adapters see the same facets:
+
+```shell
+$ fendlemark lattice explain lt_105a29352cf19efd
+lt_105a29352cf19efd  run  Succeeded  "resnet50-nightly-train"
+  facet  mlflow     6f1d2c9a8b7e4f30a1c5d9e8b2a47c13
+  facet  argo       kubeflow/resnet50-nightly-8wq5t
+  facet  kubeflow   run:9c1e4b72-3a5d-4f08-b6e1-2d7a9c0f5e83
+  merge  kfp.run_id = "9c1e4b72-3a5d-4f08-b6e1-2d7a9c0f5e83" linked kubeflow/run:9c1e4b72-3a5d-4f08-b6e1-2d7a9c0f5e83 and argo/kubeflow/resnet50-nightly-8wq5t (gap 2s)
+  merge  kfp.run_id = "9c1e4b72-3a5d-4f08-b6e1-2d7a9c0f5e83" linked argo/kubeflow/resnet50-nightly-8wq5t and mlflow/6f1d2c9a8b7e4f30a1c5d9e8b2a47c13 (gap 39s)
+```
+
+Line by line:
+
+- **The first line** is the entity: id, kind, status, and title. The kind is `run` because a run outranks a workflow when facets of different kinds merge (the order is run, workflow, pipeline, model, artifact, notebook). The title is the MLflow run's, because facets are listed in adapter order, mlflow, metaflow, argo, kubeflow, and the entity takes its title from the first.
+- **Each `facet` line** is one adapter's view of the job: the adapter and the identifier it uses upstream. The argo adapter identifies a Workflow by namespace and name; the kubeflow adapter prefixes run ids with `run:`.
+- **Each `merge` line** is one decision: the key and value two facets shared, the two facets, and the gap between their start times. The gap is what the reconciler compared against `lattice.correlation.window`.
+- **`edge` lines**, when present, are relations rather than merges: a model version `DerivedFrom` the run that produced it, or two entities that `SharesCommit` through the weak `git.sha` and `git.repo` keys. This entity has none.
+
+The merges read as a chain, and the chain has an order. For each key value, the reconciler sorts the facets that carry it by start time and links each one to its neighbour. So the explanation also tells you how the job began: KFP scheduled the run, Argo started the Workflow two seconds later, and the training step opened its MLflow run thirty-nine seconds after that. The pipeline run and the MLflow run were never compared with each other directly, and did not need to be.
+
+## What 0.9.5 clarifies
+
+An entity assembled from *n* facets has exactly *n* − 1 merges. Each merge joins two groups of facets that were apart, and it takes *n* − 1 joins to make one group of *n*. Two facets, one merge; three facets, two merges, as above.
+
+Before 0.9.5, an explanation could come up short of that number. The reconciler filed each merge under whichever facet was the entity's root when the merge was made, and a later merge could move the root to a different facet. The merges filed under the earlier root were then left out of the explanation. The entity was always assembled correctly, with the right facets and the right id; only its account of itself was incomplete, and only when it had three or more facets. 0.9.5 records the merges in the order they are made and files them once the entity is complete.
+
+You can check the arithmetic for any entity. Facets minus merges is always one:
+
+```shell
+$ fendlemark lattice explain --json lt_105a29352cf19efd | jq '(.entity.facets | length) - (.merges | length)'
+1
+```
+
+## The JSON
+
+`fendlemark lattice explain --json` and `GET /api/v1/entities/{id}/explain` return the same object: `entity` (the entity, with every facet in full), `merges`, and `relations`. The merges for the example:
+
+```shell
+$ fendlemark lattice explain --json lt_105a29352cf19efd | jq '.merges'
+[
+  {
+    "a": "kubeflow\u0000run:9c1e4b72-3a5d-4f08-b6e1-2d7a9c0f5e83",
+    "b": "argo\u0000kubeflow/resnet50-nightly-8wq5t",
+    "key": "kfp.run_id",
+    "value": "9c1e4b72-3a5d-4f08-b6e1-2d7a9c0f5e83",
+    "gap": 2000000000
+  },
+  {
+    "a": "argo\u0000kubeflow/resnet50-nightly-8wq5t",
+    "b": "mlflow\u00006f1d2c9a8b7e4f30a1c5d9e8b2a47c13",
+    "key": "kfp.run_id",
+    "value": "9c1e4b72-3a5d-4f08-b6e1-2d7a9c0f5e83",
+    "gap": 39000000000
+  }
+]
+```
+
+Three details are worth knowing before you script against it:
+
+- `a` and `b` are facet references: the adapter name, a NUL character, then the facet's source id. JSON writes the NUL as `\u0000`. Split on it rather than on `/`, which source ids are free to contain.
+- `gap` is in nanoseconds. Divide by `1e9` for seconds.
+- `relations` is `null`, not `[]`, when an entity has no edges. Treat the two the same.
+
+The same request against a running console, printed one merge per line:
+
+```shell
+$ curl -s http://127.0.0.1:7411/api/v1/entities/lt_105a29352cf19efd/explain | jq -r '.merges[] | "\(.key)  \(.a | split("\u0000") | join("/")) + \(.b | split("\u0000") | join("/"))  \(.gap / 1e9)s"'
+kfp.run_id  kubeflow/run:9c1e4b72-3a5d-4f08-b6e1-2d7a9c0f5e83 + argo/kubeflow/resnet50-nightly-8wq5t  2s
+kfp.run_id  argo/kubeflow/resnet50-nightly-8wq5t + mlflow/6f1d2c9a8b7e4f30a1c5d9e8b2a47c13  39s
+```
+
+The full schema is `Explanation` in [openapi.json](https://fendlemark.app/openapi.json).
+
+## Why the list matters
+
+An entity is a claim that several records in several tools are one job. The merge list is the evidence for that claim, and evidence with a page missing is not evidence. In practice, the complete list is useful in three ways.
+
+- **It shows which key did the work.** In the example, both merges came from `kfp.run_id`: one from the `pipeline/runid` label that Kubeflow Pipelines puts on the Workflows it creates, one from a tag the training step set. If the tag disappears in a refactor, the MLflow run will stand alone again, and the explanation tells you in advance which line of whose code it depends on.
+- **It shows how close each merge came to not happening.** The window is measured between start times. A merge with a gap near `lattice.correlation.window` (90 seconds by default) is one that a slower node or a longer queue would have prevented. To list the merges with a gap over thirty seconds:
+
+  ```shell
+  $ fendlemark lattice explain --json lt_105a29352cf19efd | jq -c '.merges[] | select(.gap > 30e9) | {key, gap_s: (.gap / 1e9)}'
+  {"key":"kfp.run_id","gap_s":39}
+  ```
+- **It shows the path.** When an entity holds a facet you did not expect, the merges say which neighbour brought it in, and on which key. This is the question an incomplete explanation answered worst: with a merge missing, a facet could sit in an entity with no line saying how it got there.
+
+## Upgrading
+
+There are no configuration changes in 0.9.5, and `fendlemark doctor` has nothing new to say. If you still spell `adapters.mlflow.trackingUri` the pre-0.9 way, it is accepted with `DOC-104` as before; see the [migration guide](https://fendlemark.app/docs/migration/).
+
+### The CLI
+
+```shell
+$ go install fendlemark.app/fendlemark/cmd/fendlemark@v0.9.5
+$ fendlemark version | head -n 1
+fendlemark 0.9.5 (go1.23.2, linux/amd64)
+```
+
+`@latest` resolves to the same release. Go 1.23 or later is required. Restart `fendlemark serve` to pick up the new binary; the lattice rebuilds from the adapters on start, so there is nothing to migrate.
+
+### Embedding the Go module
+
+```shell
+$ go get fendlemark.app/fendlemark@v0.9.5
+$ go mod tidy
+```
+
+`fendlemark.Version` is now `"0.9.5"`. The `adapter` package is unchanged, as [FDR-027](https://fendlemark.app/governance/#decisions) requires. `lattice.Explanation` has the same fields as before; `Merges` is now always complete. If your own code reconstructed missing merges from facet keys, it can stop.
+
+Adapters identify themselves upstream with a `User-Agent` of `fendlemark/0.9.5`. If a proxy in front of MLflow, Argo Server, or the KFP API matches on the version, update the rule.
+
+### The console components
+
+```shell
+$ npm install @fendlemark/ui@0.9.5
+```
+
+`@fendlemark/ui` 0.9.5 has no component or prop changes. Its `VERSION` export reads `'0.9.5'`, in lockstep with the Go module, as it always does; see [Packages](https://fendlemark.app/fendlemark/#versions).
+
+## How it was released
+
+0.9.5 followed [release governance](https://fendlemark.app/governance/#releases) in full: a Release Intent classifying the change as a Clarification, a Reflection Period, four independent and byte-identical builds, unanimous consent, and a Silence Period. The changelog entry was approved with the change and appears in the [changelog](https://fendlemark.app/changelog/#0-9-5) unmodified.
+
+## Further reading
+
+- [CLI reference: `fendlemark lattice`](https://fendlemark.app/docs/cli/#lattice)
+- [Architecture: correlation keys and reconciliation](https://fendlemark.app/docs/architecture/#correlation)
+- [Go API reference: package lattice](https://fendlemark.app/docs/api/#lattice-pkg)
+- [Configuration: `lattice.correlation.window`](https://fendlemark.app/docs/configuration/#lattice)
+
+---
+
+# Running MLflow and Argo Workflows together
+
+Source: https://fendlemark.app/blog/running-mlflow-and-argo-workflows-together/
+
+By [the Fendlemark Keepers](https://fendlemark.app/governance/#keepers) · 24 October 2026
+
+Argo Workflows is a good place to run training, and MLflow is a good place to record it. Used together without any care, they give every training job two identities in two UIs, and nothing that connects them. This guide makes each side point at the other. None of it needs Fendlemark; the last section explains what Fendlemark does with it if you run it.
+
+By the end, every MLflow run started by a workflow step will carry the workflow's name, uid, namespace, and pod as tags, every workflow will carry the MLflow run id as an output parameter, and a later step will log into the same MLflow run rather than starting another. The examples use a Workflow named `resnet50-train-…` in the `ml-training` namespace and an MLflow tracking server reachable inside the cluster at `http://mlflow.mlflow.svc:5000`. Substitute your own.
+
+## 1. Point every step at the tracking server
+
+The MLflow client reads its tracking server from the `MLFLOW_TRACKING_URI` environment variable, so a step needs no MLflow configuration in code. If your tracking server uses MLflow's basic authentication, the client also reads `MLFLOW_TRACKING_USERNAME` and `MLFLOW_TRACKING_PASSWORD`; a bearer token goes in `MLFLOW_TRACKING_TOKEN` instead.
+
+Keep the address in a ConfigMap and the credentials in a Secret, with keys named exactly like the variables, so each step can import both with `envFrom`:
+
+```shell
+$ kubectl -n ml-training create configmap mlflow-client --from-literal=MLFLOW_TRACKING_URI=http://mlflow.mlflow.svc:5000
+$ kubectl -n ml-training create secret generic mlflow-credentials --from-literal=MLFLOW_TRACKING_USERNAME=argo-runner --from-literal=MLFLOW_TRACKING_PASSWORD="$MLFLOW_PASSWORD"
+```
+
+Changing the tracking server later is then one ConfigMap edit, not an edit to every template.
+
+## 2. Give each step the workflow's identity
+
+Argo substitutes template variables in a template's fields before the pod starts, including environment variable values. Four of them identify where a step is running:
+
+| Variable | Value |
+| --- | --- |
+| `{{workflow.name}}` | The Workflow's name, for example `resnet50-train-x7k2p` when it was submitted with `generateName: resnet50-train-`. Unique within its namespace while the Workflow exists. |
+| `{{workflow.uid}}` | The Workflow's Kubernetes UID. Unique across namespaces and across time, so it still identifies this run after a Workflow with the same name has been deleted and submitted again. |
+| `{{workflow.namespace}}` | The namespace. With the name, enough to find the Workflow in the Argo UI or the CLI. |
+| `{{pod.name}}` | The step's pod, available in container and script templates. Tells you which node of the workflow logged the run. |
+
+Here is a two-step Workflow that trains and then evaluates. The training step gets the tracking server from the ConfigMap and Secret, its identity from template variables, and declares an output parameter read from a file the script will write:
+
+```yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: resnet50-train-
+  namespace: ml-training
+spec:
+  entrypoint: main
+  arguments:
+    parameters:
+      - name: lr
+        value: "0.0003"
+  templates:
+    - name: main
+      steps:
+        - - name: train
+            template: train
+        - - name: evaluate
+            template: evaluate
+            arguments:
+              parameters:
+                - name: mlflow-run-id
+                  value: "{{steps.train.outputs.parameters.mlflow-run-id}}"
+
+    - name: train
+      outputs:
+        parameters:
+          - name: mlflow-run-id
+            valueFrom:
+              path: /tmp/mlflow-run-id
+      container:
+        image: registry.example.internal/vision/train:2026.10
+        command: [python, train.py]
+        args: ["--lr", "{{workflow.parameters.lr}}"]
+        envFrom:
+          - configMapRef:
+              name: mlflow-client
+          - secretRef:
+              name: mlflow-credentials
+        env:
+          - name: ARGO_WORKFLOW_NAME
+            value: "{{workflow.name}}"
+          - name: ARGO_WORKFLOW_UID
+            value: "{{workflow.uid}}"
+          - name: ARGO_WORKFLOW_NAMESPACE
+            value: "{{workflow.namespace}}"
+          - name: ARGO_POD_NAME
+            value: "{{pod.name}}"
+
+    - name: evaluate
+      inputs:
+        parameters:
+          - name: mlflow-run-id
+      container:
+        image: registry.example.internal/vision/train:2026.10
+        command: [python, evaluate.py]
+        envFrom:
+          - configMapRef:
+              name: mlflow-client
+          - secretRef:
+              name: mlflow-credentials
+        env:
+          - name: MLFLOW_RUN_ID
+            value: "{{inputs.parameters.mlflow-run-id}}"
+```
+
+The quotes around each `{{…}}` value matter: unquoted, YAML would read the braces as a mapping.
+
+## 3. Tag the MLflow run with that identity
+
+MLflow tags are free-form string pairs on a run, searchable and shown in the run's page. `mlflow.start_run` accepts them directly, so the run carries the workflow's identity from the moment it exists:
+
+```python
+import argparse
+import os
+
+import mlflow
+
+
+def argo_tags():
+    """Where this run came from, as MLflow tags."""
+    return {
+        "argo.workflow.name": os.environ["ARGO_WORKFLOW_NAME"],
+        "argo.workflow.uid": os.environ["ARGO_WORKFLOW_UID"],
+        "argo.workflow.namespace": os.environ["ARGO_WORKFLOW_NAMESPACE"],
+        "argo.pod.name": os.environ["ARGO_POD_NAME"],
+    }
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--lr", type=float, required=True)
+    args = parser.parse_args()
+
+    mlflow.set_experiment("resnet50")
+    with mlflow.start_run(run_name=os.environ["ARGO_WORKFLOW_NAME"], tags=argo_tags()) as run:
+        # Hand the run id back to Argo: this file is the step's output parameter.
+        with open("/tmp/mlflow-run-id", "w") as f:
+            f.write(run.info.run_id)
+
+        mlflow.log_param("lr", args.lr)
+        for epoch, metrics in enumerate(train(args.lr)):  # train() is your own loop
+            mlflow.log_metrics(metrics, step=epoch)
+
+
+if __name__ == "__main__":
+    main()
+```
+
+A few choices in there are deliberate:
+
+- **The run is named after the Workflow.** MLflow does not require run names to be unique, and a name that matches the Argo UI makes the two easy to match by eye.
+- **The run id is written first.** Writing it before training means the file exists however long training takes, and the Argo UI shows it in the step's outputs once the step finishes.
+- **The tags use the names `argo.workflow.name` and `argo.workflow.uid`.** Any names would do for MLflow. These are the ones Fendlemark reads, as the last section explains.
+
+Container images rarely include a `.git` directory, so MLflow usually cannot detect the commit it would otherwise record as `mlflow.source.git.commit`. If you bake the commit into the image at build time, set that tag yourself, along with `mlflow.source.git.repoURL`, in the same dictionary.
+
+## 4. Log later steps into the same run
+
+The `evaluate` step receives the training run's id as an input parameter and exposes it as `MLFLOW_RUN_ID`. When that variable is set, `mlflow.start_run()` resumes the run with that id instead of creating a new one, so evaluation metrics land next to the training metrics:
+
+```python
+import mlflow
+
+# MLFLOW_RUN_ID is set by the workflow, so this resumes the training run.
+with mlflow.start_run() as run:
+    mlflow.log_metrics(evaluate(run.info.run_id))  # evaluate() is your own code
+```
+
+One MLflow run per workflow is easier to compare across workflows than one per step, and it keeps the correlation simple: one workflow, one run. Steps that genuinely produce separate results, such as a hyperparameter sweep fanned out with `withItems`, are better as separate runs; pass the parent's id as `parent_run_id` to `mlflow.start_run` to nest them under it.
+
+## 5. Find one from the other
+
+**From a workflow to its MLflow run.** The `train` node's outputs in the Argo UI show `mlflow-run-id`. To go the other way round without the UI, look the run up by the workflow's uid, which is unambiguous even when names repeat:
+
+```shell
+$ kubectl -n ml-training get workflow resnet50-train-x7k2p -o jsonpath='{.metadata.uid}'
+51d0c8e2-7b3a-4e19-a6f4-0c9d2e8b7a13
+```
+
+```python
+import mlflow
+
+runs = mlflow.search_runs(
+    filter_string="tags.`argo.workflow.uid` = '51d0c8e2-7b3a-4e19-a6f4-0c9d2e8b7a13'",
+    search_all_experiments=True,
+)
+print(runs[["run_id", "status", "tags.argo.pod.name"]])
+```
+
+Tag names that contain dots must be wrapped in backticks (or double quotes) in an MLflow filter, and the value in single quotes. The same filter works in the search box of the MLflow UI: `` tags.`argo.workflow.name` = 'resnet50-train-x7k2p' ``.
+
+**From an MLflow run to its workflow.** The run's `argo.workflow.namespace` and `argo.workflow.name` tags are everything the Argo CLI needs:
+
+```shell
+$ argo get resnet50-train-x7k2p -n ml-training
+```
+
+In the Argo UI, the same Workflow is at `/workflows/ml-training/resnet50-train-x7k2p` on your Argo Server.
+
+## Things that will happen eventually
+
+- **Names repeat.** A Workflow submitted with a fixed `metadata.name` instead of `generateName` gets the same name every time it is deleted and resubmitted, and the same name can exist in two namespaces at once. Search by `argo.workflow.uid` when it matters which one you mean.
+- **Retries make more runs.** If the training template has a `retryStrategy`, every attempt is a new pod, and with the script above a new MLflow run with a different `argo.pod.name`. Templates with a `retryStrategy` can also use `{{retries}}`, the attempt number, which is worth adding as a tag of its own.
+- **Killed pods leave running runs.** The `with mlflow.start_run()` block marks a run `FAILED` when Python raises, but a pod killed for exceeding its memory limit never reaches the end of the block, and its run stays `RUNNING`. Search for `attributes.status = 'RUNNING'` runs whose workflow has finished to find them.
+- **The tracking server is a dependency.** If MLflow is down, `start_run` fails once the client has exhausted its retries, and so does the step. That is usually what you want for training; if it is not, catch the error and decide explicitly.
+
+## How Fendlemark correlates them
+
+If you run Fendlemark with the [`mlflow`](https://fendlemark.app/docs/adapters/#mlflow) and [`argo`](https://fendlemark.app/docs/adapters/#argo) adapters enabled, the tags above are all it needs. The argo adapter gives every Workflow facet the correlation key `argo.workflow.name`, and `argo.workflow.uid` alongside it. The mlflow adapter reads the run tags listed in `correlation_tags`, whose default list includes `argo.workflow.name` (and `fendlemark.argo_workflow`, which it treats the same way). When a Workflow facet and an MLflow run facet carry the same value, and their start times are no further apart than `lattice.correlation.window`, the lattice merges them into one entity:
+
+```shell
+$ fendlemark lattice inspect --key argo.workflow.name=resnet50-train-x7k2p
+ID                   KIND  STATUS     FACETS       STARTED               TITLE
+lt_459baa2c413ad692  run   Succeeded  argo+mlflow  2026-10-22T09:00:00Z  resnet50-train-x7k2p
+$ fendlemark lattice explain lt_459baa2c413ad692
+lt_459baa2c413ad692  run  Succeeded  "resnet50-train-x7k2p"
+  facet  mlflow     6f1d2c9a8b7e4f30a1c5d9e8b2a47c13
+  facet  argo       ml-training/resnet50-train-x7k2p
+  merge  argo.workflow.name = "resnet50-train-x7k2p" linked argo/ml-training/resnet50-train-x7k2p and mlflow/6f1d2c9a8b7e4f30a1c5d9e8b2a47c13 (gap 14s)
+```
+
+Three details of the rules are worth knowing when you design your workflows:
+
+- **The window is measured between start times:** the Workflow's start and the MLflow run's start. The default, 90 seconds, suits a workflow whose tracked step comes first. If the step that opens the MLflow run follows a long data-preparation step, widen it to cover that step:
+
+  ```yaml
+  lattice:
+    correlation:
+      window: 20m
+  ```
+- **Two facets from the same adapter never merge.** A workflow is merged with one MLflow run: the first to start after it. That is why step 4 resumes the training run instead of starting a second one. Extra runs carrying the same tag, such as retried attempts, stay entities of their own, and `fendlemark lattice inspect --key argo.workflow.name=…` lists all of them.
+- **To correlate on the uid instead of the name,** list it in `correlation_tags`. The list replaces the default rather than adding to it, so name every tag you want read:
+
+  ```yaml
+  adapters:
+    mlflow:
+      correlation_tags:
+        - argo.workflow.uid
+        - mlflow.source.git.commit
+        - mlflow.source.git.repoURL
+  ```
+
+  The argo adapter already provides `argo.workflow.uid` for every Workflow, so nothing changes on that side. Do this if the same Workflow name can start in two namespaces within the window.
+
+The weak keys are a separate mechanism. If the MLflow run carries `mlflow.source.git.commit` and `mlflow.source.git.repoURL`, and the Workflow carries the same values in the `fendlemark.io/git-sha` and `fendlemark.io/git-repo` annotations, Fendlemark relates entities built from the same commit without merging them. The [architecture page](https://fendlemark.app/docs/architecture/#correlation) describes both kinds of key, and the [correlation matrix](https://fendlemark.app/docs/adapters/#matrix) shows which keys connect which adapters.
+
+## Further reading
+
+- [Adapters: mlflow](https://fendlemark.app/docs/adapters/#mlflow) and [argo](https://fendlemark.app/docs/adapters/#argo), including the full `correlation_tags` default list
+- [Configuration: `lattice.correlation.window`](https://fendlemark.app/docs/configuration/#lattice)
+- [CLI reference: `lattice inspect` and `lattice explain`](https://fendlemark.app/docs/cli/#lattice)
+- [Getting started](https://fendlemark.app/docs/getting-started/), which connects exactly these two tools
+
+---
+
+# Writing a Fendlemark adapter, step by step
+
+Source: https://fendlemark.app/blog/writing-a-fendlemark-adapter/
+
+By [the Fendlemark Keepers](https://fendlemark.app/governance/#keepers) · 24 October 2026
+
+The reference page for [writing an adapter](https://fendlemark.app/docs/adapters/writing-an-adapter/) describes the interface. This post uses it: we build a complete adapter for Kubernetes Jobs, test it against a recorded fixture with the conformance suite, and run it inside a Fendlemark binary. Every line of code below compiles against `fendlemark.app/fendlemark` v0.9.5.
+
+## Why Kubernetes Jobs
+
+Not every training job goes through a workflow engine. On many platforms some of them are a `batch/v1` Job, created by a script, a CI pipeline, or a person with `kubectl`, and those jobs are invisible to the four built-in adapters. They are a good first adapter: the API is stable and well documented, one Job maps cleanly onto one facet, and the interesting decisions, how to map status onto phases and where to find correlation keys, are the same decisions every adapter makes.
+
+The adapter will:
+
+- list the Jobs in the namespaces you configure, page by page, and contribute each one as a facet of kind `run`;
+- map Job status onto Fendlemark's five phases, with correct end times for failed Jobs;
+- read correlation keys from annotations on the Job, so that a Job and the MLflow run it logged become one entity;
+- report health by checking the one permission it needs, in every namespace it reads.
+
+It will not watch. Polling is a perfectly good first version, and the control plane polls any adapter that says so.
+
+## Set up the module
+
+An adapter is an ordinary Go package. It does not need to live in the Fendlemark repository, and this one does not:
+
+```shell
+$ mkdir k8sjobs && cd k8sjobs
+$ go mod init example.com/k8sjobs
+$ go get fendlemark.app/fendlemark@v0.9.5
+```
+
+You need Go 1.23 or later. By the end, the module looks like this:
+
+```text
+k8sjobs/
+├── go.mod
+├── k8sjobs.go             the adapter
+├── k8sjobs_test.go        conformance and behaviour tests
+├── testdata/jobs.json     a recorded JobList
+└── cmd/platform/main.go   Fendlemark with the adapter compiled in
+```
+
+## 1. Register the adapter and choose its keys
+
+The Go code in sections 1 to 8 is `k8sjobs.go`, in order. It starts with registration and with the one decision that matters most, which correlation keys the adapter provides:
+
+```go
+// Package k8sjobs is a Fendlemark adapter for Kubernetes batch/v1 Jobs.
+// It lists Jobs in the namespaces you configure and contributes each one
+// to the lattice as a run. Like every adapter, it never writes.
+package k8sjobs
+
+import (
+	"context"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"net/http"
+	"net/url"
+	"strings"
+	"sync"
+	"time"
+
+	"fendlemark.app/fendlemark/adapter"
+)
+
+func init() { adapter.Register("k8sjobs", New) }
+
+// Annotations maps the Job annotations this adapter reads to the shared
+// correlation key vocabulary.
+var Annotations = map[string]string{
+	"fendlemark.io/mlflow-run-id": adapter.KeyMLflowRunID,
+	"fendlemark.io/argo-workflow": adapter.KeyArgoWorkflow,
+	"fendlemark.io/git-sha":       adapter.KeyGitSHA,
+	"fendlemark.io/git-repo":      adapter.KeyGitRepo,
+}
+```
+
+`adapter.Register` takes a name and a constructor. The name is what users write under `adapters:` in `fendlemark.yaml`, and it must be the same string the adapter returns from `Name()` and puts in every facet's `Source`; the conformance suite checks the last of those.
+
+The keys come from the shared vocabulary in the `adapter` package rather than being invented: a Job that names an MLflow run should say so with exactly the key the mlflow adapter uses, `mlflow.run_id`, or the two will never meet. The reference page's rule is to invent a key only when none applies, and to prefix it with your adapter's name. None needed inventing here.
+
+They are read from annotations rather than labels because label values are limited to 63 characters from a small alphabet, and a repository URL such as `git@git.example.internal:ml/vision.git` is neither. The `fendlemark.io/` prefix matches the `fendlemark.io/git-sha` and `fendlemark.io/git-repo` annotations the argo adapter already reads from Workflows. Whatever creates the Job sets them:
+
+```yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  generateName: train-resnet50-
+  namespace: ml-training
+  annotations:
+    fendlemark.io/mlflow-run-id: "6f1d2c9a8b7e4f30a1c5d9e8b2a47c13"
+    fendlemark.io/git-sha: "a41c9e07b2d3"
+    fendlemark.io/git-repo: "git@git.example.internal:ml/vision.git"
+spec:
+  backoffLimit: 6
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: train
+          image: registry.example.internal/vision/train:2026.10
+          envFrom:
+            - configMapRef:
+                name: mlflow-client
+          env:
+            - name: MLFLOW_RUN_ID
+              value: "6f1d2c9a8b7e4f30a1c5d9e8b2a47c13"
+```
+
+The MLflow run id has to exist before the Job does, so whatever submits the Job creates the run first, with `MlflowClient().create_run(...)`, and passes its id twice: to the annotation, and to `MLFLOW_RUN_ID`, which makes the training code's `mlflow.start_run()` resume that run rather than start another. It is the same technique the evaluation step uses in [Running MLflow and Argo Workflows together](https://fendlemark.app/blog/running-mlflow-and-argo-workflows-together/#resume). Submit the manifest with `kubectl create -f`; `kubectl apply` does not accept `generateName`.
+
+## 2. The type, the constructor, and the descriptor
+
+```go
+// Jobs is the adapter.
+type Jobs struct {
+	mu         sync.RWMutex
+	up         *upstream
+	namespaces []string
+}
+
+// upstream is a minimal client for the Kubernetes API server.
+type upstream struct {
+	client *http.Client
+	api    string // base URL, for example http://127.0.0.1:8001 behind kubectl proxy
+	token  string // bearer token; empty behind kubectl proxy
+}
+
+// New returns an unconnected adapter. It is the constructor passed to Register.
+func New() adapter.Adapter { return &Jobs{} }
+
+func (j *Jobs) Name() string { return "k8sjobs" }
+
+func (j *Jobs) Describe() adapter.Descriptor {
+	return adapter.Descriptor{
+		DisplayName: "Kubernetes Jobs",
+		Kinds:       []adapter.Kind{adapter.KindRun},
+		Keys:        []string{adapter.KeyMLflowRunID, adapter.KeyArgoWorkflow, adapter.KeyGitSHA, adapter.KeyGitRepo},
+		Watchable:   false,
+		Maturity:    adapter.Provisional,
+		ConfigSchema: json.RawMessage(`{"type":"object","required":["api_url","namespaces"],"properties":{` +
+			`"api_url":{"type":"string"},"namespaces":{"type":"array","items":{"type":"string"}},"token":{"type":"string"}}}`),
+	}
+}
+```
+
+The constructor returns an unconnected adapter and does no work; the control plane may construct an adapter it never connects. The descriptor is static, and the conformance suite calls `Describe` twice and fails if the results differ, so it must not read the clock, the environment, or the network.
+
+- **`Kinds`** lists what the adapter contributes: runs only.
+- **`Keys`** must name every key a facet can carry. A facet that emits an undeclared key fails conformance, which is a useful check on typos in the annotation map.
+- **`Watchable: false`** tells the control plane to call `Facets` every `poll_interval` (30 seconds unless configured) instead of calling `Watch`.
+- **`Maturity: adapter.Provisional`** is where every new adapter starts on the [maturity ladder](https://fendlemark.app/governance/#maturity).
+- **`ConfigSchema`** is a JSON Schema for the adapter's block in `fendlemark.yaml`: `api_url`, `namespaces`, and an optional `token`.
+
+## 3. Connect
+
+```go
+func (j *Jobs) Connect(ctx context.Context, cfg adapter.Config) error {
+	api := strings.TrimRight(cfg.String("api_url"), "/")
+	if api == "" {
+		return errors.New("k8sjobs: api_url is required")
+	}
+	if u, err := url.Parse(api); err != nil || u.Scheme == "" || u.Host == "" {
+		return fmt.Errorf("k8sjobs: api_url %q is not an absolute URL", api)
+	}
+	namespaces := cfg.Strings("namespaces")
+	if len(namespaces) == 0 {
+		return errors.New("k8sjobs: namespaces must list at least one namespace")
+	}
+	up := &upstream{
+		client: &http.Client{Timeout: cfg.Duration("timeout", 10*time.Second)},
+		api:    api,
+		token:  cfg.Secret("token"),
+	}
+	// One cheap request, so a wrong URL fails here rather than on the first poll.
+	var version struct {
+		GitVersion string `json:"gitVersion"`
+	}
+	if err := up.get(ctx, "/version", &version); err != nil {
+		return fmt.Errorf("k8sjobs: %w", err)
+	}
+	j.mu.Lock()
+	j.up, j.namespaces = up, namespaces
+	j.mu.Unlock()
+	return nil
+}
+```
+
+`Connect` receives the adapter's block from `fendlemark.yaml` as an `adapter.Config`. Its helpers do the type juggling: `Strings` accepts a YAML list, `Duration` accepts `"10s"` or a number of seconds, and `Secret` is for values that must never appear in logs. The control plane adds the common keys, so `cfg.Duration("timeout", …)` sees `adapters.k8sjobs.timeout`, which defaults to ten seconds.
+
+The rule for `Connect` is to validate, build clients, and return quickly; it must not fetch facets, and the conformance suite fails it if it takes more than two seconds against the fixture. One request to `/version` is cheap and turns a wrong URL into an error at start rather than a confusing first poll. The new client is stored only once that request succeeds, so a failed `Connect` leaves the adapter unconnected rather than half connected.
+
+For development, `kubectl proxy` serves the Kubernetes API on `http://127.0.0.1:8001` with your kubeconfig's credentials, which is why the token is optional. Inside a cluster, the API server's certificate is signed by the cluster's own CA, which this adapter does not load: either run `kubectl proxy` next to Fendlemark, or extend `Connect` to read the service account's `ca.crt` and `token` from `/var/run/secrets/kubernetes.io/serviceaccount/`. Either way, the identity needs `list` on `jobs` in the `batch` API group, in those namespaces, and nothing more.
+
+## 4. Decode only what you use
+
+```go
+// jobList and job decode the parts of the batch/v1 JobList this adapter uses.
+type jobList struct {
+	Metadata struct {
+		Continue string `json:"continue"`
+	} `json:"metadata"`
+	Items []job `json:"items"`
+}
+
+type job struct {
+	Metadata struct {
+		Name              string            `json:"name"`
+		Namespace         string            `json:"namespace"`
+		UID               string            `json:"uid"`
+		CreationTimestamp time.Time         `json:"creationTimestamp"`
+		Labels            map[string]string `json:"labels"`
+		Annotations       map[string]string `json:"annotations"`
+	} `json:"metadata"`
+	Status struct {
+		StartTime      time.Time `json:"startTime"`
+		CompletionTime time.Time `json:"completionTime"`
+		Active         int       `json:"active"`
+		Succeeded      int       `json:"succeeded"`
+		Failed         int       `json:"failed"`
+		Conditions     []struct {
+			Type               string    `json:"type"`
+			Status             string    `json:"status"`
+			Reason             string    `json:"reason"`
+			LastTransitionTime time.Time `json:"lastTransitionTime"`
+		} `json:"conditions"`
+	} `json:"status"`
+}
+```
+
+A Job has many more fields than these. Decoding only the ones the adapter reads keeps the adapter honest about what it depends on, and makes it indifferent to fields that newer Kubernetes versions add. Kubernetes writes times in RFC 3339, which `time.Time` decodes directly; an absent time decodes to the zero value, which the code below relies on.
+
+## 5. Facets
+
+```go
+func (j *Jobs) Facets(ctx context.Context, q adapter.Query) ([]adapter.Facet, error) {
+	j.mu.RLock()
+	up, namespaces := j.up, j.namespaces
+	j.mu.RUnlock()
+	if up == nil {
+		return nil, adapter.ErrNotConnected
+	}
+	if !q.Wants(adapter.KindRun) {
+		return nil, nil
+	}
+	var out []adapter.Facet
+	for _, ns := range namespaces {
+		next := ""
+		for {
+			v := url.Values{"limit": {"500"}}
+			if next != "" {
+				v.Set("continue", next)
+			}
+			var list jobList
+			path := "/apis/batch/v1/namespaces/" + url.PathEscape(ns) + "/jobs?" + v.Encode()
+			if err := up.get(ctx, path, &list); err != nil {
+				return nil, fmt.Errorf("k8sjobs: jobs in %s: %w", ns, err)
+			}
+			for _, jb := range list.Items {
+				f := facetOf(jb)
+				if !q.Since.IsZero() && f.StartedAt.Before(q.Since) {
+					continue
+				}
+				out = append(out, f)
+				if q.Limit > 0 && len(out) >= q.Limit {
+					return out, nil
+				}
+			}
+			if next = list.Metadata.Continue; next == "" {
+				break
+			}
+		}
+	}
+	return out, nil
+}
+```
+
+`Facets` is called once at start and then on every poll, and returns everything that matches the query. Three details:
+
+- **Paging.** The list endpoint returns at most `limit` items and a `continue` token when there are more. The loop follows the token until it is empty, so a namespace with ten thousand Jobs costs twenty requests, not one enormous one.
+- **`q.Since`** asks for facets that started after a time. The Jobs API cannot filter on start time, so the adapter filters after decoding.
+- **Errors are whole.** If one namespace fails, `Facets` returns an error rather than a partial list. The control plane then keeps the facets it already has and marks the adapter degraded, which is better than reporting every Job in that namespace as gone.
+
+## 6. From a Job to a facet
+
+```go
+func facetOf(jb job) adapter.Facet {
+	m, s := jb.Metadata, jb.Status
+	keys := map[string]string{}
+	for annotation, key := range Annotations {
+		if v := m.Annotations[annotation]; v != "" { // empty values fail Facet.Validate
+			keys[key] = v
+		}
+	}
+	started := s.StartTime
+	if started.IsZero() {
+		started = m.CreationTimestamp // a suspended Job has no startTime yet
+	}
+	phase, ended := phaseOf(jb)
+	return adapter.Facet{
+		Source:    "k8sjobs",
+		SourceID:  m.Namespace + "/" + m.Name,
+		Kind:      adapter.KindRun,
+		Title:     m.Name,
+		Status:    phase,
+		StartedAt: started,
+		EndedAt:   ended,
+		Keys:      keys,
+		Fields: map[string]any{
+			"namespace": m.Namespace, "uid": m.UID, "labels": m.Labels,
+			"active": s.Active, "succeeded": s.Succeeded, "failed": s.Failed,
+		},
+	}
+}
+
+// phaseOf maps a Job onto Fendlemark's five phases and returns when it ended.
+// completionTime is only set when a Job succeeds, so a failed Job's end is
+// the time its Failed condition became true.
+func phaseOf(jb job) (adapter.Phase, time.Time) {
+	for _, c := range jb.Status.Conditions {
+		if c.Status != "True" {
+			continue
+		}
+		switch c.Type {
+		case "Complete":
+			return adapter.Succeeded, jb.Status.CompletionTime
+		case "Failed":
+			return adapter.Failed, c.LastTransitionTime
+		case "Suspended":
+			return adapter.Pending, time.Time{}
+		}
+	}
+	if jb.Status.Active > 0 || !jb.Status.StartTime.IsZero() {
+		return adapter.Running, time.Time{}
+	}
+	return adapter.Pending, time.Time{}
+}
+```
+
+This is where an adapter earns its keep, because it is where the upstream tool's vocabulary becomes Fendlemark's.
+
+- **`SourceID`** is the namespace and name, which is unique per facet as the reconciler requires, and is how people refer to a Job.
+- **`StartedAt`** must never be zero: `Facet.Validate` rejects it, and the correlation window is measured from it. A Job created suspended has no `startTime` until it is resumed, so the adapter falls back to `creationTimestamp`.
+- **Keys** are added only when the annotation has a value. An empty key value also fails `Validate`, and a facet that fails validation is dropped by the lattice rather than shown.
+- **Phases** come from the Job's conditions. `Complete` and `Failed` are terminal, and a Job never has both. The subtle part is the end time: Kubernetes sets `completionTime` only when a Job succeeds, so for a failed Job the adapter uses the time the `Failed` condition became true. Without that, a failed Job would have no end time, and a zero `EndedAt` means a run that is still going. Newer Kubernetes versions can also set a `FailureTarget` condition before `Failed`; the switch ignores it and waits for `Failed`.
+- **`Fields`** is for display only and never used for correlation. The console renders it as a key-value table under the adapter's display name until you write a [facet panel](https://fendlemark.app/docs/ui/#panels).
+
+## 7. Watch and Health
+
+```go
+func (j *Jobs) Watch(ctx context.Context) (<-chan adapter.Event, error) {
+	return nil, adapter.ErrWatchUnsupported
+}
+
+// Health lists one Job per namespace: it proves the permission the adapter
+// actually needs, not just that the API server answers.
+func (j *Jobs) Health(ctx context.Context) adapter.Status {
+	j.mu.RLock()
+	up, namespaces := j.up, j.namespaces
+	j.mu.RUnlock()
+	if up == nil {
+		return adapter.Status{State: adapter.Disabled, Detail: "not connected"}
+	}
+	start := time.Now()
+	var failed []string
+	var lastErr error
+	for _, ns := range namespaces {
+		var list jobList
+		if err := up.get(ctx, "/apis/batch/v1/namespaces/"+url.PathEscape(ns)+"/jobs?limit=1", &list); err != nil {
+			failed, lastErr = append(failed, ns), err
+		}
+	}
+	lat := time.Since(start)
+	switch {
+	case len(failed) == len(namespaces):
+		return adapter.Status{State: adapter.Unreachable, Detail: lastErr.Error(), Latency: lat}
+	case len(failed) > 0:
+		return adapter.Status{State: adapter.Degraded, Detail: "cannot list jobs in " + strings.Join(failed, ", "), Latency: lat}
+	}
+	return adapter.Status{State: adapter.Healthy, Detail: "listing jobs in " + strings.Join(namespaces, ", "), Latency: lat}
+}
+```
+
+`Watch` returns `adapter.ErrWatchUnsupported`, which, with `Watchable: false`, is the whole of polling. The conformance suite checks that the two agree in both directions.
+
+`Health` is what `fendlemark adapters check` and the console's adapter view show. It should be cheap and bounded by its context, and it is more useful when it checks what the adapter actually does: here, listing one Job in each namespace. A service account that can reach the API server but cannot list Jobs in one namespace is reported as `degraded` with the namespace named, instead of `healthy` followed by an empty view.
+
+## 8. The HTTP client
+
+```go
+func (u *upstream) get(ctx context.Context, path string, v any) error {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.api+path, nil)
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Accept", "application/json")
+	if u.token != "" {
+		req.Header.Set("Authorization", "Bearer "+u.token)
+	}
+	resp, err := u.client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("GET %s: %s", strings.SplitN(path, "?", 2)[0], resp.Status)
+	}
+	return json.NewDecoder(resp.Body).Decode(v)
+}
+```
+
+The standard library is enough for an adapter this size. The client's timeout and the request's context together bound every call, and errors name the path without its query string.
+
+## 9. Test it with the conformance suite
+
+Every adapter, built in or not, must pass `adapter/conformance`. It drives the adapter through its whole lifecycle against a fixture and checks the rules the reconciler depends on: a non-empty name, a pure descriptor, `Connect` within two seconds, valid facets with unique `Source` and `SourceID` and only declared keys, `Watch` agreeing with `Watchable`, and `Health` within its bound. It also flags a 32-hex-character value under any key but `mlflow.run_id` or `kfp.run_id`, which is almost always an MLflow run id filed under the wrong name.
+
+The fixture is a recorded `JobList`, the response body of `GET /apis/batch/v1/namespaces/ml-training/jobs`, trimmed to the fields that matter. It holds three Jobs: a training Job that succeeded, an evaluation Job that failed, and a backfill that is still running. Save it as `testdata/jobs.json`:
+
+```json
+{
+  "kind": "JobList",
+  "apiVersion": "batch/v1",
+  "metadata": {"resourceVersion": "48211903"},
+  "items": [
+    {
+      "metadata": {
+        "name": "train-resnet50-7xk2p",
+        "namespace": "ml-training",
+        "uid": "0b6f3d1e-58a2-4c7e-9f14-2d8e6a1b3c55",
+        "creationTimestamp": "2026-10-22T08:59:58Z",
+        "labels": {"team": "vision"},
+        "annotations": {
+          "fendlemark.io/mlflow-run-id": "6f1d2c9a8b7e4f30a1c5d9e8b2a47c13",
+          "fendlemark.io/git-sha": "a41c9e07b2d3",
+          "fendlemark.io/git-repo": "git@git.example.internal:ml/vision.git"
+        }
+      },
+      "status": {
+        "startTime": "2026-10-22T09:00:00Z",
+        "completionTime": "2026-10-22T09:41:12Z",
+        "succeeded": 1,
+        "conditions": [
+          {"type": "Complete", "status": "True", "lastTransitionTime": "2026-10-22T09:41:12Z"}
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "eval-resnet50-q9d4m",
+        "namespace": "ml-training",
+        "uid": "7c2a9e40-1f6b-4d38-8a5c-e93b0d7f2a61",
+        "creationTimestamp": "2026-10-22T09:45:01Z",
+        "annotations": {"fendlemark.io/git-sha": "a41c9e07b2d3", "fendlemark.io/git-repo": "git@git.example.internal:ml/vision.git"}
+      },
+      "status": {
+        "startTime": "2026-10-22T09:45:02Z",
+        "failed": 7,
+        "conditions": [
+          {"type": "FailureTarget", "status": "True", "reason": "BackoffLimitExceeded", "lastTransitionTime": "2026-10-22T09:52:40Z"},
+          {"type": "Failed", "status": "True", "reason": "BackoffLimitExceeded", "lastTransitionTime": "2026-10-22T09:52:41Z"}
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "features-backfill-x4n7r",
+        "namespace": "ml-training",
+        "uid": "e4d8b6a2-93c1-47f0-b25e-6a1c8d0f9e37",
+        "creationTimestamp": "2026-10-22T10:15:00Z",
+        "annotations": {"fendlemark.io/argo-workflow": "nightly-features-l2v8c"}
+      },
+      "status": {"startTime": "2026-10-22T10:15:01Z", "active": 1, "ready": 1}
+    }
+  ]
+}
+```
+
+The test serves it from an `httptest.Server` the way the API server would, and points the adapter's configuration at it. `conformance.Run` takes the constructor and a `conformance.Options` with the `Config` to pass to `Connect` and the minimum number of facets to expect:
+
+```go
+package k8sjobs
+
+import (
+	"context"
+	"net/http"
+	"net/http/httptest"
+	"os"
+	"testing"
+	"time"
+
+	"fendlemark.app/fendlemark/adapter"
+	"fendlemark.app/fendlemark/adapter/conformance"
+	"fendlemark.app/fendlemark/lattice"
+)
+
+// fixture serves a recorded JobList the way the API server would.
+func fixture(t *testing.T) *httptest.Server {
+	t.Helper()
+	jobs, err := os.ReadFile("testdata/jobs.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	mux := http.NewServeMux()
+	mux.HandleFunc("GET /version", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(`{"major":"1","minor":"31","gitVersion":"v1.31.2"}`))
+	})
+	mux.HandleFunc("GET /apis/batch/v1/namespaces/ml-training/jobs", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(jobs)
+	})
+	srv := httptest.NewServer(mux)
+	t.Cleanup(srv.Close)
+	return srv
+}
+
+func config(srv *httptest.Server) adapter.Config {
+	return adapter.Config{"api_url": srv.URL, "namespaces": []any{"ml-training"}}
+}
+
+func TestConformance(t *testing.T) {
+	conformance.Run(t, New, conformance.Options{Config: config(fixture(t)), MinFacets: 3})
+}
+```
+
+Conformance checks the contract, not the meaning. Two more tests check the meaning: that the phases and end times come out right, and that a Job and its MLflow run really do reconcile into one entity. The second builds a lattice in-process with the `lattice` package and an MLflow facet written by hand:
+
+```go
+func TestFacets(t *testing.T) {
+	a := New()
+	if err := a.Connect(context.Background(), config(fixture(t))); err != nil {
+		t.Fatal(err)
+	}
+	facets, err := a.Facets(context.Background(), adapter.Query{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := map[string]adapter.Facet{}
+	for _, f := range facets {
+		got[f.SourceID] = f
+	}
+	train := got["ml-training/train-resnet50-7xk2p"]
+	if train.Status != adapter.Succeeded || train.Keys[adapter.KeyMLflowRunID] != "6f1d2c9a8b7e4f30a1c5d9e8b2a47c13" {
+		t.Errorf("train: %+v", train)
+	}
+	eval := got["ml-training/eval-resnet50-q9d4m"]
+	if eval.Status != adapter.Failed || !eval.EndedAt.Equal(time.Date(2026, 10, 22, 9, 52, 41, 0, time.UTC)) {
+		t.Errorf("eval: status %s, ended %s", eval.Status, eval.EndedAt)
+	}
+	if backfill := got["ml-training/features-backfill-x4n7r"]; backfill.Status != adapter.Running || !backfill.EndedAt.IsZero() {
+		t.Errorf("backfill: %+v", backfill)
+	}
+}
+
+// TestCorrelates checks the point of the exercise: a Job and the MLflow run
+// it logs to become one entity. The run was created just before the Job.
+func TestCorrelates(t *testing.T) {
+	a := New()
+	if err := a.Connect(context.Background(), config(fixture(t))); err != nil {
+		t.Fatal(err)
+	}
+	facets, err := a.Facets(context.Background(), adapter.Query{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	run := adapter.Facet{
+		Source: "mlflow", SourceID: "6f1d2c9a8b7e4f30a1c5d9e8b2a47c13", Kind: adapter.KindRun,
+		Title: "resnet50 lr=3e-4", Status: adapter.Succeeded,
+		StartedAt: time.Date(2026, 10, 22, 8, 59, 57, 0, time.UTC),
+		Keys:      map[string]string{adapter.KeyMLflowRunID: "6f1d2c9a8b7e4f30a1c5d9e8b2a47c13"},
+	}
+	l := lattice.New(lattice.Options{})
+	l.Apply(append(facets, run))
+	ents := l.Query(lattice.Query{Keys: map[string]string{adapter.KeyMLflowRunID: run.SourceID}})
+	if len(ents) != 1 || len(ents[0].Facets) != 2 {
+		t.Fatalf("want one entity with two facets, got %+v", ents)
+	}
+	ex, _ := l.Explain(ents[0].ID)
+	if len(ex.Merges) != 1 || ex.Merges[0].Key != adapter.KeyMLflowRunID || ex.Merges[0].Gap != 3*time.Second {
+		t.Fatalf("unexpected merges: %+v", ex.Merges)
+	}
+	t.Logf("%s %q: merged on %s, gap %s", ents[0].ID, ents[0].Title, ex.Merges[0].Key, ex.Merges[0].Gap)
+}
+```
+
+```shell
+$ go mod tidy
+$ go test -v .
+=== RUN   TestConformance
+--- PASS: TestConformance (0.02s)
+=== RUN   TestFacets
+--- PASS: TestFacets (0.00s)
+=== RUN   TestCorrelates
+    k8sjobs_test.go:97: lt_074076a9a9bb28f9 "resnet50 lr=3e-4": merged on mlflow.run_id, gap 3s
+--- PASS: TestCorrelates (0.00s)
+PASS
+ok  	example.com/k8sjobs	0.157s
+```
+
+The merged entity takes the MLflow run's title, because facets are ordered with the built-in adapters first and an entity is titled after its first facet. The training and evaluation Jobs are not merged, because they share only the weak keys `git.sha` and `git.repo`; the lattice relates them with a `SharesCommit` edge instead.
+
+## 10. Run it
+
+Fendlemark loads no plugins at runtime; adapters are compiled in. You do not need to change Fendlemark's own source to do that. A small `main` package that imports the adapter for its side effect, and then does what [embedding](https://fendlemark.app/docs/api/#embedding) describes, is a complete Fendlemark with one more adapter. Save it as `cmd/platform/main.go`:
+
+```go
+// Command platform is Fendlemark with one more adapter compiled in.
+package main
+
+import (
+	"context"
+	"log"
+	"os/signal"
+	"syscall"
+
+	"fendlemark.app/fendlemark"
+	"fendlemark.app/fendlemark/config"
+
+	_ "example.com/k8sjobs" // registers "k8sjobs"
+)
+
+func main() {
+	// Configuration validation accepts only adapters it knows about (DOC-110).
+	config.KnownAdapters = append(config.KnownAdapters, "k8sjobs")
+
+	cfg, _, err := config.Load("fendlemark.yaml")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fm, err := fendlemark.New(cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
+	if err := fm.Run(ctx); err != nil {
+		log.Fatal(err)
+	}
+}
+```
+
+Importing `fendlemark.app/fendlemark` registers the four built-in adapters too, so this binary can read MLflow, Metaflow, Argo, and Kubeflow as well as Jobs. Configuration validation rejects an `adapters.<name>` block for an adapter it does not know, with `DOC-110`, so `main` adds the new name to `config.KnownAdapters` before loading the file.
+
+Point it at the API through `kubectl proxy`:
+
+```yaml
+adapters:
+  k8sjobs:
+    enabled: true
+    api_url: "http://127.0.0.1:8001"
+    namespaces: ["ml-training"]
+```
+
+```shell
+$ kubectl proxy &
+$ go build -o platform ./cmd/platform
+$ ./platform
+INFO fendlemark starting version=0.9.5 adapters=k8sjobs
+INFO adapter connected adapter=k8sjobs took=19ms
+INFO lattice reconciled entities=3 facets=3 generation=1 took=0s
+INFO console listening addr=127.0.0.1:7411
+```
+
+(The log's timestamps are trimmed here.) The console is on [http://localhost:7411](http://localhost:7411) as usual, and the API reports the new adapter alongside any others you enable:
+
+```shell
+$ curl -s http://127.0.0.1:7411/api/v1/adapters | jq '.adapters[0] | {name, state, detail, maturity}'
+{
+  "name": "k8sjobs",
+  "state": "healthy",
+  "detail": "listing jobs in ml-training · 3 facets",
+  "maturity": "Provisional"
+}
+```
+
+Enable the `mlflow` adapter in the same file, and every Job annotated with `fendlemark.io/mlflow-run-id` appears once, with both facets attached, as `TestCorrelates` showed. That holds as long as the run and the Job start within the correlation window of each other, which they do when the run is created just before the Job.
+
+## Where to go from here
+
+- **Watch.** The Kubernetes API supports watching Jobs. To use it, set `Watchable: true` and return a channel of `adapter.Event` values that closes when the context passed to `Watch` is cancelled. The control plane calls `Facets` once for the initial load and reconnects with backoff when the channel closes, and the conformance suite checks the channel closes within two seconds of cancellation.
+- **A facet panel.** The default key-value table is fine for `Fields` this small. A Job with many pods deserves a panel; [The console](https://fendlemark.app/docs/ui/#panels) explains how panels are written and registered.
+- **Upstream.** If your adapter would be useful to everyone, the [Fendlemark Contribution Protocol](https://fendlemark.app/governance/contributing/) describes how to propose it. It would enter at Provisional, and Provisional adapters are not compiled into release binaries; the [maturity ladder](https://fendlemark.app/governance/#maturity) describes what it takes to reach Settled, when they are.
+
+## Further reading
+
+- [Writing an adapter](https://fendlemark.app/docs/adapters/writing-an-adapter/): the interface, facets, lifecycle, and conformance rules
+- [Adapters](https://fendlemark.app/docs/adapters/): what the four built-in adapters read and which keys they provide
+- [Architecture: correlation keys](https://fendlemark.app/docs/architecture/#correlation)
+- [Go API reference: package adapter](https://fendlemark.app/docs/api/#adapter)
 
 ---
 
@@ -121,15 +1245,11 @@ Every release, in reverse order. Entries are classified as **Accommodations** (t
 
 ## 0.9.5 · 2026-10-24
 
-**Accommodations**
-
-- The project now lives at `fendlemark.app`. The Go module path is `fendlemark.app/fendlemark`: update your imports and `go install` commands. `fendlemark.develops.guru/fendlemark` remains at 0.9.4, where it will stay.
-
 **Clarifications**
 
 - `fendlemark lattice explain` and `GET /api/v1/entities/{id}/explain` now list every merge for an entity assembled from three or more facets. The merges always happened. Now all of them are explained.
 
-Reading of the Diff took longer than usual: the diff was mostly a domain name, read aloud in full each time.
+The Reading of the Diff was the shortest on record. The Sceptic remained sceptical.
 
 ## 0.9.4 · 2026-09-30
 
@@ -404,6 +1524,8 @@ Which keys connect which adapters, out of the box, with no configuration beyond 
 
 Write an adapter. The interface has six methods and is documented in [Writing an adapter](https://fendlemark.app/docs/adapters/writing-an-adapter/). Proposing it for inclusion in the binary is governed by [FCP-1](https://fendlemark.app/governance/contributing/), which the Keepers describe as "thorough".
 
+Related reading: [Running MLflow and Argo Workflows together](https://fendlemark.app/blog/running-mlflow-and-argo-workflows-together/), on tagging MLflow runs with the workflow that started them.
+
 ---
 
 # Writing an adapter
@@ -582,6 +1704,8 @@ To propose your adapter for inclusion in the official binary, so that everyone g
 ## The facet panel
 
 By default the console renders your facet's `Fields` as a key-value table under your adapter's display name. For a custom panel, add a Vue component to `console/src/panels/example/` and register it in `console/src/panels/index.ts`. The component receives the facet as a prop and is rendered inside `<FmFacetPanel>`, which provides the header, the deep links, and the collapse state. See [The console](https://fendlemark.app/docs/ui/#panels).
+
+Related reading: [Writing a Fendlemark adapter, step by step](https://fendlemark.app/blog/writing-a-fendlemark-adapter/), a complete adapter for Kubernetes Jobs with its conformance tests.
 
 ---
 
@@ -1002,6 +2126,8 @@ $ fendlemark lattice stats
 - `inspect` runs a one-shot reconciliation against the configured adapters and prints matching entities without starting the server.
 - `explain` prints why an entity has the facets it has: which keys matched, within what time distance, and which rule merged them. The single most useful command for "why are these two things one thing" and "why are these one thing two things".
 - `stats` prints entity counts by kind, facets by adapter, correlation counts by key, and the generation number.
+
+Related reading: [Fendlemark 0.9.5](https://fendlemark.app/blog/fendlemark-0-9-5/), on reading the output of `lattice explain`.
 
 ## fendlemark auth
 

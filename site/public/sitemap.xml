@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemap.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://fendlemark.app/</loc><lastmod>2026-10-24</lastmod><priority>1.0</priority></url>
   <url><loc>https://fendlemark.app/about/</loc><lastmod>2026-10-24</lastmod><priority>0.7</priority></url>
+  <url><loc>https://fendlemark.app/blog/</loc><lastmod>2026-10-24</lastmod><priority>0.7</priority></url>
+  <url><loc>https://fendlemark.app/blog/fendlemark-0-9-5/</loc><lastmod>2026-10-24</lastmod><priority>0.7</priority></url>
+  <url><loc>https://fendlemark.app/blog/running-mlflow-and-argo-workflows-together/</loc><lastmod>2026-10-24</lastmod><priority>0.7</priority></url>
+  <url><loc>https://fendlemark.app/blog/writing-a-fendlemark-adapter/</loc><lastmod>2026-10-24</lastmod><priority>0.7</priority></url>
   <url><loc>https://fendlemark.app/changelog/</loc><lastmod>2026-10-24</lastmod><priority>0.7</priority></url>
   <url><loc>https://fendlemark.app/docs/</loc><lastmod>2026-10-24</lastmod><priority>0.7</priority></url>
   <url><loc>https://fendlemark.app/docs/adapters/</loc><lastmod>2026-10-24</lastmod><priority>0.7</priority></url>

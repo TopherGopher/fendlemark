@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://fendlemark.app/docs/
+    about: Getting started, configuration, adapters, the console, and the CLI.
+  - name: FAQ
+    url: https://fendlemark.app/faq/
+    about: Most questions have been asked, and answered with confidence.
+  - name: Security report
+    url: https://github.com/TopherGopher/fendlemark/blob/main/SECURITY.md
+    about: Please report vulnerabilities privately, as described in SECURITY.md.

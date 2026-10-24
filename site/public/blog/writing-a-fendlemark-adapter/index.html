@@ -1,0 +1,723 @@
+<!doctype html>
+<html lang="en" data-layout="docs" data-page="blog-writing-a-fendlemark-adapter">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Writing a Fendlemark adapter, step by step · Fendlemark</title>
+<meta name="description" content="Build a working Fendlemark adapter for Kubernetes Jobs: descriptor, facets, phases, correlation keys, health, conformance tests, and a binary to run it in.">
+<link rel="canonical" href="https://fendlemark.app/blog/writing-a-fendlemark-adapter/">
+<link rel="alternate" type="text/markdown" href="/blog/writing-a-fendlemark-adapter/index.md">
+<link rel="describedby" href="/llms.txt">
+<link rel="api-catalog" href="/.well-known/api-catalog" type="application/linkset+json">
+<link rel="service-desc" href="/openapi.json" type="application/openapi+json">
+<link rel="service-doc" href="/docs/api/#http" type="text/html">
+<meta name="go-import" content="fendlemark.app/fendlemark git https://github.com/TopherGopher/fendlemark">
+<link rel="alternate" type="application/atom+xml" title="Fendlemark releases" href="/feed.xml">
+<link rel="alternate" type="application/atom+xml" title="Fendlemark blog" href="/blog/feed.xml">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+<meta name="theme-color" content="#0f5c54" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0b1513" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="2026-10-24">
+<meta property="article:modified_time" content="2026-10-24">
+<meta property="article:author" content="https://fendlemark.app/governance/">
+<meta property="article:section" content="Walkthrough">
+<meta property="og:site_name" content="Fendlemark">
+<meta property="og:title" content="Writing a Fendlemark adapter, step by step · Fendlemark">
+<meta property="og:description" content="Build a working Fendlemark adapter for Kubernetes Jobs: descriptor, facets, phases, correlation keys, health, conformance tests, and a binary to run it in.">
+<meta property="og:url" content="https://fendlemark.app/blog/writing-a-fendlemark-adapter/">
+<meta property="og:image" content="https://fendlemark.app/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Writing a Fendlemark adapter, step by step · Fendlemark">
+<meta name="twitter:description" content="Build a working Fendlemark adapter for Kubernetes Jobs: descriptor, facets, phases, correlation keys, health, conformance tests, and a binary to run it in.">
+<meta name="twitter:image" content="https://fendlemark.app/assets/og-image.png">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="preload" href="/assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/jetbrains-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css">
+<script>document.documentElement.classList.add('js');try{var t=localStorage.getItem('fm-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Fendlemark", "item": "https://fendlemark.app/"}, {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://fendlemark.app/blog/"}, {"@type": "ListItem", "position": 3, "name": "Writing a Fendlemark adapter, step by step", "item": "https://fendlemark.app/blog/writing-a-fendlemark-adapter/"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Writing a Fendlemark adapter, step by step", "description": "Build a working Fendlemark adapter for Kubernetes Jobs: descriptor, facets, phases, correlation keys, health, conformance tests, and a binary to run it in.", "url": "https://fendlemark.app/blog/writing-a-fendlemark-adapter/", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://fendlemark.app/blog/writing-a-fendlemark-adapter/"}, "image": "https://fendlemark.app/assets/og-image.png", "datePublished": "2026-10-24", "dateModified": "2026-10-24", "author": {"@type": "Organization", "name": "The Fendlemark Keepers", "url": "https://fendlemark.app/governance/"}, "publisher": {"@type": "Organization", "name": "The Fendlemark Keepers", "url": "https://fendlemark.app/governance/"}, "inLanguage": "en", "articleSection": "Walkthrough"}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="site-header-inner">
+    <a class="brand" href="/" aria-label="Fendlemark home">
+      <svg class="brand-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
+      <span class="brand-name">Fendlemark</span>
+    </a>
+    <span class="brand-version">v0.9.5</span>
+    <nav class="top-nav" aria-label="Primary">
+      <a href="/docs/getting-started/">Docs</a>
+      <a href="/philosophy/">Philosophy</a>
+      <a href="/governance/">Governance</a>
+      <a href="/changelog/">Changelog</a>
+      <a href="/blog/" aria-current="true" class="in-section">Blog</a>
+      <a href="/fendlemark/">Packages</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-btn js-only" id="theme-toggle" type="button" aria-label="Dark theme" aria-pressed="false" title="Dark theme">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><g class="sun"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/></g><path class="moon" d="M20.5 14.2A8.5 8.5 0 1 1 9.8 3.5a6.8 6.8 0 0 0 10.7 10.7z"/></svg>
+      </button>
+      <button class="icon-btn menu-btn js-only" id="menu-toggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="sidebar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path class="bars" d="M4 7h16M4 12h16M4 17h16"/><path class="cross" d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="page">
+  <nav class="sidebar" id="sidebar" aria-label="Documentation">
+<div class="nav-group"><p class="nav-group-title" id="nav-documentation">Documentation</p><ul aria-labelledby="nav-documentation">
+<li><a href="/docs/">Overview</a></li>
+<li><a href="/docs/getting-started/">Getting started</a></li>
+<li><a href="/docs/architecture/">Architecture</a></li>
+<li><a href="/docs/configuration/">Configuration</a></li>
+<li><a href="/docs/adapters/">Adapters</a></li>
+<li><a href="/docs/adapters/writing-an-adapter/">Writing an adapter</a></li>
+<li><a href="/docs/ui/">The console (UI)</a></li>
+<li><a href="/docs/auth/">Authentication</a></li>
+<li><a href="/docs/cli/">CLI reference</a></li>
+<li><a href="/docs/api/">Go API reference</a></li>
+<li><a href="/docs/migration/">Migrating 0.8 to 0.9</a></li>
+</ul></div>
+<div class="nav-group"><p class="nav-group-title" id="nav-project">Project</p><ul aria-labelledby="nav-project">
+<li><a href="/philosophy/">Philosophy</a></li>
+<li><a href="/governance/">Governance</a></li>
+<li><a href="/governance/contributing/">Contributing (FCP-1)</a></li>
+<li><a href="/changelog/">Changelog</a></li>
+<li><a href="/blog/" class="active" aria-current="true">Blog</a></li>
+<li><a href="/fendlemark/">Packages</a></li>
+<li><a href="/faq/">FAQ</a></li>
+<li><a href="/about/">About</a></li>
+</ul></div>
+  </nav>
+  <main class="main" id="main">
+<p class="eyebrow">Walkthrough</p>
+<h1>Writing a Fendlemark adapter, step by step</h1>
+<p class="byline">By <a href="/governance/#keepers">the Fendlemark Keepers</a> · <time datetime="2026-10-24">24 October 2026</time></p>
+<p class="lede">The reference page for <a href="/docs/adapters/writing-an-adapter/">writing an adapter</a> describes the interface. This post uses it: we build a complete adapter for Kubernetes Jobs, test it against a recorded fixture with the conformance suite, and run it inside a Fendlemark binary. Every line of code below compiles against <code>fendlemark.app/fendlemark</code> v0.9.5.</p>
+
+<h2 id="why-jobs"><a class="anchor" href="#why-jobs">Why Kubernetes Jobs</a></h2>
+<p>Not every training job goes through a workflow engine. On many platforms some of them are a <code>batch/v1</code> Job, created by a script, a CI pipeline, or a person with <code>kubectl</code>, and those jobs are invisible to the four built-in adapters. They are a good first adapter: the API is stable and well documented, one Job maps cleanly onto one facet, and the interesting decisions, how to map status onto phases and where to find correlation keys, are the same decisions every adapter makes.</p>
+<p>The adapter will:</p>
+<ul>
+  <li>list the Jobs in the namespaces you configure, page by page, and contribute each one as a facet of kind <code>run</code>;</li>
+  <li>map Job status onto Fendlemark's five phases, with correct end times for failed Jobs;</li>
+  <li>read correlation keys from annotations on the Job, so that a Job and the MLflow run it logged become one entity;</li>
+  <li>report health by checking the one permission it needs, in every namespace it reads.</li>
+</ul>
+<p>It will not watch. Polling is a perfectly good first version, and the control plane polls any adapter that says so.</p>
+
+<h2 id="setup"><a class="anchor" href="#setup">Set up the module</a></h2>
+<p>An adapter is an ordinary Go package. It does not need to live in the Fendlemark repository, and this one does not:</p>
+<div class="code" data-lang="shell"><pre data-lang="shell" role="region" tabindex="0" aria-label="Shell code: Set up the module" data-scroll><code><span class="p">$</span> mkdir k8sjobs &amp;&amp; cd k8sjobs
+<span class="p">$</span> go mod init example.com/k8sjobs
+<span class="p">$</span> go get fendlemark.app/fendlemark@v0.9.5</code></pre></div>
+<p>You need Go 1.23 or later. By the end, the module looks like this:</p>
+<div class="code" data-lang="text"><pre data-lang="text" role="region" tabindex="0" aria-label="Text code: Set up the module" data-scroll><code>k8sjobs/
+├── go.mod
+├── k8sjobs.go             the adapter
+├── k8sjobs_test.go        conformance and behaviour tests
+├── testdata/jobs.json     a recorded JobList
+└── cmd/platform/main.go   Fendlemark with the adapter compiled in</code></pre></div>
+
+<h2 id="register"><a class="anchor" href="#register">1. Register the adapter and choose its keys</a></h2>
+<p>The Go code in sections 1 to 8 is <code>k8sjobs.go</code>, in order. It starts with registration and with the one decision that matters most, which correlation keys the adapter provides:</p>
+<div class="code" data-lang="go"><pre data-lang="go" role="region" tabindex="0" aria-label="Go code: 1. Register the adapter and choose its keys" data-scroll><code><span class="c">// Package k8sjobs is a Fendlemark adapter for Kubernetes batch/v1 Jobs.</span>
+<span class="c">// It lists Jobs in the namespaces you configure and contributes each one</span>
+<span class="c">// to the lattice as a run. Like every adapter, it never writes.</span>
+<span class="k">package</span> k8sjobs
+
+<span class="k">import</span> (
+	<span class="s">"context"</span>
+	<span class="s">"encoding/json"</span>
+	<span class="s">"errors"</span>
+	<span class="s">"fmt"</span>
+	<span class="s">"net/http"</span>
+	<span class="s">"net/url"</span>
+	<span class="s">"strings"</span>
+	<span class="s">"sync"</span>
+	<span class="s">"time"</span>
+
+	<span class="s">"fendlemark.app/fendlemark/adapter"</span>
+)
+
+<span class="k">func</span> init() { adapter.Register(<span class="s">"k8sjobs"</span>, New) }
+
+<span class="c">// Annotations maps the Job annotations this adapter reads to the shared</span>
+<span class="c">// correlation key vocabulary.</span>
+<span class="k">var</span> Annotations = <span class="k">map</span>[<span class="k">string</span>]<span class="k">string</span>{
+	<span class="s">"fendlemark.io/mlflow-run-id"</span>: adapter.KeyMLflowRunID,
+	<span class="s">"fendlemark.io/argo-workflow"</span>: adapter.KeyArgoWorkflow,
+	<span class="s">"fendlemark.io/git-sha"</span>:       adapter.KeyGitSHA,
+	<span class="s">"fendlemark.io/git-repo"</span>:      adapter.KeyGitRepo,
+}</code></pre></div>
+<p><code>adapter.Register</code> takes a name and a constructor. The name is what users write under <code>adapters:</code> in <code>fendlemark.yaml</code>, and it must be the same string the adapter returns from <code>Name()</code> and puts in every facet's <code>Source</code>; the conformance suite checks the last of those.</p>
+<p>The keys come from the shared vocabulary in the <code>adapter</code> package rather than being invented: a Job that names an MLflow run should say so with exactly the key the mlflow adapter uses, <code>mlflow.run_id</code>, or the two will never meet. The reference page's rule is to invent a key only when none applies, and to prefix it with your adapter's name. None needed inventing here.</p>
+<p>They are read from annotations rather than labels because label values are limited to 63 characters from a small alphabet, and a repository URL such as <code>git@git.example.internal:ml/vision.git</code> is neither. The <code>fendlemark.io/</code> prefix matches the <code>fendlemark.io/git-sha</code> and <code>fendlemark.io/git-repo</code> annotations the argo adapter already reads from Workflows. Whatever creates the Job sets them:</p>
+<div class="code" data-lang="yaml"><pre data-lang="yaml" role="region" tabindex="0" aria-label="YAML code: 1. Register the adapter and choose its keys" data-scroll><code><span class="k">apiVersion</span>: <span class="s">batch/v1</span>
+<span class="k">kind</span>: <span class="s">Job</span>
+<span class="k">metadata</span>:
+  <span class="k">generateName</span>: <span class="s">train-resnet50-</span>
+  <span class="k">namespace</span>: <span class="s">ml-training</span>
+  <span class="k">annotations</span>:
+    <span class="k">fendlemark.io/mlflow-run-id</span>: <span class="s">"6f1d2c9a8b7e4f30a1c5d9e8b2a47c13"</span>
+    <span class="k">fendlemark.io/git-sha</span>: <span class="s">"a41c9e07b2d3"</span>
+    <span class="k">fendlemark.io/git-repo</span>: <span class="s">"git@git.example.internal:ml/vision.git"</span>
+<span class="k">spec</span>:
+  <span class="k">backoffLimit</span>: <span class="s">6</span>
+  <span class="k">template</span>:
+    <span class="k">spec</span>:
+      <span class="k">restartPolicy</span>: <span class="s">Never</span>
+      <span class="k">containers</span>:
+        - <span class="k">name</span>: <span class="s">train</span>
+          <span class="k">image</span>: <span class="s">registry.example.internal/vision/train:2026.10</span>
+          <span class="k">envFrom</span>:
+            - <span class="k">configMapRef</span>:
+                <span class="k">name</span>: <span class="s">mlflow-client</span>
+          <span class="k">env</span>:
+            - <span class="k">name</span>: <span class="s">MLFLOW_RUN_ID</span>
+              <span class="k">value</span>: <span class="s">"6f1d2c9a8b7e4f30a1c5d9e8b2a47c13"</span></code></pre></div>
+<p>The MLflow run id has to exist before the Job does, so whatever submits the Job creates the run first, with <code>MlflowClient().create_run(...)</code>, and passes its id twice: to the annotation, and to <code>MLFLOW_RUN_ID</code>, which makes the training code's <code>mlflow.start_run()</code> resume that run rather than start another. It is the same technique the evaluation step uses in <a href="/blog/running-mlflow-and-argo-workflows-together/#resume">Running MLflow and Argo Workflows together</a>. Submit the manifest with <code>kubectl create -f</code>; <code>kubectl apply</code> does not accept <code>generateName</code>.</p>
+
+<h2 id="describe"><a class="anchor" href="#describe">2. The type, the constructor, and the descriptor</a></h2>
+<div class="code" data-lang="go"><pre data-lang="go" role="region" tabindex="0" aria-label="Go code: 2. The type, the constructor, and the descriptor" data-scroll><code><span class="c">// Jobs is the adapter.</span>
+<span class="k">type</span> Jobs <span class="k">struct</span> {
+	mu         sync.RWMutex
+	up         *upstream
+	namespaces []<span class="k">string</span>
+}
+
+<span class="c">// upstream is a minimal client for the Kubernetes API server.</span>
+<span class="k">type</span> upstream <span class="k">struct</span> {
+	client *http.Client
+	api    <span class="k">string</span> <span class="c">// base URL, for example http://127.0.0.1:8001 behind kubectl proxy</span>
+	token  <span class="k">string</span> <span class="c">// bearer token; empty behind kubectl proxy</span>
+}
+
+<span class="c">// New returns an unconnected adapter. It is the constructor passed to Register.</span>
+<span class="k">func</span> New() adapter.Adapter { <span class="k">return</span> &amp;Jobs{} }
+
+<span class="k">func</span> (j *Jobs) Name() <span class="k">string</span> { <span class="k">return</span> <span class="s">"k8sjobs"</span> }
+
+<span class="k">func</span> (j *Jobs) Describe() adapter.Descriptor {
+	<span class="k">return</span> adapter.Descriptor{
+		DisplayName: <span class="s">"Kubernetes Jobs"</span>,
+		Kinds:       []adapter.Kind{adapter.KindRun},
+		Keys:        []<span class="k">string</span>{adapter.KeyMLflowRunID, adapter.KeyArgoWorkflow, adapter.KeyGitSHA, adapter.KeyGitRepo},
+		Watchable:   <span class="k">false</span>,
+		Maturity:    adapter.Provisional,
+		ConfigSchema: json.RawMessage(<span class="s">`{"type":"object","required":["api_url","namespaces"],"properties":{`</span> +
+			<span class="s">`"api_url":{"type":"string"},"namespaces":{"type":"array","items":{"type":"string"}},"token":{"type":"string"}}}`</span>),
+	}
+}</code></pre></div>
+<p>The constructor returns an unconnected adapter and does no work; the control plane may construct an adapter it never connects. The descriptor is static, and the conformance suite calls <code>Describe</code> twice and fails if the results differ, so it must not read the clock, the environment, or the network.</p>
+<ul>
+  <li><strong><code>Kinds</code></strong> lists what the adapter contributes: runs only.</li>
+  <li><strong><code>Keys</code></strong> must name every key a facet can carry. A facet that emits an undeclared key fails conformance, which is a useful check on typos in the annotation map.</li>
+  <li><strong><code>Watchable: false</code></strong> tells the control plane to call <code>Facets</code> every <code>poll_interval</code> (30 seconds unless configured) instead of calling <code>Watch</code>.</li>
+  <li><strong><code>Maturity: adapter.Provisional</code></strong> is where every new adapter starts on the <a href="/governance/#maturity">maturity ladder</a>.</li>
+  <li><strong><code>ConfigSchema</code></strong> is a JSON Schema for the adapter's block in <code>fendlemark.yaml</code>: <code>api_url</code>, <code>namespaces</code>, and an optional <code>token</code>.</li>
+</ul>
+
+<h2 id="connect"><a class="anchor" href="#connect">3. Connect</a></h2>
+<div class="code" data-lang="go"><pre data-lang="go" role="region" tabindex="0" aria-label="Go code: 3. Connect" data-scroll><code><span class="k">func</span> (j *Jobs) Connect(ctx context.Context, cfg adapter.Config) <span class="k">error</span> {
+	api := strings.TrimRight(cfg.String(<span class="s">"api_url"</span>), <span class="s">"/"</span>)
+	<span class="k">if</span> api == <span class="s">""</span> {
+		<span class="k">return</span> errors.New(<span class="s">"k8sjobs: api_url is required"</span>)
+	}
+	<span class="k">if</span> u, err := url.Parse(api); err != <span class="k">nil</span> || u.Scheme == <span class="s">""</span> || u.Host == <span class="s">""</span> {
+		<span class="k">return</span> fmt.Errorf(<span class="s">"k8sjobs: api_url %q is not an absolute URL"</span>, api)
+	}
+	namespaces := cfg.Strings(<span class="s">"namespaces"</span>)
+	<span class="k">if</span> <span class="k">len</span>(namespaces) == 0 {
+		<span class="k">return</span> errors.New(<span class="s">"k8sjobs: namespaces must list at least one namespace"</span>)
+	}
+	up := &amp;upstream{
+		client: &amp;http.Client{Timeout: cfg.Duration(<span class="s">"timeout"</span>, 10*time.Second)},
+		api:    api,
+		token:  cfg.Secret(<span class="s">"token"</span>),
+	}
+	<span class="c">// One cheap request, so a wrong URL fails here rather than on the first poll.</span>
+	<span class="k">var</span> version <span class="k">struct</span> {
+		GitVersion <span class="k">string</span> <span class="s">`json:"gitVersion"`</span>
+	}
+	<span class="k">if</span> err := up.get(ctx, <span class="s">"/version"</span>, &amp;version); err != <span class="k">nil</span> {
+		<span class="k">return</span> fmt.Errorf(<span class="s">"k8sjobs: %w"</span>, err)
+	}
+	j.mu.Lock()
+	j.up, j.namespaces = up, namespaces
+	j.mu.Unlock()
+	<span class="k">return</span> <span class="k">nil</span>
+}</code></pre></div>
+<p><code>Connect</code> receives the adapter's block from <code>fendlemark.yaml</code> as an <code>adapter.Config</code>. Its helpers do the type juggling: <code>Strings</code> accepts a YAML list, <code>Duration</code> accepts <code>"10s"</code> or a number of seconds, and <code>Secret</code> is for values that must never appear in logs. The control plane adds the common keys, so <code>cfg.Duration("timeout", …)</code> sees <code>adapters.k8sjobs.timeout</code>, which defaults to ten seconds.</p>
+<p>The rule for <code>Connect</code> is to validate, build clients, and return quickly; it must not fetch facets, and the conformance suite fails it if it takes more than two seconds against the fixture. One request to <code>/version</code> is cheap and turns a wrong URL into an error at start rather than a confusing first poll. The new client is stored only once that request succeeds, so a failed <code>Connect</code> leaves the adapter unconnected rather than half connected.</p>
+<p>For development, <code>kubectl proxy</code> serves the Kubernetes API on <code>http://127.0.0.1:8001</code> with your kubeconfig's credentials, which is why the token is optional. Inside a cluster, the API server's certificate is signed by the cluster's own CA, which this adapter does not load: either run <code>kubectl proxy</code> next to Fendlemark, or extend <code>Connect</code> to read the service account's <code>ca.crt</code> and <code>token</code> from <code>/var/run/secrets/kubernetes.io/serviceaccount/</code>. Either way, the identity needs <code>list</code> on <code>jobs</code> in the <code>batch</code> API group, in those namespaces, and nothing more.</p>
+
+<h2 id="decode"><a class="anchor" href="#decode">4. Decode only what you use</a></h2>
+<div class="code" data-lang="go"><pre data-lang="go" role="region" tabindex="0" aria-label="Go code: 4. Decode only what you use" data-scroll><code><span class="c">// jobList and job decode the parts of the batch/v1 JobList this adapter uses.</span>
+<span class="k">type</span> jobList <span class="k">struct</span> {
+	Metadata <span class="k">struct</span> {
+		Continue <span class="k">string</span> <span class="s">`json:"continue"`</span>
+	} <span class="s">`json:"metadata"`</span>
+	Items []job <span class="s">`json:"items"`</span>
+}
+
+<span class="k">type</span> job <span class="k">struct</span> {
+	Metadata <span class="k">struct</span> {
+		Name              <span class="k">string</span>            <span class="s">`json:"name"`</span>
+		Namespace         <span class="k">string</span>            <span class="s">`json:"namespace"`</span>
+		UID               <span class="k">string</span>            <span class="s">`json:"uid"`</span>
+		CreationTimestamp time.Time         <span class="s">`json:"creationTimestamp"`</span>
+		Labels            <span class="k">map</span>[<span class="k">string</span>]<span class="k">string</span> <span class="s">`json:"labels"`</span>
+		Annotations       <span class="k">map</span>[<span class="k">string</span>]<span class="k">string</span> <span class="s">`json:"annotations"`</span>
+	} <span class="s">`json:"metadata"`</span>
+	Status <span class="k">struct</span> {
+		StartTime      time.Time <span class="s">`json:"startTime"`</span>
+		CompletionTime time.Time <span class="s">`json:"completionTime"`</span>
+		Active         <span class="k">int</span>       <span class="s">`json:"active"`</span>
+		Succeeded      <span class="k">int</span>       <span class="s">`json:"succeeded"`</span>
+		Failed         <span class="k">int</span>       <span class="s">`json:"failed"`</span>
+		Conditions     []<span class="k">struct</span> {
+			Type               <span class="k">string</span>    <span class="s">`json:"type"`</span>
+			Status             <span class="k">string</span>    <span class="s">`json:"status"`</span>
+			Reason             <span class="k">string</span>    <span class="s">`json:"reason"`</span>
+			LastTransitionTime time.Time <span class="s">`json:"lastTransitionTime"`</span>
+		} <span class="s">`json:"conditions"`</span>
+	} <span class="s">`json:"status"`</span>
+}</code></pre></div>
+<p>A Job has many more fields than these. Decoding only the ones the adapter reads keeps the adapter honest about what it depends on, and makes it indifferent to fields that newer Kubernetes versions add. Kubernetes writes times in RFC 3339, which <code>time.Time</code> decodes directly; an absent time decodes to the zero value, which the code below relies on.</p>
+
+<h2 id="facets"><a class="anchor" href="#facets">5. Facets</a></h2>
+<div class="code" data-lang="go"><pre data-lang="go" role="region" tabindex="0" aria-label="Go code: 5. Facets" data-scroll><code><span class="k">func</span> (j *Jobs) Facets(ctx context.Context, q adapter.Query) ([]adapter.Facet, <span class="k">error</span>) {
+	j.mu.RLock()
+	up, namespaces := j.up, j.namespaces
+	j.mu.RUnlock()
+	<span class="k">if</span> up == <span class="k">nil</span> {
+		<span class="k">return</span> <span class="k">nil</span>, adapter.ErrNotConnected
+	}
+	<span class="k">if</span> !q.Wants(adapter.KindRun) {
+		<span class="k">return</span> <span class="k">nil</span>, <span class="k">nil</span>
+	}
+	<span class="k">var</span> out []adapter.Facet
+	<span class="k">for</span> _, ns := <span class="k">range</span> namespaces {
+		next := <span class="s">""</span>
+		<span class="k">for</span> {
+			v := url.Values{<span class="s">"limit"</span>: {<span class="s">"500"</span>}}
+			<span class="k">if</span> next != <span class="s">""</span> {
+				v.Set(<span class="s">"continue"</span>, next)
+			}
+			<span class="k">var</span> list jobList
+			path := <span class="s">"/apis/batch/v1/namespaces/"</span> + url.PathEscape(ns) + <span class="s">"/jobs?"</span> + v.Encode()
+			<span class="k">if</span> err := up.get(ctx, path, &amp;list); err != <span class="k">nil</span> {
+				<span class="k">return</span> <span class="k">nil</span>, fmt.Errorf(<span class="s">"k8sjobs: jobs in %s: %w"</span>, ns, err)
+			}
+			<span class="k">for</span> _, jb := <span class="k">range</span> list.Items {
+				f := facetOf(jb)
+				<span class="k">if</span> !q.Since.IsZero() &amp;&amp; f.StartedAt.Before(q.Since) {
+					<span class="k">continue</span>
+				}
+				out = <span class="k">append</span>(out, f)
+				<span class="k">if</span> q.Limit &gt; 0 &amp;&amp; <span class="k">len</span>(out) &gt;= q.Limit {
+					<span class="k">return</span> out, <span class="k">nil</span>
+				}
+			}
+			<span class="k">if</span> next = list.Metadata.Continue; next == <span class="s">""</span> {
+				<span class="k">break</span>
+			}
+		}
+	}
+	<span class="k">return</span> out, <span class="k">nil</span>
+}</code></pre></div>
+<p><code>Facets</code> is called once at start and then on every poll, and returns everything that matches the query. Three details:</p>
+<ul>
+  <li><strong>Paging.</strong> The list endpoint returns at most <code>limit</code> items and a <code>continue</code> token when there are more. The loop follows the token until it is empty, so a namespace with ten thousand Jobs costs twenty requests, not one enormous one.</li>
+  <li><strong><code>q.Since</code></strong> asks for facets that started after a time. The Jobs API cannot filter on start time, so the adapter filters after decoding.</li>
+  <li><strong>Errors are whole.</strong> If one namespace fails, <code>Facets</code> returns an error rather than a partial list. The control plane then keeps the facets it already has and marks the adapter degraded, which is better than reporting every Job in that namespace as gone.</li>
+</ul>
+
+<h2 id="phases"><a class="anchor" href="#phases">6. From a Job to a facet</a></h2>
+<div class="code" data-lang="go"><pre data-lang="go" role="region" tabindex="0" aria-label="Go code: 6. From a Job to a facet" data-scroll><code><span class="k">func</span> facetOf(jb job) adapter.Facet {
+	m, s := jb.Metadata, jb.Status
+	keys := <span class="k">map</span>[<span class="k">string</span>]<span class="k">string</span>{}
+	<span class="k">for</span> annotation, key := <span class="k">range</span> Annotations {
+		<span class="k">if</span> v := m.Annotations[annotation]; v != <span class="s">""</span> { <span class="c">// empty values fail Facet.Validate</span>
+			keys[key] = v
+		}
+	}
+	started := s.StartTime
+	<span class="k">if</span> started.IsZero() {
+		started = m.CreationTimestamp <span class="c">// a suspended Job has no startTime yet</span>
+	}
+	phase, ended := phaseOf(jb)
+	<span class="k">return</span> adapter.Facet{
+		Source:    <span class="s">"k8sjobs"</span>,
+		SourceID:  m.Namespace + <span class="s">"/"</span> + m.Name,
+		Kind:      adapter.KindRun,
+		Title:     m.Name,
+		Status:    phase,
+		StartedAt: started,
+		EndedAt:   ended,
+		Keys:      keys,
+		Fields: <span class="k">map</span>[<span class="k">string</span>]<span class="k">any</span>{
+			<span class="s">"namespace"</span>: m.Namespace, <span class="s">"uid"</span>: m.UID, <span class="s">"labels"</span>: m.Labels,
+			<span class="s">"active"</span>: s.Active, <span class="s">"succeeded"</span>: s.Succeeded, <span class="s">"failed"</span>: s.Failed,
+		},
+	}
+}
+
+<span class="c">// phaseOf maps a Job onto Fendlemark's five phases and returns when it ended.</span>
+<span class="c">// completionTime is only set when a Job succeeds, so a failed Job's end is</span>
+<span class="c">// the time its Failed condition became true.</span>
+<span class="k">func</span> phaseOf(jb job) (adapter.Phase, time.Time) {
+	<span class="k">for</span> _, c := <span class="k">range</span> jb.Status.Conditions {
+		<span class="k">if</span> c.Status != <span class="s">"True"</span> {
+			<span class="k">continue</span>
+		}
+		<span class="k">switch</span> c.Type {
+		<span class="k">case</span> <span class="s">"Complete"</span>:
+			<span class="k">return</span> adapter.Succeeded, jb.Status.CompletionTime
+		<span class="k">case</span> <span class="s">"Failed"</span>:
+			<span class="k">return</span> adapter.Failed, c.LastTransitionTime
+		<span class="k">case</span> <span class="s">"Suspended"</span>:
+			<span class="k">return</span> adapter.Pending, time.Time{}
+		}
+	}
+	<span class="k">if</span> jb.Status.Active &gt; 0 || !jb.Status.StartTime.IsZero() {
+		<span class="k">return</span> adapter.Running, time.Time{}
+	}
+	<span class="k">return</span> adapter.Pending, time.Time{}
+}</code></pre></div>
+<p>This is where an adapter earns its keep, because it is where the upstream tool's vocabulary becomes Fendlemark's.</p>
+<ul>
+  <li><strong><code>SourceID</code></strong> is the namespace and name, which is unique per facet as the reconciler requires, and is how people refer to a Job.</li>
+  <li><strong><code>StartedAt</code></strong> must never be zero: <code>Facet.Validate</code> rejects it, and the correlation window is measured from it. A Job created suspended has no <code>startTime</code> until it is resumed, so the adapter falls back to <code>creationTimestamp</code>.</li>
+  <li><strong>Keys</strong> are added only when the annotation has a value. An empty key value also fails <code>Validate</code>, and a facet that fails validation is dropped by the lattice rather than shown.</li>
+  <li><strong>Phases</strong> come from the Job's conditions. <code>Complete</code> and <code>Failed</code> are terminal, and a Job never has both. The subtle part is the end time: Kubernetes sets <code>completionTime</code> only when a Job succeeds, so for a failed Job the adapter uses the time the <code>Failed</code> condition became true. Without that, a failed Job would have no end time, and a zero <code>EndedAt</code> means a run that is still going. Newer Kubernetes versions can also set a <code>FailureTarget</code> condition before <code>Failed</code>; the switch ignores it and waits for <code>Failed</code>.</li>
+  <li><strong><code>Fields</code></strong> is for display only and never used for correlation. The console renders it as a key-value table under the adapter's display name until you write a <a href="/docs/ui/#panels">facet panel</a>.</li>
+</ul>
+
+<h2 id="health"><a class="anchor" href="#health">7. Watch and Health</a></h2>
+<div class="code" data-lang="go"><pre data-lang="go" role="region" tabindex="0" aria-label="Go code: 7. Watch and Health" data-scroll><code><span class="k">func</span> (j *Jobs) Watch(ctx context.Context) (&lt;-<span class="k">chan</span> adapter.Event, <span class="k">error</span>) {
+	<span class="k">return</span> <span class="k">nil</span>, adapter.ErrWatchUnsupported
+}
+
+<span class="c">// Health lists one Job per namespace: it proves the permission the adapter</span>
+<span class="c">// actually needs, not just that the API server answers.</span>
+<span class="k">func</span> (j *Jobs) Health(ctx context.Context) adapter.Status {
+	j.mu.RLock()
+	up, namespaces := j.up, j.namespaces
+	j.mu.RUnlock()
+	<span class="k">if</span> up == <span class="k">nil</span> {
+		<span class="k">return</span> adapter.Status{State: adapter.Disabled, Detail: <span class="s">"not connected"</span>}
+	}
+	start := time.Now()
+	<span class="k">var</span> failed []<span class="k">string</span>
+	<span class="k">var</span> lastErr <span class="k">error</span>
+	<span class="k">for</span> _, ns := <span class="k">range</span> namespaces {
+		<span class="k">var</span> list jobList
+		<span class="k">if</span> err := up.get(ctx, <span class="s">"/apis/batch/v1/namespaces/"</span>+url.PathEscape(ns)+<span class="s">"/jobs?limit=1"</span>, &amp;list); err != <span class="k">nil</span> {
+			failed, lastErr = <span class="k">append</span>(failed, ns), err
+		}
+	}
+	lat := time.Since(start)
+	<span class="k">switch</span> {
+	<span class="k">case</span> <span class="k">len</span>(failed) == <span class="k">len</span>(namespaces):
+		<span class="k">return</span> adapter.Status{State: adapter.Unreachable, Detail: lastErr.Error(), Latency: lat}
+	<span class="k">case</span> <span class="k">len</span>(failed) &gt; 0:
+		<span class="k">return</span> adapter.Status{State: adapter.Degraded, Detail: <span class="s">"cannot list jobs in "</span> + strings.Join(failed, <span class="s">", "</span>), Latency: lat}
+	}
+	<span class="k">return</span> adapter.Status{State: adapter.Healthy, Detail: <span class="s">"listing jobs in "</span> + strings.Join(namespaces, <span class="s">", "</span>), Latency: lat}
+}</code></pre></div>
+<p><code>Watch</code> returns <code>adapter.ErrWatchUnsupported</code>, which, with <code>Watchable: false</code>, is the whole of polling. The conformance suite checks that the two agree in both directions.</p>
+<p><code>Health</code> is what <code>fendlemark adapters check</code> and the console's adapter view show. It should be cheap and bounded by its context, and it is more useful when it checks what the adapter actually does: here, listing one Job in each namespace. A service account that can reach the API server but cannot list Jobs in one namespace is reported as <code>degraded</code> with the namespace named, instead of <code>healthy</code> followed by an empty view.</p>
+
+<h2 id="http"><a class="anchor" href="#http">8. The HTTP client</a></h2>
+<div class="code" data-lang="go"><pre data-lang="go" role="region" tabindex="0" aria-label="Go code: 8. The HTTP client" data-scroll><code><span class="k">func</span> (u *upstream) get(ctx context.Context, path <span class="k">string</span>, v <span class="k">any</span>) <span class="k">error</span> {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.api+path, <span class="k">nil</span>)
+	<span class="k">if</span> err != <span class="k">nil</span> {
+		<span class="k">return</span> err
+	}
+	req.Header.Set(<span class="s">"Accept"</span>, <span class="s">"application/json"</span>)
+	<span class="k">if</span> u.token != <span class="s">""</span> {
+		req.Header.Set(<span class="s">"Authorization"</span>, <span class="s">"Bearer "</span>+u.token)
+	}
+	resp, err := u.client.Do(req)
+	<span class="k">if</span> err != <span class="k">nil</span> {
+		<span class="k">return</span> err
+	}
+	<span class="k">defer</span> resp.Body.Close()
+	<span class="k">if</span> resp.StatusCode != http.StatusOK {
+		<span class="k">return</span> fmt.Errorf(<span class="s">"GET %s: %s"</span>, strings.SplitN(path, <span class="s">"?"</span>, 2)[0], resp.Status)
+	}
+	<span class="k">return</span> json.NewDecoder(resp.Body).Decode(v)
+}</code></pre></div>
+<p>The standard library is enough for an adapter this size. The client's timeout and the request's context together bound every call, and errors name the path without its query string.</p>
+
+<h2 id="test"><a class="anchor" href="#test">9. Test it with the conformance suite</a></h2>
+<p>Every adapter, built in or not, must pass <code>adapter/conformance</code>. It drives the adapter through its whole lifecycle against a fixture and checks the rules the reconciler depends on: a non-empty name, a pure descriptor, <code>Connect</code> within two seconds, valid facets with unique <code>Source</code> and <code>SourceID</code> and only declared keys, <code>Watch</code> agreeing with <code>Watchable</code>, and <code>Health</code> within its bound. It also flags a 32-hex-character value under any key but <code>mlflow.run_id</code> or <code>kfp.run_id</code>, which is almost always an MLflow run id filed under the wrong name.</p>
+<p>The fixture is a recorded <code>JobList</code>, the response body of <code>GET /apis/batch/v1/namespaces/ml-training/jobs</code>, trimmed to the fields that matter. It holds three Jobs: a training Job that succeeded, an evaluation Job that failed, and a backfill that is still running. Save it as <code>testdata/jobs.json</code>:</p>
+<div class="code" data-lang="json"><pre data-lang="json" role="region" tabindex="0" aria-label="JSON code: 9. Test it with the conformance suite" data-scroll><code>{
+  "kind": "JobList",
+  "apiVersion": "batch/v1",
+  "metadata": {"resourceVersion": "48211903"},
+  "items": [
+    {
+      "metadata": {
+        "name": "train-resnet50-7xk2p",
+        "namespace": "ml-training",
+        "uid": "0b6f3d1e-58a2-4c7e-9f14-2d8e6a1b3c55",
+        "creationTimestamp": "2026-10-22T08:59:58Z",
+        "labels": {"team": "vision"},
+        "annotations": {
+          "fendlemark.io/mlflow-run-id": "6f1d2c9a8b7e4f30a1c5d9e8b2a47c13",
+          "fendlemark.io/git-sha": "a41c9e07b2d3",
+          "fendlemark.io/git-repo": "git@git.example.internal:ml/vision.git"
+        }
+      },
+      "status": {
+        "startTime": "2026-10-22T09:00:00Z",
+        "completionTime": "2026-10-22T09:41:12Z",
+        "succeeded": 1,
+        "conditions": [
+          {"type": "Complete", "status": "True", "lastTransitionTime": "2026-10-22T09:41:12Z"}
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "eval-resnet50-q9d4m",
+        "namespace": "ml-training",
+        "uid": "7c2a9e40-1f6b-4d38-8a5c-e93b0d7f2a61",
+        "creationTimestamp": "2026-10-22T09:45:01Z",
+        "annotations": {"fendlemark.io/git-sha": "a41c9e07b2d3", "fendlemark.io/git-repo": "git@git.example.internal:ml/vision.git"}
+      },
+      "status": {
+        "startTime": "2026-10-22T09:45:02Z",
+        "failed": 7,
+        "conditions": [
+          {"type": "FailureTarget", "status": "True", "reason": "BackoffLimitExceeded", "lastTransitionTime": "2026-10-22T09:52:40Z"},
+          {"type": "Failed", "status": "True", "reason": "BackoffLimitExceeded", "lastTransitionTime": "2026-10-22T09:52:41Z"}
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "features-backfill-x4n7r",
+        "namespace": "ml-training",
+        "uid": "e4d8b6a2-93c1-47f0-b25e-6a1c8d0f9e37",
+        "creationTimestamp": "2026-10-22T10:15:00Z",
+        "annotations": {"fendlemark.io/argo-workflow": "nightly-features-l2v8c"}
+      },
+      "status": {"startTime": "2026-10-22T10:15:01Z", "active": 1, "ready": 1}
+    }
+  ]
+}</code></pre></div>
+<p>The test serves it from an <code>httptest.Server</code> the way the API server would, and points the adapter's configuration at it. <code>conformance.Run</code> takes the constructor and a <code>conformance.Options</code> with the <code>Config</code> to pass to <code>Connect</code> and the minimum number of facets to expect:</p>
+<div class="code" data-lang="go"><pre data-lang="go" role="region" tabindex="0" aria-label="Go code: 9. Test it with the conformance suite" data-scroll><code><span class="k">package</span> k8sjobs
+
+<span class="k">import</span> (
+	<span class="s">"context"</span>
+	<span class="s">"net/http"</span>
+	<span class="s">"net/http/httptest"</span>
+	<span class="s">"os"</span>
+	<span class="s">"testing"</span>
+	<span class="s">"time"</span>
+
+	<span class="s">"fendlemark.app/fendlemark/adapter"</span>
+	<span class="s">"fendlemark.app/fendlemark/adapter/conformance"</span>
+	<span class="s">"fendlemark.app/fendlemark/lattice"</span>
+)
+
+<span class="c">// fixture serves a recorded JobList the way the API server would.</span>
+<span class="k">func</span> fixture(t *testing.T) *httptest.Server {
+	t.Helper()
+	jobs, err := os.ReadFile(<span class="s">"testdata/jobs.json"</span>)
+	<span class="k">if</span> err != <span class="k">nil</span> {
+		t.Fatal(err)
+	}
+	mux := http.NewServeMux()
+	mux.HandleFunc(<span class="s">"GET /version"</span>, <span class="k">func</span>(w http.ResponseWriter, r *http.Request) {
+		w.Write([]<span class="k">byte</span>(<span class="s">`{"major":"1","minor":"31","gitVersion":"v1.31.2"}`</span>))
+	})
+	mux.HandleFunc(<span class="s">"GET /apis/batch/v1/namespaces/ml-training/jobs"</span>, <span class="k">func</span>(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set(<span class="s">"Content-Type"</span>, <span class="s">"application/json"</span>)
+		w.Write(jobs)
+	})
+	srv := httptest.NewServer(mux)
+	t.Cleanup(srv.Close)
+	<span class="k">return</span> srv
+}
+
+<span class="k">func</span> config(srv *httptest.Server) adapter.Config {
+	<span class="k">return</span> adapter.Config{<span class="s">"api_url"</span>: srv.URL, <span class="s">"namespaces"</span>: []<span class="k">any</span>{<span class="s">"ml-training"</span>}}
+}
+
+<span class="k">func</span> TestConformance(t *testing.T) {
+	conformance.Run(t, New, conformance.Options{Config: config(fixture(t)), MinFacets: 3})
+}</code></pre></div>
+<p>Conformance checks the contract, not the meaning. Two more tests check the meaning: that the phases and end times come out right, and that a Job and its MLflow run really do reconcile into one entity. The second builds a lattice in-process with the <code>lattice</code> package and an MLflow facet written by hand:</p>
+<div class="code" data-lang="go"><pre data-lang="go" role="region" tabindex="0" aria-label="Go code: 9. Test it with the conformance suite (2)" data-scroll><code><span class="k">func</span> TestFacets(t *testing.T) {
+	a := New()
+	<span class="k">if</span> err := a.Connect(context.Background(), config(fixture(t))); err != <span class="k">nil</span> {
+		t.Fatal(err)
+	}
+	facets, err := a.Facets(context.Background(), adapter.Query{})
+	<span class="k">if</span> err != <span class="k">nil</span> {
+		t.Fatal(err)
+	}
+	got := <span class="k">map</span>[<span class="k">string</span>]adapter.Facet{}
+	<span class="k">for</span> _, f := <span class="k">range</span> facets {
+		got[f.SourceID] = f
+	}
+	train := got[<span class="s">"ml-training/train-resnet50-7xk2p"</span>]
+	<span class="k">if</span> train.Status != adapter.Succeeded || train.Keys[adapter.KeyMLflowRunID] != <span class="s">"6f1d2c9a8b7e4f30a1c5d9e8b2a47c13"</span> {
+		t.Errorf(<span class="s">"train: %+v"</span>, train)
+	}
+	eval := got[<span class="s">"ml-training/eval-resnet50-q9d4m"</span>]
+	<span class="k">if</span> eval.Status != adapter.Failed || !eval.EndedAt.Equal(time.Date(2026, 10, 22, 9, 52, 41, 0, time.UTC)) {
+		t.Errorf(<span class="s">"eval: status %s, ended %s"</span>, eval.Status, eval.EndedAt)
+	}
+	<span class="k">if</span> backfill := got[<span class="s">"ml-training/features-backfill-x4n7r"</span>]; backfill.Status != adapter.Running || !backfill.EndedAt.IsZero() {
+		t.Errorf(<span class="s">"backfill: %+v"</span>, backfill)
+	}
+}
+
+<span class="c">// TestCorrelates checks the point of the exercise: a Job and the MLflow run</span>
+<span class="c">// it logs to become one entity. The run was created just before the Job.</span>
+<span class="k">func</span> TestCorrelates(t *testing.T) {
+	a := New()
+	<span class="k">if</span> err := a.Connect(context.Background(), config(fixture(t))); err != <span class="k">nil</span> {
+		t.Fatal(err)
+	}
+	facets, err := a.Facets(context.Background(), adapter.Query{})
+	<span class="k">if</span> err != <span class="k">nil</span> {
+		t.Fatal(err)
+	}
+	run := adapter.Facet{
+		Source: <span class="s">"mlflow"</span>, SourceID: <span class="s">"6f1d2c9a8b7e4f30a1c5d9e8b2a47c13"</span>, Kind: adapter.KindRun,
+		Title: <span class="s">"resnet50 lr=3e-4"</span>, Status: adapter.Succeeded,
+		StartedAt: time.Date(2026, 10, 22, 8, 59, 57, 0, time.UTC),
+		Keys:      <span class="k">map</span>[<span class="k">string</span>]<span class="k">string</span>{adapter.KeyMLflowRunID: <span class="s">"6f1d2c9a8b7e4f30a1c5d9e8b2a47c13"</span>},
+	}
+	l := lattice.New(lattice.Options{})
+	l.Apply(<span class="k">append</span>(facets, run))
+	ents := l.Query(lattice.Query{Keys: <span class="k">map</span>[<span class="k">string</span>]<span class="k">string</span>{adapter.KeyMLflowRunID: run.SourceID}})
+	<span class="k">if</span> <span class="k">len</span>(ents) != 1 || <span class="k">len</span>(ents[0].Facets) != 2 {
+		t.Fatalf(<span class="s">"want one entity with two facets, got %+v"</span>, ents)
+	}
+	ex, _ := l.Explain(ents[0].ID)
+	<span class="k">if</span> <span class="k">len</span>(ex.Merges) != 1 || ex.Merges[0].Key != adapter.KeyMLflowRunID || ex.Merges[0].Gap != 3*time.Second {
+		t.Fatalf(<span class="s">"unexpected merges: %+v"</span>, ex.Merges)
+	}
+	t.Logf(<span class="s">"%s %q: merged on %s, gap %s"</span>, ents[0].ID, ents[0].Title, ex.Merges[0].Key, ex.Merges[0].Gap)
+}</code></pre></div>
+<div class="code" data-lang="shell"><pre data-lang="shell" role="region" tabindex="0" aria-label="Shell code: 9. Test it with the conformance suite" data-scroll><code><span class="p">$</span> go mod tidy
+<span class="p">$</span> go test -v .
+=== RUN   TestConformance
+--- PASS: TestConformance (0.02s)
+=== RUN   TestFacets
+--- PASS: TestFacets (0.00s)
+=== RUN   TestCorrelates
+    k8sjobs_test.go:97: lt_074076a9a9bb28f9 "resnet50 lr=3e-4": merged on mlflow.run_id, gap 3s
+--- PASS: TestCorrelates (0.00s)
+PASS
+ok  	example.com/k8sjobs	0.157s</code></pre></div>
+<p>The merged entity takes the MLflow run's title, because facets are ordered with the built-in adapters first and an entity is titled after its first facet. The training and evaluation Jobs are not merged, because they share only the weak keys <code>git.sha</code> and <code>git.repo</code>; the lattice relates them with a <code>SharesCommit</code> edge instead.</p>
+
+<h2 id="binary"><a class="anchor" href="#binary">10. Run it</a></h2>
+<p>Fendlemark loads no plugins at runtime; adapters are compiled in. You do not need to change Fendlemark's own source to do that. A small <code>main</code> package that imports the adapter for its side effect, and then does what <a href="/docs/api/#embedding">embedding</a> describes, is a complete Fendlemark with one more adapter. Save it as <code>cmd/platform/main.go</code>:</p>
+<div class="code" data-lang="go"><pre data-lang="go" role="region" tabindex="0" aria-label="Go code: 10. Run it" data-scroll><code><span class="c">// Command platform is Fendlemark with one more adapter compiled in.</span>
+<span class="k">package</span> main
+
+<span class="k">import</span> (
+	<span class="s">"context"</span>
+	<span class="s">"log"</span>
+	<span class="s">"os/signal"</span>
+	<span class="s">"syscall"</span>
+
+	<span class="s">"fendlemark.app/fendlemark"</span>
+	<span class="s">"fendlemark.app/fendlemark/config"</span>
+
+	_ <span class="s">"example.com/k8sjobs"</span> <span class="c">// registers "k8sjobs"</span>
+)
+
+<span class="k">func</span> main() {
+	<span class="c">// Configuration validation accepts only adapters it knows about (DOC-110).</span>
+	config.KnownAdapters = <span class="k">append</span>(config.KnownAdapters, <span class="s">"k8sjobs"</span>)
+
+	cfg, _, err := config.Load(<span class="s">"fendlemark.yaml"</span>)
+	<span class="k">if</span> err != <span class="k">nil</span> {
+		log.Fatal(err)
+	}
+	fm, err := fendlemark.New(cfg)
+	<span class="k">if</span> err != <span class="k">nil</span> {
+		log.Fatal(err)
+	}
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	<span class="k">defer</span> stop()
+	<span class="k">if</span> err := fm.Run(ctx); err != <span class="k">nil</span> {
+		log.Fatal(err)
+	}
+}</code></pre></div>
+<p>Importing <code>fendlemark.app/fendlemark</code> registers the four built-in adapters too, so this binary can read MLflow, Metaflow, Argo, and Kubeflow as well as Jobs. Configuration validation rejects an <code>adapters.&lt;name&gt;</code> block for an adapter it does not know, with <code>DOC-110</code>, so <code>main</code> adds the new name to <code>config.KnownAdapters</code> before loading the file.</p>
+<p>Point it at the API through <code>kubectl proxy</code>:</p>
+<div class="code" data-lang="yaml"><pre data-lang="yaml" role="region" tabindex="0" aria-label="YAML code: 10. Run it" data-scroll><code><span class="k">adapters</span>:
+  <span class="k">k8sjobs</span>:
+    <span class="k">enabled</span>: <span class="s">true</span>
+    <span class="k">api_url</span>: <span class="s">"http://127.0.0.1:8001"</span>
+    <span class="k">namespaces</span>: [<span class="s">"ml-training"</span>]</code></pre></div>
+<div class="code" data-lang="shell"><pre data-lang="shell" role="region" tabindex="0" aria-label="Shell code: 10. Run it" data-scroll><code><span class="p">$</span> kubectl proxy &amp;
+<span class="p">$</span> go build -o platform ./cmd/platform
+<span class="p">$</span> ./platform
+INFO fendlemark starting version=0.9.5 adapters=k8sjobs
+INFO adapter connected adapter=k8sjobs took=19ms
+INFO lattice reconciled entities=3 facets=3 generation=1 took=0s
+INFO console listening addr=127.0.0.1:7411</code></pre></div>
+<p>(The log's timestamps are trimmed here.) The console is on <a href="http://localhost:7411">http://localhost:7411</a> as usual, and the API reports the new adapter alongside any others you enable:</p>
+<div class="code" data-lang="shell"><pre data-lang="shell" role="region" tabindex="0" aria-label="Shell code: 10. Run it (2)" data-scroll><code><span class="p">$</span> curl -s http://127.0.0.1:7411/api/v1/adapters | jq '.adapters[0] | {name, state, detail, maturity}'
+{
+  "name": "k8sjobs",
+  "state": "healthy",
+  "detail": "listing jobs in ml-training · 3 facets",
+  "maturity": "Provisional"
+}</code></pre></div>
+<p>Enable the <code>mlflow</code> adapter in the same file, and every Job annotated with <code>fendlemark.io/mlflow-run-id</code> appears once, with both facets attached, as <code>TestCorrelates</code> showed. That holds as long as the run and the Job start within the correlation window of each other, which they do when the run is created just before the Job.</p>
+
+<h2 id="next"><a class="anchor" href="#next">Where to go from here</a></h2>
+<ul>
+  <li><strong>Watch.</strong> The Kubernetes API supports watching Jobs. To use it, set <code>Watchable: true</code> and return a channel of <code>adapter.Event</code> values that closes when the context passed to <code>Watch</code> is cancelled. The control plane calls <code>Facets</code> once for the initial load and reconnects with backoff when the channel closes, and the conformance suite checks the channel closes within two seconds of cancellation.</li>
+  <li><strong>A facet panel.</strong> The default key-value table is fine for <code>Fields</code> this small. A Job with many pods deserves a panel; <a href="/docs/ui/#panels">The console</a> explains how panels are written and registered.</li>
+  <li><strong>Upstream.</strong> If your adapter would be useful to everyone, the <a href="/governance/contributing/">Fendlemark Contribution Protocol</a> describes how to propose it. It would enter at Provisional, and Provisional adapters are not compiled into release binaries; the <a href="/governance/#maturity">maturity ladder</a> describes what it takes to reach Settled, when they are.</li>
+</ul>
+
+<h2 id="reading"><a class="anchor" href="#reading">Further reading</a></h2>
+<ul>
+  <li><a href="/docs/adapters/writing-an-adapter/">Writing an adapter</a>: the interface, facets, lifecycle, and conformance rules</li>
+  <li><a href="/docs/adapters/">Adapters</a>: what the four built-in adapters read and which keys they provide</li>
+  <li><a href="/docs/architecture/#correlation">Architecture: correlation keys</a></li>
+  <li><a href="/docs/api/#adapter">Go API reference: package adapter</a></li>
+</ul>
+
+  </main>
+</div>
+
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <svg class="footer-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
+    <div class="footer-text">
+      <p>Fendlemark is released under the MIT licence and maintained by the Fendlemark Keepers. Documentation for v0.9.5.</p>
+      <p class="fine">MLflow, Metaflow, Argo Workflows, and Kubeflow are trademarks of their respective owners. Fendlemark is an independent project and is not affiliated with, endorsed by, or sponsored by any of them.</p>
+      <p class="fine footer-links"><a href="/about/">About this site</a> · <a href="https://contact.fendlemark.app/">Contact</a> · <a href="/governance/">Governance</a> · <a href="/changelog/">Changelog</a> · <a href="/sitemap.xml">Sitemap</a></p>
+    </div>
+  </div>
+</footer>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "a453832d2b2f43eab267259df60fc9f4"}'></script>
+<script src="/assets/site.js" defer data-ga="G-26P3Z52D45"></script>
+</body>
+</html>

@@ -6,15 +6,11 @@ Every release, in reverse order. Entries are classified as **Accommodations** (t
 
 ## 0.9.5 · 2026-10-24
 
-**Accommodations**
-
-- The project now lives at `fendlemark.app`. The Go module path is `fendlemark.app/fendlemark`: update your imports and `go install` commands. `fendlemark.develops.guru/fendlemark` remains at 0.9.4, where it will stay.
-
 **Clarifications**
 
 - `fendlemark lattice explain` and `GET /api/v1/entities/{id}/explain` now list every merge for an entity assembled from three or more facets. The merges always happened. Now all of them are explained.
 
-Reading of the Diff took longer than usual: the diff was mostly a domain name, read aloud in full each time.
+The Reading of the Diff was the shortest on record. The Sceptic remained sceptical.
 
 ## 0.9.4 · 2026-09-30
 

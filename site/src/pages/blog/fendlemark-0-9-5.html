@@ -1,0 +1,105 @@
+<!-- meta {"title": "Fendlemark 0.9.5: every merge, explained", "description": "Fendlemark 0.9.5 makes lattice explain list every merge for entities built from three or more facets. How to read an explanation, and how to upgrade.", "summary": "Explain now lists every merge for entities assembled from three or more facets. How to read an explanation, and how to upgrade.", "section": "Release notes", "published": "2026-10-24", "modified": "2026-10-24"} -->
+<p class="eyebrow">Release notes</p>
+<h1>Fendlemark 0.9.5: every merge, explained</h1>
+<p class="lede">Fendlemark 0.9.5 is a Clarification. When an entity is assembled from three or more facets, <code>fendlemark lattice explain</code> and the explain endpoint of the API now list every merge that assembled it. The lattice itself has not changed: the same facets reconcile into the same entities, with the same ids, as they did before.</p>
+
+<h2 id="explain">What Explain is for</h2>
+<p>The <a href="/docs/architecture/#lattice">lattice</a> takes the facets every adapter reports and decides which of them describe the same thing. It decides by exact equality on <a href="/docs/architecture/#correlation">correlation keys</a>, within the correlation window, and never by resemblance. That makes every entity accountable: it can say which facets it holds, which key joined each pair, and how far apart the two facets started. <code>fendlemark lattice explain</code> prints that account, and <code>GET /api/v1/entities/{id}/explain</code> returns it as JSON.</p>
+<p>The <a href="/docs/cli/#lattice">CLI reference</a> describes Explain as the single most useful command for "why are these two things one thing". The Keepers see no reason to revise that. They have only made sure that, from this release, the answer is always complete.</p>
+
+<h2 id="example">Reading an explanation</h2>
+<p>Take a nightly training pipeline in Kubeflow Pipelines. KFP executes it on Argo Workflows, and its training step logs to MLflow, tagging the MLflow run with the pipeline run's id as <code>kfp.run_id</code>. With the <code>kubeflow</code>, <code>argo</code>, and <code>mlflow</code> adapters enabled, that one job is three facets: the pipeline run, the Workflow it ran as, and the MLflow run. <code>lattice inspect</code> shows them as one entity:</p>
+<pre data-lang="shell"><code><span class="p">$</span> fendlemark lattice inspect --kind run
+ID                   KIND  STATUS     FACETS                STARTED               TITLE
+lt_105a29352cf19efd  run   Succeeded  argo+kubeflow+mlflow  2026-10-22T02:00:00Z  resnet50-nightly-train</code></pre>
+<p>Entity ids are derived from the set of facets that merged, so the id <code>inspect</code> prints is the id <code>explain</code> accepts, on any machine whose adapters see the same facets:</p>
+<pre data-lang="shell"><code><span class="p">$</span> fendlemark lattice explain lt_105a29352cf19efd
+lt_105a29352cf19efd  run  Succeeded  "resnet50-nightly-train"
+  facet  mlflow     6f1d2c9a8b7e4f30a1c5d9e8b2a47c13
+  facet  argo       kubeflow/resnet50-nightly-8wq5t
+  facet  kubeflow   run:9c1e4b72-3a5d-4f08-b6e1-2d7a9c0f5e83
+  merge  kfp.run_id = "9c1e4b72-3a5d-4f08-b6e1-2d7a9c0f5e83" linked kubeflow/run:9c1e4b72-3a5d-4f08-b6e1-2d7a9c0f5e83 and argo/kubeflow/resnet50-nightly-8wq5t (gap 2s)
+  merge  kfp.run_id = "9c1e4b72-3a5d-4f08-b6e1-2d7a9c0f5e83" linked argo/kubeflow/resnet50-nightly-8wq5t and mlflow/6f1d2c9a8b7e4f30a1c5d9e8b2a47c13 (gap 39s)</code></pre>
+<p>Line by line:</p>
+<ul>
+  <li><strong>The first line</strong> is the entity: id, kind, status, and title. The kind is <code>run</code> because a run outranks a workflow when facets of different kinds merge (the order is run, workflow, pipeline, model, artifact, notebook). The title is the MLflow run's, because facets are listed in adapter order, mlflow, metaflow, argo, kubeflow, and the entity takes its title from the first.</li>
+  <li><strong>Each <code>facet</code> line</strong> is one adapter's view of the job: the adapter and the identifier it uses upstream. The argo adapter identifies a Workflow by namespace and name; the kubeflow adapter prefixes run ids with <code>run:</code>.</li>
+  <li><strong>Each <code>merge</code> line</strong> is one decision: the key and value two facets shared, the two facets, and the gap between their start times. The gap is what the reconciler compared against <code>lattice.correlation.window</code>.</li>
+  <li><strong><code>edge</code> lines</strong>, when present, are relations rather than merges: a model version <code>DerivedFrom</code> the run that produced it, or two entities that <code>SharesCommit</code> through the weak <code>git.sha</code> and <code>git.repo</code> keys. This entity has none.</li>
+</ul>
+<p>The merges read as a chain, and the chain has an order. For each key value, the reconciler sorts the facets that carry it by start time and links each one to its neighbour. So the explanation also tells you how the job began: KFP scheduled the run, Argo started the Workflow two seconds later, and the training step opened its MLflow run thirty-nine seconds after that. The pipeline run and the MLflow run were never compared with each other directly, and did not need to be.</p>
+
+<h2 id="clarification">What 0.9.5 clarifies</h2>
+<p>An entity assembled from <em>n</em> facets has exactly <em>n</em> − 1 merges. Each merge joins two groups of facets that were apart, and it takes <em>n</em> − 1 joins to make one group of <em>n</em>. Two facets, one merge; three facets, two merges, as above.</p>
+<p>Before 0.9.5, an explanation could come up short of that number. The reconciler filed each merge under whichever facet was the entity's root when the merge was made, and a later merge could move the root to a different facet. The merges filed under the earlier root were then left out of the explanation. The entity was always assembled correctly, with the right facets and the right id; only its account of itself was incomplete, and only when it had three or more facets. 0.9.5 records the merges in the order they are made and files them once the entity is complete.</p>
+<p>You can check the arithmetic for any entity. Facets minus merges is always one:</p>
+<pre data-lang="shell"><code><span class="p">$</span> fendlemark lattice explain --json lt_105a29352cf19efd | jq '(.entity.facets | length) - (.merges | length)'
+1</code></pre>
+
+<h2 id="json">The JSON</h2>
+<p><code>fendlemark lattice explain --json</code> and <code>GET /api/v1/entities/{id}/explain</code> return the same object: <code>entity</code> (the entity, with every facet in full), <code>merges</code>, and <code>relations</code>. The merges for the example:</p>
+<pre data-lang="shell"><code><span class="p">$</span> fendlemark lattice explain --json lt_105a29352cf19efd | jq '.merges'
+[
+  {
+    "a": "kubeflow\u0000run:9c1e4b72-3a5d-4f08-b6e1-2d7a9c0f5e83",
+    "b": "argo\u0000kubeflow/resnet50-nightly-8wq5t",
+    "key": "kfp.run_id",
+    "value": "9c1e4b72-3a5d-4f08-b6e1-2d7a9c0f5e83",
+    "gap": 2000000000
+  },
+  {
+    "a": "argo\u0000kubeflow/resnet50-nightly-8wq5t",
+    "b": "mlflow\u00006f1d2c9a8b7e4f30a1c5d9e8b2a47c13",
+    "key": "kfp.run_id",
+    "value": "9c1e4b72-3a5d-4f08-b6e1-2d7a9c0f5e83",
+    "gap": 39000000000
+  }
+]</code></pre>
+<p>Three details are worth knowing before you script against it:</p>
+<ul>
+  <li><code>a</code> and <code>b</code> are facet references: the adapter name, a NUL character, then the facet's source id. JSON writes the NUL as <code>\u0000</code>. Split on it rather than on <code>/</code>, which source ids are free to contain.</li>
+  <li><code>gap</code> is in nanoseconds. Divide by <code>1e9</code> for seconds.</li>
+  <li><code>relations</code> is <code>null</code>, not <code>[]</code>, when an entity has no edges. Treat the two the same.</li>
+</ul>
+<p>The same request against a running console, printed one merge per line:</p>
+<pre data-lang="shell"><code><span class="p">$</span> curl -s http://127.0.0.1:7411/api/v1/entities/lt_105a29352cf19efd/explain | jq -r '.merges[] | "\(.key)  \(.a | split("\u0000") | join("/")) + \(.b | split("\u0000") | join("/"))  \(.gap / 1e9)s"'
+kfp.run_id  kubeflow/run:9c1e4b72-3a5d-4f08-b6e1-2d7a9c0f5e83 + argo/kubeflow/resnet50-nightly-8wq5t  2s
+kfp.run_id  argo/kubeflow/resnet50-nightly-8wq5t + mlflow/6f1d2c9a8b7e4f30a1c5d9e8b2a47c13  39s</code></pre>
+<p>The full schema is <code>Explanation</code> in <a href="/openapi.json">openapi.json</a>.</p>
+
+<h2 id="why">Why the list matters</h2>
+<p>An entity is a claim that several records in several tools are one job. The merge list is the evidence for that claim, and evidence with a page missing is not evidence. In practice, the complete list is useful in three ways.</p>
+<ul>
+  <li><strong>It shows which key did the work.</strong> In the example, both merges came from <code>kfp.run_id</code>: one from the <code>pipeline/runid</code> label that Kubeflow Pipelines puts on the Workflows it creates, one from a tag the training step set. If the tag disappears in a refactor, the MLflow run will stand alone again, and the explanation tells you in advance which line of whose code it depends on.</li>
+  <li><strong>It shows how close each merge came to not happening.</strong> The window is measured between start times. A merge with a gap near <code>lattice.correlation.window</code> (90 seconds by default) is one that a slower node or a longer queue would have prevented. To list the merges with a gap over thirty seconds:
+<pre data-lang="shell"><code><span class="p">$</span> fendlemark lattice explain --json lt_105a29352cf19efd | jq -c '.merges[] | select(.gap &gt; 30e9) | {key, gap_s: (.gap / 1e9)}'
+{"key":"kfp.run_id","gap_s":39}</code></pre></li>
+  <li><strong>It shows the path.</strong> When an entity holds a facet you did not expect, the merges say which neighbour brought it in, and on which key. This is the question an incomplete explanation answered worst: with a merge missing, a facet could sit in an entity with no line saying how it got there.</li>
+</ul>
+
+<h2 id="upgrade">Upgrading</h2>
+<p>There are no configuration changes in 0.9.5, and <code>fendlemark doctor</code> has nothing new to say. If you still spell <code>adapters.mlflow.trackingUri</code> the pre-0.9 way, it is accepted with <code>DOC-104</code> as before; see the <a href="/docs/migration/">migration guide</a>.</p>
+<h3 id="upgrade-cli">The CLI</h3>
+<pre data-lang="shell"><code><span class="p">$</span> go install fendlemark.app/fendlemark/cmd/fendlemark@v0.9.5
+<span class="p">$</span> fendlemark version | head -n 1
+fendlemark 0.9.5 (go1.23.2, linux/amd64)</code></pre>
+<p><code>@latest</code> resolves to the same release. Go 1.23 or later is required. Restart <code>fendlemark serve</code> to pick up the new binary; the lattice rebuilds from the adapters on start, so there is nothing to migrate.</p>
+<h3 id="upgrade-go">Embedding the Go module</h3>
+<pre data-lang="shell"><code><span class="p">$</span> go get fendlemark.app/fendlemark@v0.9.5
+<span class="p">$</span> go mod tidy</code></pre>
+<p><code>fendlemark.Version</code> is now <code>"0.9.5"</code>. The <code>adapter</code> package is unchanged, as <a href="/governance/#decisions">FDR-027</a> requires. <code>lattice.Explanation</code> has the same fields as before; <code>Merges</code> is now always complete. If your own code reconstructed missing merges from facet keys, it can stop.</p>
+<p>Adapters identify themselves upstream with a <code>User-Agent</code> of <code>fendlemark/0.9.5</code>. If a proxy in front of MLflow, Argo Server, or the KFP API matches on the version, update the rule.</p>
+<h3 id="upgrade-npm">The console components</h3>
+<pre data-lang="shell"><code><span class="p">$</span> npm install @fendlemark/ui@0.9.5</code></pre>
+<p><code>@fendlemark/ui</code> 0.9.5 has no component or prop changes. Its <code>VERSION</code> export reads <code>'0.9.5'</code>, in lockstep with the Go module, as it always does; see <a href="/fendlemark/#versions">Packages</a>.</p>
+
+<h2 id="governance">How it was released</h2>
+<p>0.9.5 followed <a href="/governance/#releases">release governance</a> in full: a Release Intent classifying the change as a Clarification, a Reflection Period, four independent and byte-identical builds, unanimous consent, and a Silence Period. The changelog entry was approved with the change and appears in the <a href="/changelog/#0-9-5">changelog</a> unmodified.</p>
+
+<h2 id="reading">Further reading</h2>
+<ul>
+  <li><a href="/docs/cli/#lattice">CLI reference: <code>fendlemark lattice</code></a></li>
+  <li><a href="/docs/architecture/#correlation">Architecture: correlation keys and reconciliation</a></li>
+  <li><a href="/docs/api/#lattice-pkg">Go API reference: package lattice</a></li>
+  <li><a href="/docs/configuration/#lattice">Configuration: <code>lattice.correlation.window</code></a></li>
+</ul>

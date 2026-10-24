@@ -12,7 +12,6 @@
 <link rel="service-desc" href="/openapi.json" type="application/openapi+json">
 <link rel="service-doc" href="/docs/api/#http" type="text/html">
 <meta name="go-import" content="fendlemark.app/fendlemark git https://github.com/TopherGopher/fendlemark">
-<meta name="go-import" content="fendlemark.develops.guru/fendlemark git https://github.com/TopherGopher/fendlemark">
 <link rel="alternate" type="application/atom+xml" title="Fendlemark releases" href="/feed.xml">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
 <meta name="theme-color" content="#0f5c54" media="(prefers-color-scheme: light)">
@@ -52,6 +51,7 @@
       <a href="/philosophy/">Philosophy</a>
       <a href="/governance/">Governance</a>
       <a href="/changelog/">Changelog</a>
+      <a href="/blog/">Blog</a>
       <a href="/fendlemark/">Packages</a>
     </nav>
     <div class="header-actions">
@@ -85,6 +85,7 @@
 <li><a href="/governance/">Governance</a></li>
 <li><a href="/governance/contributing/">Contributing (FCP-1)</a></li>
 <li><a href="/changelog/">Changelog</a></li>
+<li><a href="/blog/">Blog</a></li>
 <li><a href="/fendlemark/">Packages</a></li>
 <li><a href="/faq/">FAQ</a></li>
 <li><a href="/about/">About</a></li>
@@ -243,6 +244,7 @@
 
 <h2 id="panel"><a class="anchor" href="#panel">The facet panel</a></h2>
 <p>By default the console renders your facet's <code>Fields</code> as a key-value table under your adapter's display name. For a custom panel, add a Vue component to <code>console/src/panels/example/</code> and register it in <code>console/src/panels/index.ts</code>. The component receives the facet as a prop and is rendered inside <code>&lt;FmFacetPanel&gt;</code>, which provides the header, the deep links, and the collapse state. See <a href="/docs/ui/#panels">The console</a>.</p>
+<p class="fine">Related reading: <a href="/blog/writing-a-fendlemark-adapter/">Writing a Fendlemark adapter, step by step</a>, a complete adapter for Kubernetes Jobs with its conformance tests.</p>
 <nav class="pager" aria-label="Previous and next pages">
 <a class="pager-prev" href="/docs/adapters/" rel="prev"><span class="pager-label">Previous</span><span class="pager-title">Adapters</span></a>
 <a class="pager-next" href="/docs/ui/" rel="next"><span class="pager-label">Next</span><span class="pager-title">The console (UI)</span></a>
@@ -256,7 +258,7 @@
     <div class="footer-text">
       <p>Fendlemark is released under the MIT licence and maintained by the Fendlemark Keepers. Documentation for v0.9.5.</p>
       <p class="fine">MLflow, Metaflow, Argo Workflows, and Kubeflow are trademarks of their respective owners. Fendlemark is an independent project and is not affiliated with, endorsed by, or sponsored by any of them.</p>
-      <p class="fine footer-links"><a href="/about/">About this site</a> · <a href="/governance/">Governance</a> · <a href="/changelog/">Changelog</a> · <a href="/sitemap.xml">Sitemap</a></p>
+      <p class="fine footer-links"><a href="/about/">About this site</a> · <a href="https://contact.fendlemark.app/">Contact</a> · <a href="/governance/">Governance</a> · <a href="/changelog/">Changelog</a> · <a href="/sitemap.xml">Sitemap</a></p>
     </div>
   </div>
 </footer>

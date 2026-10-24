@@ -1,0 +1,941 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Fendlemark blog</title>
+  <subtitle>Release posts, how-tos, and walkthroughs from the Fendlemark Keepers.</subtitle>
+  <link href="https://fendlemark.app/blog/feed.xml" rel="self"/>
+  <link href="https://fendlemark.app/blog/"/>
+  <id>https://fendlemark.app/blog/</id>
+  <updated>2026-10-24T00:00:00Z</updated>
+  <author><name>The Fendlemark Keepers</name><uri>https://fendlemark.app/governance/</uri></author>
+  <entry>
+    <title>Fendlemark 0.9.5: every merge, explained</title>
+    <link href="https://fendlemark.app/blog/fendlemark-0-9-5/"/>
+    <id>https://fendlemark.app/blog/fendlemark-0-9-5/</id>
+    <published>2026-10-24T00:00:00Z</published>
+    <updated>2026-10-24T00:00:00Z</updated>
+    <author><name>The Fendlemark Keepers</name><uri>https://fendlemark.app/governance/</uri></author>
+    <summary>Fendlemark 0.9.5 makes lattice explain list every merge for entities built from three or more facets. How to read an explanation, and how to upgrade.</summary>
+    <content type="html">&lt;p class=&quot;lede&quot;&gt;Fendlemark 0.9.5 is a Clarification. When an entity is assembled from three or more facets, &lt;code&gt;fendlemark lattice explain&lt;/code&gt; and the explain endpoint of the API now list every merge that assembled it. The lattice itself has not changed: the same facets reconcile into the same entities, with the same ids, as they did before.&lt;/p&gt;
+
+&lt;h2 id=&quot;explain&quot;&gt;What Explain is for&lt;/h2&gt;
+&lt;p&gt;The &lt;a href=&quot;https://fendlemark.app/docs/architecture/#lattice&quot;&gt;lattice&lt;/a&gt; takes the facets every adapter reports and decides which of them describe the same thing. It decides by exact equality on &lt;a href=&quot;https://fendlemark.app/docs/architecture/#correlation&quot;&gt;correlation keys&lt;/a&gt;, within the correlation window, and never by resemblance. That makes every entity accountable: it can say which facets it holds, which key joined each pair, and how far apart the two facets started. &lt;code&gt;fendlemark lattice explain&lt;/code&gt; prints that account, and &lt;code&gt;GET /api/v1/entities/{id}/explain&lt;/code&gt; returns it as JSON.&lt;/p&gt;
+&lt;p&gt;The &lt;a href=&quot;https://fendlemark.app/docs/cli/#lattice&quot;&gt;CLI reference&lt;/a&gt; describes Explain as the single most useful command for &quot;why are these two things one thing&quot;. The Keepers see no reason to revise that. They have only made sure that, from this release, the answer is always complete.&lt;/p&gt;
+
+&lt;h2 id=&quot;example&quot;&gt;Reading an explanation&lt;/h2&gt;
+&lt;p&gt;Take a nightly training pipeline in Kubeflow Pipelines. KFP executes it on Argo Workflows, and its training step logs to MLflow, tagging the MLflow run with the pipeline run&#x27;s id as &lt;code&gt;kfp.run_id&lt;/code&gt;. With the &lt;code&gt;kubeflow&lt;/code&gt;, &lt;code&gt;argo&lt;/code&gt;, and &lt;code&gt;mlflow&lt;/code&gt; adapters enabled, that one job is three facets: the pipeline run, the Workflow it ran as, and the MLflow run. &lt;code&gt;lattice inspect&lt;/code&gt; shows them as one entity:&lt;/p&gt;
+&lt;pre data-lang=&quot;shell&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;$&lt;/span&gt; fendlemark lattice inspect --kind run
+ID                   KIND  STATUS     FACETS                STARTED               TITLE
+lt_105a29352cf19efd  run   Succeeded  argo+kubeflow+mlflow  2026-10-22T02:00:00Z  resnet50-nightly-train&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Entity ids are derived from the set of facets that merged, so the id &lt;code&gt;inspect&lt;/code&gt; prints is the id &lt;code&gt;explain&lt;/code&gt; accepts, on any machine whose adapters see the same facets:&lt;/p&gt;
+&lt;pre data-lang=&quot;shell&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;$&lt;/span&gt; fendlemark lattice explain lt_105a29352cf19efd
+lt_105a29352cf19efd  run  Succeeded  &quot;resnet50-nightly-train&quot;
+  facet  mlflow     6f1d2c9a8b7e4f30a1c5d9e8b2a47c13
+  facet  argo       kubeflow/resnet50-nightly-8wq5t
+  facet  kubeflow   run:9c1e4b72-3a5d-4f08-b6e1-2d7a9c0f5e83
+  merge  kfp.run_id = &quot;9c1e4b72-3a5d-4f08-b6e1-2d7a9c0f5e83&quot; linked kubeflow/run:9c1e4b72-3a5d-4f08-b6e1-2d7a9c0f5e83 and argo/kubeflow/resnet50-nightly-8wq5t (gap 2s)
+  merge  kfp.run_id = &quot;9c1e4b72-3a5d-4f08-b6e1-2d7a9c0f5e83&quot; linked argo/kubeflow/resnet50-nightly-8wq5t and mlflow/6f1d2c9a8b7e4f30a1c5d9e8b2a47c13 (gap 39s)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Line by line:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;The first line&lt;/strong&gt; is the entity: id, kind, status, and title. The kind is &lt;code&gt;run&lt;/code&gt; because a run outranks a workflow when facets of different kinds merge (the order is run, workflow, pipeline, model, artifact, notebook). The title is the MLflow run&#x27;s, because facets are listed in adapter order, mlflow, metaflow, argo, kubeflow, and the entity takes its title from the first.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Each &lt;code&gt;facet&lt;/code&gt; line&lt;/strong&gt; is one adapter&#x27;s view of the job: the adapter and the identifier it uses upstream. The argo adapter identifies a Workflow by namespace and name; the kubeflow adapter prefixes run ids with &lt;code&gt;run:&lt;/code&gt;.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Each &lt;code&gt;merge&lt;/code&gt; line&lt;/strong&gt; is one decision: the key and value two facets shared, the two facets, and the gap between their start times. The gap is what the reconciler compared against &lt;code&gt;lattice.correlation.window&lt;/code&gt;.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;code&gt;edge&lt;/code&gt; lines&lt;/strong&gt;, when present, are relations rather than merges: a model version &lt;code&gt;DerivedFrom&lt;/code&gt; the run that produced it, or two entities that &lt;code&gt;SharesCommit&lt;/code&gt; through the weak &lt;code&gt;git.sha&lt;/code&gt; and &lt;code&gt;git.repo&lt;/code&gt; keys. This entity has none.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The merges read as a chain, and the chain has an order. For each key value, the reconciler sorts the facets that carry it by start time and links each one to its neighbour. So the explanation also tells you how the job began: KFP scheduled the run, Argo started the Workflow two seconds later, and the training step opened its MLflow run thirty-nine seconds after that. The pipeline run and the MLflow run were never compared with each other directly, and did not need to be.&lt;/p&gt;
+
+&lt;h2 id=&quot;clarification&quot;&gt;What 0.9.5 clarifies&lt;/h2&gt;
+&lt;p&gt;An entity assembled from &lt;em&gt;n&lt;/em&gt; facets has exactly &lt;em&gt;n&lt;/em&gt; − 1 merges. Each merge joins two groups of facets that were apart, and it takes &lt;em&gt;n&lt;/em&gt; − 1 joins to make one group of &lt;em&gt;n&lt;/em&gt;. Two facets, one merge; three facets, two merges, as above.&lt;/p&gt;
+&lt;p&gt;Before 0.9.5, an explanation could come up short of that number. The reconciler filed each merge under whichever facet was the entity&#x27;s root when the merge was made, and a later merge could move the root to a different facet. The merges filed under the earlier root were then left out of the explanation. The entity was always assembled correctly, with the right facets and the right id; only its account of itself was incomplete, and only when it had three or more facets. 0.9.5 records the merges in the order they are made and files them once the entity is complete.&lt;/p&gt;
+&lt;p&gt;You can check the arithmetic for any entity. Facets minus merges is always one:&lt;/p&gt;
+&lt;pre data-lang=&quot;shell&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;$&lt;/span&gt; fendlemark lattice explain --json lt_105a29352cf19efd | jq &#x27;(.entity.facets | length) - (.merges | length)&#x27;
+1&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&quot;json&quot;&gt;The JSON&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;fendlemark lattice explain --json&lt;/code&gt; and &lt;code&gt;GET /api/v1/entities/{id}/explain&lt;/code&gt; return the same object: &lt;code&gt;entity&lt;/code&gt; (the entity, with every facet in full), &lt;code&gt;merges&lt;/code&gt;, and &lt;code&gt;relations&lt;/code&gt;. The merges for the example:&lt;/p&gt;
+&lt;pre data-lang=&quot;shell&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;$&lt;/span&gt; fendlemark lattice explain --json lt_105a29352cf19efd | jq &#x27;.merges&#x27;
+[
+  {
+    &quot;a&quot;: &quot;kubeflow\u0000run:9c1e4b72-3a5d-4f08-b6e1-2d7a9c0f5e83&quot;,
+    &quot;b&quot;: &quot;argo\u0000kubeflow/resnet50-nightly-8wq5t&quot;,
+    &quot;key&quot;: &quot;kfp.run_id&quot;,
+    &quot;value&quot;: &quot;9c1e4b72-3a5d-4f08-b6e1-2d7a9c0f5e83&quot;,
+    &quot;gap&quot;: 2000000000
+  },
+  {
+    &quot;a&quot;: &quot;argo\u0000kubeflow/resnet50-nightly-8wq5t&quot;,
+    &quot;b&quot;: &quot;mlflow\u00006f1d2c9a8b7e4f30a1c5d9e8b2a47c13&quot;,
+    &quot;key&quot;: &quot;kfp.run_id&quot;,
+    &quot;value&quot;: &quot;9c1e4b72-3a5d-4f08-b6e1-2d7a9c0f5e83&quot;,
+    &quot;gap&quot;: 39000000000
+  }
+]&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Three details are worth knowing before you script against it:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;code&gt;a&lt;/code&gt; and &lt;code&gt;b&lt;/code&gt; are facet references: the adapter name, a NUL character, then the facet&#x27;s source id. JSON writes the NUL as &lt;code&gt;\u0000&lt;/code&gt;. Split on it rather than on &lt;code&gt;/&lt;/code&gt;, which source ids are free to contain.&lt;/li&gt;
+  &lt;li&gt;&lt;code&gt;gap&lt;/code&gt; is in nanoseconds. Divide by &lt;code&gt;1e9&lt;/code&gt; for seconds.&lt;/li&gt;
+  &lt;li&gt;&lt;code&gt;relations&lt;/code&gt; is &lt;code&gt;null&lt;/code&gt;, not &lt;code&gt;[]&lt;/code&gt;, when an entity has no edges. Treat the two the same.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The same request against a running console, printed one merge per line:&lt;/p&gt;
+&lt;pre data-lang=&quot;shell&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;$&lt;/span&gt; curl -s http://127.0.0.1:7411/api/v1/entities/lt_105a29352cf19efd/explain | jq -r &#x27;.merges[] | &quot;\(.key)  \(.a | split(&quot;\u0000&quot;) | join(&quot;/&quot;)) + \(.b | split(&quot;\u0000&quot;) | join(&quot;/&quot;))  \(.gap / 1e9)s&quot;&#x27;
+kfp.run_id  kubeflow/run:9c1e4b72-3a5d-4f08-b6e1-2d7a9c0f5e83 + argo/kubeflow/resnet50-nightly-8wq5t  2s
+kfp.run_id  argo/kubeflow/resnet50-nightly-8wq5t + mlflow/6f1d2c9a8b7e4f30a1c5d9e8b2a47c13  39s&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The full schema is &lt;code&gt;Explanation&lt;/code&gt; in &lt;a href=&quot;https://fendlemark.app/openapi.json&quot;&gt;openapi.json&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2 id=&quot;why&quot;&gt;Why the list matters&lt;/h2&gt;
+&lt;p&gt;An entity is a claim that several records in several tools are one job. The merge list is the evidence for that claim, and evidence with a page missing is not evidence. In practice, the complete list is useful in three ways.&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;It shows which key did the work.&lt;/strong&gt; In the example, both merges came from &lt;code&gt;kfp.run_id&lt;/code&gt;: one from the &lt;code&gt;pipeline/runid&lt;/code&gt; label that Kubeflow Pipelines puts on the Workflows it creates, one from a tag the training step set. If the tag disappears in a refactor, the MLflow run will stand alone again, and the explanation tells you in advance which line of whose code it depends on.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;It shows how close each merge came to not happening.&lt;/strong&gt; The window is measured between start times. A merge with a gap near &lt;code&gt;lattice.correlation.window&lt;/code&gt; (90 seconds by default) is one that a slower node or a longer queue would have prevented. To list the merges with a gap over thirty seconds:
+&lt;pre data-lang=&quot;shell&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;$&lt;/span&gt; fendlemark lattice explain --json lt_105a29352cf19efd | jq -c &#x27;.merges[] | select(.gap &amp;gt; 30e9) | {key, gap_s: (.gap / 1e9)}&#x27;
+{&quot;key&quot;:&quot;kfp.run_id&quot;,&quot;gap_s&quot;:39}&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;It shows the path.&lt;/strong&gt; When an entity holds a facet you did not expect, the merges say which neighbour brought it in, and on which key. This is the question an incomplete explanation answered worst: with a merge missing, a facet could sit in an entity with no line saying how it got there.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;upgrade&quot;&gt;Upgrading&lt;/h2&gt;
+&lt;p&gt;There are no configuration changes in 0.9.5, and &lt;code&gt;fendlemark doctor&lt;/code&gt; has nothing new to say. If you still spell &lt;code&gt;adapters.mlflow.trackingUri&lt;/code&gt; the pre-0.9 way, it is accepted with &lt;code&gt;DOC-104&lt;/code&gt; as before; see the &lt;a href=&quot;https://fendlemark.app/docs/migration/&quot;&gt;migration guide&lt;/a&gt;.&lt;/p&gt;
+&lt;h3 id=&quot;upgrade-cli&quot;&gt;The CLI&lt;/h3&gt;
+&lt;pre data-lang=&quot;shell&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;$&lt;/span&gt; go install fendlemark.app/fendlemark/cmd/fendlemark@v0.9.5
+&lt;span class=&quot;p&quot;&gt;$&lt;/span&gt; fendlemark version | head -n 1
+fendlemark 0.9.5 (go1.23.2, linux/amd64)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;@latest&lt;/code&gt; resolves to the same release. Go 1.23 or later is required. Restart &lt;code&gt;fendlemark serve&lt;/code&gt; to pick up the new binary; the lattice rebuilds from the adapters on start, so there is nothing to migrate.&lt;/p&gt;
+&lt;h3 id=&quot;upgrade-go&quot;&gt;Embedding the Go module&lt;/h3&gt;
+&lt;pre data-lang=&quot;shell&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;$&lt;/span&gt; go get fendlemark.app/fendlemark@v0.9.5
+&lt;span class=&quot;p&quot;&gt;$&lt;/span&gt; go mod tidy&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;fendlemark.Version&lt;/code&gt; is now &lt;code&gt;&quot;0.9.5&quot;&lt;/code&gt;. The &lt;code&gt;adapter&lt;/code&gt; package is unchanged, as &lt;a href=&quot;https://fendlemark.app/governance/#decisions&quot;&gt;FDR-027&lt;/a&gt; requires. &lt;code&gt;lattice.Explanation&lt;/code&gt; has the same fields as before; &lt;code&gt;Merges&lt;/code&gt; is now always complete. If your own code reconstructed missing merges from facet keys, it can stop.&lt;/p&gt;
+&lt;p&gt;Adapters identify themselves upstream with a &lt;code&gt;User-Agent&lt;/code&gt; of &lt;code&gt;fendlemark/0.9.5&lt;/code&gt;. If a proxy in front of MLflow, Argo Server, or the KFP API matches on the version, update the rule.&lt;/p&gt;
+&lt;h3 id=&quot;upgrade-npm&quot;&gt;The console components&lt;/h3&gt;
+&lt;pre data-lang=&quot;shell&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;$&lt;/span&gt; npm install @fendlemark/ui@0.9.5&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;@fendlemark/ui&lt;/code&gt; 0.9.5 has no component or prop changes. Its &lt;code&gt;VERSION&lt;/code&gt; export reads &lt;code&gt;&#x27;0.9.5&#x27;&lt;/code&gt;, in lockstep with the Go module, as it always does; see &lt;a href=&quot;https://fendlemark.app/fendlemark/#versions&quot;&gt;Packages&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2 id=&quot;governance&quot;&gt;How it was released&lt;/h2&gt;
+&lt;p&gt;0.9.5 followed &lt;a href=&quot;https://fendlemark.app/governance/#releases&quot;&gt;release governance&lt;/a&gt; in full: a Release Intent classifying the change as a Clarification, a Reflection Period, four independent and byte-identical builds, unanimous consent, and a Silence Period. The changelog entry was approved with the change and appears in the &lt;a href=&quot;https://fendlemark.app/changelog/#0-9-5&quot;&gt;changelog&lt;/a&gt; unmodified.&lt;/p&gt;
+
+&lt;h2 id=&quot;reading&quot;&gt;Further reading&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://fendlemark.app/docs/cli/#lattice&quot;&gt;CLI reference: &lt;code&gt;fendlemark lattice&lt;/code&gt;&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://fendlemark.app/docs/architecture/#correlation&quot;&gt;Architecture: correlation keys and reconciliation&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://fendlemark.app/docs/api/#lattice-pkg&quot;&gt;Go API reference: package lattice&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://fendlemark.app/docs/configuration/#lattice&quot;&gt;Configuration: &lt;code&gt;lattice.correlation.window&lt;/code&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</content>
+  </entry>
+  <entry>
+    <title>Running MLflow and Argo Workflows together</title>
+    <link href="https://fendlemark.app/blog/running-mlflow-and-argo-workflows-together/"/>
+    <id>https://fendlemark.app/blog/running-mlflow-and-argo-workflows-together/</id>
+    <published>2026-10-24T00:00:00Z</published>
+    <updated>2026-10-24T00:00:00Z</updated>
+    <author><name>The Fendlemark Keepers</name><uri>https://fendlemark.app/governance/</uri></author>
+    <summary>Run MLflow-tracked training steps in Argo Workflows: set MLFLOW_TRACKING_URI, tag each run with the workflow name and uid, and find each from the other.</summary>
+    <content type="html">&lt;p class=&quot;lede&quot;&gt;Argo Workflows is a good place to run training, and MLflow is a good place to record it. Used together without any care, they give every training job two identities in two UIs, and nothing that connects them. This guide makes each side point at the other. None of it needs Fendlemark; the last section explains what Fendlemark does with it if you run it.&lt;/p&gt;
+
+&lt;p&gt;By the end, every MLflow run started by a workflow step will carry the workflow&#x27;s name, uid, namespace, and pod as tags, every workflow will carry the MLflow run id as an output parameter, and a later step will log into the same MLflow run rather than starting another. The examples use a Workflow named &lt;code&gt;resnet50-train-…&lt;/code&gt; in the &lt;code&gt;ml-training&lt;/code&gt; namespace and an MLflow tracking server reachable inside the cluster at &lt;code&gt;http://mlflow.mlflow.svc:5000&lt;/code&gt;. Substitute your own.&lt;/p&gt;
+
+&lt;h2 id=&quot;tracking-uri&quot;&gt;1. Point every step at the tracking server&lt;/h2&gt;
+&lt;p&gt;The MLflow client reads its tracking server from the &lt;code&gt;MLFLOW_TRACKING_URI&lt;/code&gt; environment variable, so a step needs no MLflow configuration in code. If your tracking server uses MLflow&#x27;s basic authentication, the client also reads &lt;code&gt;MLFLOW_TRACKING_USERNAME&lt;/code&gt; and &lt;code&gt;MLFLOW_TRACKING_PASSWORD&lt;/code&gt;; a bearer token goes in &lt;code&gt;MLFLOW_TRACKING_TOKEN&lt;/code&gt; instead.&lt;/p&gt;
+&lt;p&gt;Keep the address in a ConfigMap and the credentials in a Secret, with keys named exactly like the variables, so each step can import both with &lt;code&gt;envFrom&lt;/code&gt;:&lt;/p&gt;
+&lt;pre data-lang=&quot;shell&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;$&lt;/span&gt; kubectl -n ml-training create configmap mlflow-client --from-literal=MLFLOW_TRACKING_URI=http://mlflow.mlflow.svc:5000
+&lt;span class=&quot;p&quot;&gt;$&lt;/span&gt; kubectl -n ml-training create secret generic mlflow-credentials --from-literal=MLFLOW_TRACKING_USERNAME=argo-runner --from-literal=MLFLOW_TRACKING_PASSWORD=&quot;$MLFLOW_PASSWORD&quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Changing the tracking server later is then one ConfigMap edit, not an edit to every template.&lt;/p&gt;
+
+&lt;h2 id=&quot;identity&quot;&gt;2. Give each step the workflow&#x27;s identity&lt;/h2&gt;
+&lt;p&gt;Argo substitutes template variables in a template&#x27;s fields before the pod starts, including environment variable values. Four of them identify where a step is running:&lt;/p&gt;
+&lt;div class=&quot;table-wrap&quot;&gt;&lt;table&gt;
+&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Variable&lt;/th&gt;&lt;th&gt;Value&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;&lt;code&gt;{{workflow.name}}&lt;/code&gt;&lt;/td&gt;&lt;td&gt;The Workflow&#x27;s name, for example &lt;code&gt;resnet50-train-x7k2p&lt;/code&gt; when it was submitted with &lt;code&gt;generateName: resnet50-train-&lt;/code&gt;. Unique within its namespace while the Workflow exists.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;code&gt;{{workflow.uid}}&lt;/code&gt;&lt;/td&gt;&lt;td&gt;The Workflow&#x27;s Kubernetes UID. Unique across namespaces and across time, so it still identifies this run after a Workflow with the same name has been deleted and submitted again.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;code&gt;{{workflow.namespace}}&lt;/code&gt;&lt;/td&gt;&lt;td&gt;The namespace. With the name, enough to find the Workflow in the Argo UI or the CLI.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;code&gt;{{pod.name}}&lt;/code&gt;&lt;/td&gt;&lt;td&gt;The step&#x27;s pod, available in container and script templates. Tells you which node of the workflow logged the run.&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;
+&lt;p&gt;Here is a two-step Workflow that trains and then evaluates. The training step gets the tracking server from the ConfigMap and Secret, its identity from template variables, and declares an output parameter read from a file the script will write:&lt;/p&gt;
+&lt;pre data-lang=&quot;yaml&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;apiVersion&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;argoproj.io/v1alpha1&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;kind&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;Workflow&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;metadata&lt;/span&gt;:
+  &lt;span class=&quot;k&quot;&gt;generateName&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;resnet50-train-&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;namespace&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;ml-training&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;spec&lt;/span&gt;:
+  &lt;span class=&quot;k&quot;&gt;entrypoint&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;main&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;arguments&lt;/span&gt;:
+    &lt;span class=&quot;k&quot;&gt;parameters&lt;/span&gt;:
+      - &lt;span class=&quot;k&quot;&gt;name&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;lr&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;value&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;&quot;0.0003&quot;&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;templates&lt;/span&gt;:
+    - &lt;span class=&quot;k&quot;&gt;name&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;main&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;steps&lt;/span&gt;:
+        - &lt;span class=&quot;s&quot;&gt;- name: train&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;template&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;train&lt;/span&gt;
+        - &lt;span class=&quot;s&quot;&gt;- name: evaluate&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;template&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;evaluate&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;arguments&lt;/span&gt;:
+              &lt;span class=&quot;k&quot;&gt;parameters&lt;/span&gt;:
+                - &lt;span class=&quot;k&quot;&gt;name&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;mlflow-run-id&lt;/span&gt;
+                  &lt;span class=&quot;k&quot;&gt;value&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;&quot;{{steps.train.outputs.parameters.mlflow-run-id}}&quot;&lt;/span&gt;
+
+    - &lt;span class=&quot;k&quot;&gt;name&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;train&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;outputs&lt;/span&gt;:
+        &lt;span class=&quot;k&quot;&gt;parameters&lt;/span&gt;:
+          - &lt;span class=&quot;k&quot;&gt;name&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;mlflow-run-id&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;valueFrom&lt;/span&gt;:
+              &lt;span class=&quot;k&quot;&gt;path&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;/tmp/mlflow-run-id&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;container&lt;/span&gt;:
+        &lt;span class=&quot;k&quot;&gt;image&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;registry.example.internal/vision/train:2026.10&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;command&lt;/span&gt;: [&lt;span class=&quot;s&quot;&gt;python&lt;/span&gt;, &lt;span class=&quot;s&quot;&gt;train.py&lt;/span&gt;]
+        &lt;span class=&quot;k&quot;&gt;args&lt;/span&gt;: [&lt;span class=&quot;s&quot;&gt;&quot;--lr&quot;&lt;/span&gt;, &lt;span class=&quot;s&quot;&gt;&quot;{{workflow.parameters.lr}}&quot;&lt;/span&gt;]
+        &lt;span class=&quot;k&quot;&gt;envFrom&lt;/span&gt;:
+          - &lt;span class=&quot;k&quot;&gt;configMapRef&lt;/span&gt;:
+              &lt;span class=&quot;k&quot;&gt;name&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;mlflow-client&lt;/span&gt;
+          - &lt;span class=&quot;k&quot;&gt;secretRef&lt;/span&gt;:
+              &lt;span class=&quot;k&quot;&gt;name&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;mlflow-credentials&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;env&lt;/span&gt;:
+          - &lt;span class=&quot;k&quot;&gt;name&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;ARGO_WORKFLOW_NAME&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;value&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;&quot;{{workflow.name}}&quot;&lt;/span&gt;
+          - &lt;span class=&quot;k&quot;&gt;name&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;ARGO_WORKFLOW_UID&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;value&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;&quot;{{workflow.uid}}&quot;&lt;/span&gt;
+          - &lt;span class=&quot;k&quot;&gt;name&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;ARGO_WORKFLOW_NAMESPACE&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;value&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;&quot;{{workflow.namespace}}&quot;&lt;/span&gt;
+          - &lt;span class=&quot;k&quot;&gt;name&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;ARGO_POD_NAME&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;value&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;&quot;{{pod.name}}&quot;&lt;/span&gt;
+
+    - &lt;span class=&quot;k&quot;&gt;name&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;evaluate&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;inputs&lt;/span&gt;:
+        &lt;span class=&quot;k&quot;&gt;parameters&lt;/span&gt;:
+          - &lt;span class=&quot;k&quot;&gt;name&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;mlflow-run-id&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;container&lt;/span&gt;:
+        &lt;span class=&quot;k&quot;&gt;image&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;registry.example.internal/vision/train:2026.10&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;command&lt;/span&gt;: [&lt;span class=&quot;s&quot;&gt;python&lt;/span&gt;, &lt;span class=&quot;s&quot;&gt;evaluate.py&lt;/span&gt;]
+        &lt;span class=&quot;k&quot;&gt;envFrom&lt;/span&gt;:
+          - &lt;span class=&quot;k&quot;&gt;configMapRef&lt;/span&gt;:
+              &lt;span class=&quot;k&quot;&gt;name&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;mlflow-client&lt;/span&gt;
+          - &lt;span class=&quot;k&quot;&gt;secretRef&lt;/span&gt;:
+              &lt;span class=&quot;k&quot;&gt;name&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;mlflow-credentials&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;env&lt;/span&gt;:
+          - &lt;span class=&quot;k&quot;&gt;name&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;MLFLOW_RUN_ID&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;value&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;&quot;{{inputs.parameters.mlflow-run-id}}&quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The quotes around each &lt;code&gt;{{…}}&lt;/code&gt; value matter: unquoted, YAML would read the braces as a mapping.&lt;/p&gt;
+
+&lt;h2 id=&quot;tags&quot;&gt;3. Tag the MLflow run with that identity&lt;/h2&gt;
+&lt;p&gt;MLflow tags are free-form string pairs on a run, searchable and shown in the run&#x27;s page. &lt;code&gt;mlflow.start_run&lt;/code&gt; accepts them directly, so the run carries the workflow&#x27;s identity from the moment it exists:&lt;/p&gt;
+&lt;pre data-lang=&quot;python&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt; argparse
+&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt; os
+
+&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt; mlflow
+
+
+&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; argo_tags():
+    &lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Where this run came from, as MLflow tags.&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; {
+        &lt;span class=&quot;s&quot;&gt;&quot;argo.workflow.name&quot;&lt;/span&gt;: os.environ[&lt;span class=&quot;s&quot;&gt;&quot;ARGO_WORKFLOW_NAME&quot;&lt;/span&gt;],
+        &lt;span class=&quot;s&quot;&gt;&quot;argo.workflow.uid&quot;&lt;/span&gt;: os.environ[&lt;span class=&quot;s&quot;&gt;&quot;ARGO_WORKFLOW_UID&quot;&lt;/span&gt;],
+        &lt;span class=&quot;s&quot;&gt;&quot;argo.workflow.namespace&quot;&lt;/span&gt;: os.environ[&lt;span class=&quot;s&quot;&gt;&quot;ARGO_WORKFLOW_NAMESPACE&quot;&lt;/span&gt;],
+        &lt;span class=&quot;s&quot;&gt;&quot;argo.pod.name&quot;&lt;/span&gt;: os.environ[&lt;span class=&quot;s&quot;&gt;&quot;ARGO_POD_NAME&quot;&lt;/span&gt;],
+    }
+
+
+&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(&lt;span class=&quot;s&quot;&gt;&quot;--lr&quot;&lt;/span&gt;, type=float, required=&lt;span class=&quot;k&quot;&gt;True&lt;/span&gt;)
+    args = parser.parse_args()
+
+    mlflow.set_experiment(&lt;span class=&quot;s&quot;&gt;&quot;resnet50&quot;&lt;/span&gt;)
+    &lt;span class=&quot;k&quot;&gt;with&lt;/span&gt; mlflow.start_run(run_name=os.environ[&lt;span class=&quot;s&quot;&gt;&quot;ARGO_WORKFLOW_NAME&quot;&lt;/span&gt;], tags=argo_tags()) &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; run:
+        &lt;span class=&quot;c&quot;&gt;# Hand the run id back to Argo: this file is the step&#x27;s output parameter.&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;open&lt;/span&gt;(&lt;span class=&quot;s&quot;&gt;&quot;/tmp/mlflow-run-id&quot;&lt;/span&gt;, &lt;span class=&quot;s&quot;&gt;&quot;w&quot;&lt;/span&gt;) &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; f:
+            f.write(run.info.run_id)
+
+        mlflow.log_param(&lt;span class=&quot;s&quot;&gt;&quot;lr&quot;&lt;/span&gt;, args.lr)
+        &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; epoch, metrics &lt;span class=&quot;k&quot;&gt;in&lt;/span&gt; enumerate(train(args.lr)):  &lt;span class=&quot;c&quot;&gt;# train() is your own loop&lt;/span&gt;
+            mlflow.log_metrics(metrics, step=epoch)
+
+
+&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; __name__ == &lt;span class=&quot;s&quot;&gt;&quot;__main__&quot;&lt;/span&gt;:
+    main()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;A few choices in there are deliberate:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;The run is named after the Workflow.&lt;/strong&gt; MLflow does not require run names to be unique, and a name that matches the Argo UI makes the two easy to match by eye.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;The run id is written first.&lt;/strong&gt; Writing it before training means the file exists however long training takes, and the Argo UI shows it in the step&#x27;s outputs once the step finishes.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;The tags use the names &lt;code&gt;argo.workflow.name&lt;/code&gt; and &lt;code&gt;argo.workflow.uid&lt;/code&gt;.&lt;/strong&gt; Any names would do for MLflow. These are the ones Fendlemark reads, as the last section explains.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Container images rarely include a &lt;code&gt;.git&lt;/code&gt; directory, so MLflow usually cannot detect the commit it would otherwise record as &lt;code&gt;mlflow.source.git.commit&lt;/code&gt;. If you bake the commit into the image at build time, set that tag yourself, along with &lt;code&gt;mlflow.source.git.repoURL&lt;/code&gt;, in the same dictionary.&lt;/p&gt;
+
+&lt;h2 id=&quot;resume&quot;&gt;4. Log later steps into the same run&lt;/h2&gt;
+&lt;p&gt;The &lt;code&gt;evaluate&lt;/code&gt; step receives the training run&#x27;s id as an input parameter and exposes it as &lt;code&gt;MLFLOW_RUN_ID&lt;/code&gt;. When that variable is set, &lt;code&gt;mlflow.start_run()&lt;/code&gt; resumes the run with that id instead of creating a new one, so evaluation metrics land next to the training metrics:&lt;/p&gt;
+&lt;pre data-lang=&quot;python&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt; mlflow
+
+&lt;span class=&quot;c&quot;&gt;# MLFLOW_RUN_ID is set by the workflow, so this resumes the training run.&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;with&lt;/span&gt; mlflow.start_run() &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; run:
+    mlflow.log_metrics(evaluate(run.info.run_id))  &lt;span class=&quot;c&quot;&gt;# evaluate() is your own code&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;One MLflow run per workflow is easier to compare across workflows than one per step, and it keeps the correlation simple: one workflow, one run. Steps that genuinely produce separate results, such as a hyperparameter sweep fanned out with &lt;code&gt;withItems&lt;/code&gt;, are better as separate runs; pass the parent&#x27;s id as &lt;code&gt;parent_run_id&lt;/code&gt; to &lt;code&gt;mlflow.start_run&lt;/code&gt; to nest them under it.&lt;/p&gt;
+
+&lt;h2 id=&quot;find&quot;&gt;5. Find one from the other&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;From a workflow to its MLflow run.&lt;/strong&gt; The &lt;code&gt;train&lt;/code&gt; node&#x27;s outputs in the Argo UI show &lt;code&gt;mlflow-run-id&lt;/code&gt;. To go the other way round without the UI, look the run up by the workflow&#x27;s uid, which is unambiguous even when names repeat:&lt;/p&gt;
+&lt;pre data-lang=&quot;shell&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;$&lt;/span&gt; kubectl -n ml-training get workflow resnet50-train-x7k2p -o jsonpath=&#x27;{.metadata.uid}&#x27;
+51d0c8e2-7b3a-4e19-a6f4-0c9d2e8b7a13&lt;/code&gt;&lt;/pre&gt;
+&lt;pre data-lang=&quot;python&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt; mlflow
+
+runs = mlflow.search_runs(
+    filter_string=&lt;span class=&quot;s&quot;&gt;&quot;tags.`argo.workflow.uid` = &#x27;51d0c8e2-7b3a-4e19-a6f4-0c9d2e8b7a13&#x27;&quot;&lt;/span&gt;,
+    search_all_experiments=&lt;span class=&quot;k&quot;&gt;True&lt;/span&gt;,
+)
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;(runs[[&lt;span class=&quot;s&quot;&gt;&quot;run_id&quot;&lt;/span&gt;, &lt;span class=&quot;s&quot;&gt;&quot;status&quot;&lt;/span&gt;, &lt;span class=&quot;s&quot;&gt;&quot;tags.argo.pod.name&quot;&lt;/span&gt;]])&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Tag names that contain dots must be wrapped in backticks (or double quotes) in an MLflow filter, and the value in single quotes. The same filter works in the search box of the MLflow UI: &lt;code&gt;tags.`argo.workflow.name` = &#x27;resnet50-train-x7k2p&#x27;&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;From an MLflow run to its workflow.&lt;/strong&gt; The run&#x27;s &lt;code&gt;argo.workflow.namespace&lt;/code&gt; and &lt;code&gt;argo.workflow.name&lt;/code&gt; tags are everything the Argo CLI needs:&lt;/p&gt;
+&lt;pre data-lang=&quot;shell&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;$&lt;/span&gt; argo get resnet50-train-x7k2p -n ml-training&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In the Argo UI, the same Workflow is at &lt;code&gt;/workflows/ml-training/resnet50-train-x7k2p&lt;/code&gt; on your Argo Server.&lt;/p&gt;
+
+&lt;h2 id=&quot;gotchas&quot;&gt;Things that will happen eventually&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;Names repeat.&lt;/strong&gt; A Workflow submitted with a fixed &lt;code&gt;metadata.name&lt;/code&gt; instead of &lt;code&gt;generateName&lt;/code&gt; gets the same name every time it is deleted and resubmitted, and the same name can exist in two namespaces at once. Search by &lt;code&gt;argo.workflow.uid&lt;/code&gt; when it matters which one you mean.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Retries make more runs.&lt;/strong&gt; If the training template has a &lt;code&gt;retryStrategy&lt;/code&gt;, every attempt is a new pod, and with the script above a new MLflow run with a different &lt;code&gt;argo.pod.name&lt;/code&gt;. Templates with a &lt;code&gt;retryStrategy&lt;/code&gt; can also use &lt;code&gt;{{retries}}&lt;/code&gt;, the attempt number, which is worth adding as a tag of its own.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Killed pods leave running runs.&lt;/strong&gt; The &lt;code&gt;with mlflow.start_run()&lt;/code&gt; block marks a run &lt;code&gt;FAILED&lt;/code&gt; when Python raises, but a pod killed for exceeding its memory limit never reaches the end of the block, and its run stays &lt;code&gt;RUNNING&lt;/code&gt;. Search for &lt;code&gt;attributes.status = &#x27;RUNNING&#x27;&lt;/code&gt; runs whose workflow has finished to find them.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;The tracking server is a dependency.&lt;/strong&gt; If MLflow is down, &lt;code&gt;start_run&lt;/code&gt; fails once the client has exhausted its retries, and so does the step. That is usually what you want for training; if it is not, catch the error and decide explicitly.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;fendlemark&quot;&gt;How Fendlemark correlates them&lt;/h2&gt;
+&lt;p&gt;If you run Fendlemark with the &lt;a href=&quot;https://fendlemark.app/docs/adapters/#mlflow&quot;&gt;&lt;code&gt;mlflow&lt;/code&gt;&lt;/a&gt; and &lt;a href=&quot;https://fendlemark.app/docs/adapters/#argo&quot;&gt;&lt;code&gt;argo&lt;/code&gt;&lt;/a&gt; adapters enabled, the tags above are all it needs. The argo adapter gives every Workflow facet the correlation key &lt;code&gt;argo.workflow.name&lt;/code&gt;, and &lt;code&gt;argo.workflow.uid&lt;/code&gt; alongside it. The mlflow adapter reads the run tags listed in &lt;code&gt;correlation_tags&lt;/code&gt;, whose default list includes &lt;code&gt;argo.workflow.name&lt;/code&gt; (and &lt;code&gt;fendlemark.argo_workflow&lt;/code&gt;, which it treats the same way). When a Workflow facet and an MLflow run facet carry the same value, and their start times are no further apart than &lt;code&gt;lattice.correlation.window&lt;/code&gt;, the lattice merges them into one entity:&lt;/p&gt;
+&lt;pre data-lang=&quot;shell&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;$&lt;/span&gt; fendlemark lattice inspect --key argo.workflow.name=resnet50-train-x7k2p
+ID                   KIND  STATUS     FACETS       STARTED               TITLE
+lt_459baa2c413ad692  run   Succeeded  argo+mlflow  2026-10-22T09:00:00Z  resnet50-train-x7k2p
+&lt;span class=&quot;p&quot;&gt;$&lt;/span&gt; fendlemark lattice explain lt_459baa2c413ad692
+lt_459baa2c413ad692  run  Succeeded  &quot;resnet50-train-x7k2p&quot;
+  facet  mlflow     6f1d2c9a8b7e4f30a1c5d9e8b2a47c13
+  facet  argo       ml-training/resnet50-train-x7k2p
+  merge  argo.workflow.name = &quot;resnet50-train-x7k2p&quot; linked argo/ml-training/resnet50-train-x7k2p and mlflow/6f1d2c9a8b7e4f30a1c5d9e8b2a47c13 (gap 14s)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Three details of the rules are worth knowing when you design your workflows:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;The window is measured between start times:&lt;/strong&gt; the Workflow&#x27;s start and the MLflow run&#x27;s start. The default, 90 seconds, suits a workflow whose tracked step comes first. If the step that opens the MLflow run follows a long data-preparation step, widen it to cover that step:
+&lt;pre data-lang=&quot;yaml&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;lattice&lt;/span&gt;:
+  &lt;span class=&quot;k&quot;&gt;correlation&lt;/span&gt;:
+    &lt;span class=&quot;k&quot;&gt;window&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;20m&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Two facets from the same adapter never merge.&lt;/strong&gt; A workflow is merged with one MLflow run: the first to start after it. That is why step 4 resumes the training run instead of starting a second one. Extra runs carrying the same tag, such as retried attempts, stay entities of their own, and &lt;code&gt;fendlemark lattice inspect --key argo.workflow.name=…&lt;/code&gt; lists all of them.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;To correlate on the uid instead of the name,&lt;/strong&gt; list it in &lt;code&gt;correlation_tags&lt;/code&gt;. The list replaces the default rather than adding to it, so name every tag you want read:
+&lt;pre data-lang=&quot;yaml&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;adapters&lt;/span&gt;:
+  &lt;span class=&quot;k&quot;&gt;mlflow&lt;/span&gt;:
+    &lt;span class=&quot;k&quot;&gt;correlation_tags&lt;/span&gt;:
+      - &lt;span class=&quot;s&quot;&gt;argo.workflow.uid&lt;/span&gt;
+      - &lt;span class=&quot;s&quot;&gt;mlflow.source.git.commit&lt;/span&gt;
+      - &lt;span class=&quot;s&quot;&gt;mlflow.source.git.repoURL&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+  The argo adapter already provides &lt;code&gt;argo.workflow.uid&lt;/code&gt; for every Workflow, so nothing changes on that side. Do this if the same Workflow name can start in two namespaces within the window.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The weak keys are a separate mechanism. If the MLflow run carries &lt;code&gt;mlflow.source.git.commit&lt;/code&gt; and &lt;code&gt;mlflow.source.git.repoURL&lt;/code&gt;, and the Workflow carries the same values in the &lt;code&gt;fendlemark.io/git-sha&lt;/code&gt; and &lt;code&gt;fendlemark.io/git-repo&lt;/code&gt; annotations, Fendlemark relates entities built from the same commit without merging them. The &lt;a href=&quot;https://fendlemark.app/docs/architecture/#correlation&quot;&gt;architecture page&lt;/a&gt; describes both kinds of key, and the &lt;a href=&quot;https://fendlemark.app/docs/adapters/#matrix&quot;&gt;correlation matrix&lt;/a&gt; shows which keys connect which adapters.&lt;/p&gt;
+
+&lt;h2 id=&quot;reading&quot;&gt;Further reading&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://fendlemark.app/docs/adapters/#mlflow&quot;&gt;Adapters: mlflow&lt;/a&gt; and &lt;a href=&quot;https://fendlemark.app/docs/adapters/#argo&quot;&gt;argo&lt;/a&gt;, including the full &lt;code&gt;correlation_tags&lt;/code&gt; default list&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://fendlemark.app/docs/configuration/#lattice&quot;&gt;Configuration: &lt;code&gt;lattice.correlation.window&lt;/code&gt;&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://fendlemark.app/docs/cli/#lattice&quot;&gt;CLI reference: &lt;code&gt;lattice inspect&lt;/code&gt; and &lt;code&gt;lattice explain&lt;/code&gt;&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://fendlemark.app/docs/getting-started/&quot;&gt;Getting started&lt;/a&gt;, which connects exactly these two tools&lt;/li&gt;
+&lt;/ul&gt;</content>
+  </entry>
+  <entry>
+    <title>Writing a Fendlemark adapter, step by step</title>
+    <link href="https://fendlemark.app/blog/writing-a-fendlemark-adapter/"/>
+    <id>https://fendlemark.app/blog/writing-a-fendlemark-adapter/</id>
+    <published>2026-10-24T00:00:00Z</published>
+    <updated>2026-10-24T00:00:00Z</updated>
+    <author><name>The Fendlemark Keepers</name><uri>https://fendlemark.app/governance/</uri></author>
+    <summary>Build a working Fendlemark adapter for Kubernetes Jobs: descriptor, facets, phases, correlation keys, health, conformance tests, and a binary to run it in.</summary>
+    <content type="html">&lt;p class=&quot;lede&quot;&gt;The reference page for &lt;a href=&quot;https://fendlemark.app/docs/adapters/writing-an-adapter/&quot;&gt;writing an adapter&lt;/a&gt; describes the interface. This post uses it: we build a complete adapter for Kubernetes Jobs, test it against a recorded fixture with the conformance suite, and run it inside a Fendlemark binary. Every line of code below compiles against &lt;code&gt;fendlemark.app/fendlemark&lt;/code&gt; v0.9.5.&lt;/p&gt;
+
+&lt;h2 id=&quot;why-jobs&quot;&gt;Why Kubernetes Jobs&lt;/h2&gt;
+&lt;p&gt;Not every training job goes through a workflow engine. On many platforms some of them are a &lt;code&gt;batch/v1&lt;/code&gt; Job, created by a script, a CI pipeline, or a person with &lt;code&gt;kubectl&lt;/code&gt;, and those jobs are invisible to the four built-in adapters. They are a good first adapter: the API is stable and well documented, one Job maps cleanly onto one facet, and the interesting decisions, how to map status onto phases and where to find correlation keys, are the same decisions every adapter makes.&lt;/p&gt;
+&lt;p&gt;The adapter will:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;list the Jobs in the namespaces you configure, page by page, and contribute each one as a facet of kind &lt;code&gt;run&lt;/code&gt;;&lt;/li&gt;
+  &lt;li&gt;map Job status onto Fendlemark&#x27;s five phases, with correct end times for failed Jobs;&lt;/li&gt;
+  &lt;li&gt;read correlation keys from annotations on the Job, so that a Job and the MLflow run it logged become one entity;&lt;/li&gt;
+  &lt;li&gt;report health by checking the one permission it needs, in every namespace it reads.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;It will not watch. Polling is a perfectly good first version, and the control plane polls any adapter that says so.&lt;/p&gt;
+
+&lt;h2 id=&quot;setup&quot;&gt;Set up the module&lt;/h2&gt;
+&lt;p&gt;An adapter is an ordinary Go package. It does not need to live in the Fendlemark repository, and this one does not:&lt;/p&gt;
+&lt;pre data-lang=&quot;shell&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;$&lt;/span&gt; mkdir k8sjobs &amp;amp;&amp;amp; cd k8sjobs
+&lt;span class=&quot;p&quot;&gt;$&lt;/span&gt; go mod init example.com/k8sjobs
+&lt;span class=&quot;p&quot;&gt;$&lt;/span&gt; go get fendlemark.app/fendlemark@v0.9.5&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;You need Go 1.23 or later. By the end, the module looks like this:&lt;/p&gt;
+&lt;pre data-lang=&quot;text&quot;&gt;&lt;code&gt;k8sjobs/
+├── go.mod
+├── k8sjobs.go             the adapter
+├── k8sjobs_test.go        conformance and behaviour tests
+├── testdata/jobs.json     a recorded JobList
+└── cmd/platform/main.go   Fendlemark with the adapter compiled in&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&quot;register&quot;&gt;1. Register the adapter and choose its keys&lt;/h2&gt;
+&lt;p&gt;The Go code in sections 1 to 8 is &lt;code&gt;k8sjobs.go&lt;/code&gt;, in order. It starts with registration and with the one decision that matters most, which correlation keys the adapter provides:&lt;/p&gt;
+&lt;pre data-lang=&quot;go&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;// Package k8sjobs is a Fendlemark adapter for Kubernetes batch/v1 Jobs.&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;// It lists Jobs in the namespaces you configure and contributes each one&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;// to the lattice as a run. Like every adapter, it never writes.&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;package&lt;/span&gt; k8sjobs
+
+&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt; (
+	&lt;span class=&quot;s&quot;&gt;&quot;context&quot;&lt;/span&gt;
+	&lt;span class=&quot;s&quot;&gt;&quot;encoding/json&quot;&lt;/span&gt;
+	&lt;span class=&quot;s&quot;&gt;&quot;errors&quot;&lt;/span&gt;
+	&lt;span class=&quot;s&quot;&gt;&quot;fmt&quot;&lt;/span&gt;
+	&lt;span class=&quot;s&quot;&gt;&quot;net/http&quot;&lt;/span&gt;
+	&lt;span class=&quot;s&quot;&gt;&quot;net/url&quot;&lt;/span&gt;
+	&lt;span class=&quot;s&quot;&gt;&quot;strings&quot;&lt;/span&gt;
+	&lt;span class=&quot;s&quot;&gt;&quot;sync&quot;&lt;/span&gt;
+	&lt;span class=&quot;s&quot;&gt;&quot;time&quot;&lt;/span&gt;
+
+	&lt;span class=&quot;s&quot;&gt;&quot;fendlemark.app/fendlemark/adapter&quot;&lt;/span&gt;
+)
+
+&lt;span class=&quot;k&quot;&gt;func&lt;/span&gt; init() { adapter.Register(&lt;span class=&quot;s&quot;&gt;&quot;k8sjobs&quot;&lt;/span&gt;, New) }
+
+&lt;span class=&quot;c&quot;&gt;// Annotations maps the Job annotations this adapter reads to the shared&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;// correlation key vocabulary.&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;var&lt;/span&gt; Annotations = &lt;span class=&quot;k&quot;&gt;map&lt;/span&gt;[&lt;span class=&quot;k&quot;&gt;string&lt;/span&gt;]&lt;span class=&quot;k&quot;&gt;string&lt;/span&gt;{
+	&lt;span class=&quot;s&quot;&gt;&quot;fendlemark.io/mlflow-run-id&quot;&lt;/span&gt;: adapter.KeyMLflowRunID,
+	&lt;span class=&quot;s&quot;&gt;&quot;fendlemark.io/argo-workflow&quot;&lt;/span&gt;: adapter.KeyArgoWorkflow,
+	&lt;span class=&quot;s&quot;&gt;&quot;fendlemark.io/git-sha&quot;&lt;/span&gt;:       adapter.KeyGitSHA,
+	&lt;span class=&quot;s&quot;&gt;&quot;fendlemark.io/git-repo&quot;&lt;/span&gt;:      adapter.KeyGitRepo,
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;adapter.Register&lt;/code&gt; takes a name and a constructor. The name is what users write under &lt;code&gt;adapters:&lt;/code&gt; in &lt;code&gt;fendlemark.yaml&lt;/code&gt;, and it must be the same string the adapter returns from &lt;code&gt;Name()&lt;/code&gt; and puts in every facet&#x27;s &lt;code&gt;Source&lt;/code&gt;; the conformance suite checks the last of those.&lt;/p&gt;
+&lt;p&gt;The keys come from the shared vocabulary in the &lt;code&gt;adapter&lt;/code&gt; package rather than being invented: a Job that names an MLflow run should say so with exactly the key the mlflow adapter uses, &lt;code&gt;mlflow.run_id&lt;/code&gt;, or the two will never meet. The reference page&#x27;s rule is to invent a key only when none applies, and to prefix it with your adapter&#x27;s name. None needed inventing here.&lt;/p&gt;
+&lt;p&gt;They are read from annotations rather than labels because label values are limited to 63 characters from a small alphabet, and a repository URL such as &lt;code&gt;git@git.example.internal:ml/vision.git&lt;/code&gt; is neither. The &lt;code&gt;fendlemark.io/&lt;/code&gt; prefix matches the &lt;code&gt;fendlemark.io/git-sha&lt;/code&gt; and &lt;code&gt;fendlemark.io/git-repo&lt;/code&gt; annotations the argo adapter already reads from Workflows. Whatever creates the Job sets them:&lt;/p&gt;
+&lt;pre data-lang=&quot;yaml&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;apiVersion&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;batch/v1&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;kind&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;Job&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;metadata&lt;/span&gt;:
+  &lt;span class=&quot;k&quot;&gt;generateName&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;train-resnet50-&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;namespace&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;ml-training&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;annotations&lt;/span&gt;:
+    &lt;span class=&quot;k&quot;&gt;fendlemark.io/mlflow-run-id&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;&quot;6f1d2c9a8b7e4f30a1c5d9e8b2a47c13&quot;&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;fendlemark.io/git-sha&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;&quot;a41c9e07b2d3&quot;&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;fendlemark.io/git-repo&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;&quot;git@git.example.internal:ml/vision.git&quot;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;spec&lt;/span&gt;:
+  &lt;span class=&quot;k&quot;&gt;backoffLimit&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;6&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;template&lt;/span&gt;:
+    &lt;span class=&quot;k&quot;&gt;spec&lt;/span&gt;:
+      &lt;span class=&quot;k&quot;&gt;restartPolicy&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;Never&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;containers&lt;/span&gt;:
+        - &lt;span class=&quot;k&quot;&gt;name&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;train&lt;/span&gt;
+          &lt;span class=&quot;k&quot;&gt;image&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;registry.example.internal/vision/train:2026.10&lt;/span&gt;
+          &lt;span class=&quot;k&quot;&gt;envFrom&lt;/span&gt;:
+            - &lt;span class=&quot;k&quot;&gt;configMapRef&lt;/span&gt;:
+                &lt;span class=&quot;k&quot;&gt;name&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;mlflow-client&lt;/span&gt;
+          &lt;span class=&quot;k&quot;&gt;env&lt;/span&gt;:
+            - &lt;span class=&quot;k&quot;&gt;name&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;MLFLOW_RUN_ID&lt;/span&gt;
+              &lt;span class=&quot;k&quot;&gt;value&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;&quot;6f1d2c9a8b7e4f30a1c5d9e8b2a47c13&quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The MLflow run id has to exist before the Job does, so whatever submits the Job creates the run first, with &lt;code&gt;MlflowClient().create_run(...)&lt;/code&gt;, and passes its id twice: to the annotation, and to &lt;code&gt;MLFLOW_RUN_ID&lt;/code&gt;, which makes the training code&#x27;s &lt;code&gt;mlflow.start_run()&lt;/code&gt; resume that run rather than start another. It is the same technique the evaluation step uses in &lt;a href=&quot;https://fendlemark.app/blog/running-mlflow-and-argo-workflows-together/#resume&quot;&gt;Running MLflow and Argo Workflows together&lt;/a&gt;. Submit the manifest with &lt;code&gt;kubectl create -f&lt;/code&gt;; &lt;code&gt;kubectl apply&lt;/code&gt; does not accept &lt;code&gt;generateName&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h2 id=&quot;describe&quot;&gt;2. The type, the constructor, and the descriptor&lt;/h2&gt;
+&lt;pre data-lang=&quot;go&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;// Jobs is the adapter.&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;type&lt;/span&gt; Jobs &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; {
+	mu         sync.RWMutex
+	up         *upstream
+	namespaces []&lt;span class=&quot;k&quot;&gt;string&lt;/span&gt;
+}
+
+&lt;span class=&quot;c&quot;&gt;// upstream is a minimal client for the Kubernetes API server.&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;type&lt;/span&gt; upstream &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; {
+	client *http.Client
+	api    &lt;span class=&quot;k&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;// base URL, for example http://127.0.0.1:8001 behind kubectl proxy&lt;/span&gt;
+	token  &lt;span class=&quot;k&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;// bearer token; empty behind kubectl proxy&lt;/span&gt;
+}
+
+&lt;span class=&quot;c&quot;&gt;// New returns an unconnected adapter. It is the constructor passed to Register.&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;func&lt;/span&gt; New() adapter.Adapter { &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &amp;amp;Jobs{} }
+
+&lt;span class=&quot;k&quot;&gt;func&lt;/span&gt; (j *Jobs) Name() &lt;span class=&quot;k&quot;&gt;string&lt;/span&gt; { &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;k8sjobs&quot;&lt;/span&gt; }
+
+&lt;span class=&quot;k&quot;&gt;func&lt;/span&gt; (j *Jobs) Describe() adapter.Descriptor {
+	&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; adapter.Descriptor{
+		DisplayName: &lt;span class=&quot;s&quot;&gt;&quot;Kubernetes Jobs&quot;&lt;/span&gt;,
+		Kinds:       []adapter.Kind{adapter.KindRun},
+		Keys:        []&lt;span class=&quot;k&quot;&gt;string&lt;/span&gt;{adapter.KeyMLflowRunID, adapter.KeyArgoWorkflow, adapter.KeyGitSHA, adapter.KeyGitRepo},
+		Watchable:   &lt;span class=&quot;k&quot;&gt;false&lt;/span&gt;,
+		Maturity:    adapter.Provisional,
+		ConfigSchema: json.RawMessage(&lt;span class=&quot;s&quot;&gt;`{&quot;type&quot;:&quot;object&quot;,&quot;required&quot;:[&quot;api_url&quot;,&quot;namespaces&quot;],&quot;properties&quot;:{`&lt;/span&gt; +
+			&lt;span class=&quot;s&quot;&gt;`&quot;api_url&quot;:{&quot;type&quot;:&quot;string&quot;},&quot;namespaces&quot;:{&quot;type&quot;:&quot;array&quot;,&quot;items&quot;:{&quot;type&quot;:&quot;string&quot;}},&quot;token&quot;:{&quot;type&quot;:&quot;string&quot;}}}`&lt;/span&gt;),
+	}
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The constructor returns an unconnected adapter and does no work; the control plane may construct an adapter it never connects. The descriptor is static, and the conformance suite calls &lt;code&gt;Describe&lt;/code&gt; twice and fails if the results differ, so it must not read the clock, the environment, or the network.&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;code&gt;Kinds&lt;/code&gt;&lt;/strong&gt; lists what the adapter contributes: runs only.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;code&gt;Keys&lt;/code&gt;&lt;/strong&gt; must name every key a facet can carry. A facet that emits an undeclared key fails conformance, which is a useful check on typos in the annotation map.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;code&gt;Watchable: false&lt;/code&gt;&lt;/strong&gt; tells the control plane to call &lt;code&gt;Facets&lt;/code&gt; every &lt;code&gt;poll_interval&lt;/code&gt; (30 seconds unless configured) instead of calling &lt;code&gt;Watch&lt;/code&gt;.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;code&gt;Maturity: adapter.Provisional&lt;/code&gt;&lt;/strong&gt; is where every new adapter starts on the &lt;a href=&quot;https://fendlemark.app/governance/#maturity&quot;&gt;maturity ladder&lt;/a&gt;.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;code&gt;ConfigSchema&lt;/code&gt;&lt;/strong&gt; is a JSON Schema for the adapter&#x27;s block in &lt;code&gt;fendlemark.yaml&lt;/code&gt;: &lt;code&gt;api_url&lt;/code&gt;, &lt;code&gt;namespaces&lt;/code&gt;, and an optional &lt;code&gt;token&lt;/code&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;connect&quot;&gt;3. Connect&lt;/h2&gt;
+&lt;pre data-lang=&quot;go&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;func&lt;/span&gt; (j *Jobs) Connect(ctx context.Context, cfg adapter.Config) &lt;span class=&quot;k&quot;&gt;error&lt;/span&gt; {
+	api := strings.TrimRight(cfg.String(&lt;span class=&quot;s&quot;&gt;&quot;api_url&quot;&lt;/span&gt;), &lt;span class=&quot;s&quot;&gt;&quot;/&quot;&lt;/span&gt;)
+	&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; api == &lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt; {
+		&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; errors.New(&lt;span class=&quot;s&quot;&gt;&quot;k8sjobs: api_url is required&quot;&lt;/span&gt;)
+	}
+	&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; u, err := url.Parse(api); err != &lt;span class=&quot;k&quot;&gt;nil&lt;/span&gt; || u.Scheme == &lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt; || u.Host == &lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt; {
+		&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; fmt.Errorf(&lt;span class=&quot;s&quot;&gt;&quot;k8sjobs: api_url %q is not an absolute URL&quot;&lt;/span&gt;, api)
+	}
+	namespaces := cfg.Strings(&lt;span class=&quot;s&quot;&gt;&quot;namespaces&quot;&lt;/span&gt;)
+	&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;len&lt;/span&gt;(namespaces) == 0 {
+		&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; errors.New(&lt;span class=&quot;s&quot;&gt;&quot;k8sjobs: namespaces must list at least one namespace&quot;&lt;/span&gt;)
+	}
+	up := &amp;amp;upstream{
+		client: &amp;amp;http.Client{Timeout: cfg.Duration(&lt;span class=&quot;s&quot;&gt;&quot;timeout&quot;&lt;/span&gt;, 10*time.Second)},
+		api:    api,
+		token:  cfg.Secret(&lt;span class=&quot;s&quot;&gt;&quot;token&quot;&lt;/span&gt;),
+	}
+	&lt;span class=&quot;c&quot;&gt;// One cheap request, so a wrong URL fails here rather than on the first poll.&lt;/span&gt;
+	&lt;span class=&quot;k&quot;&gt;var&lt;/span&gt; version &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; {
+		GitVersion &lt;span class=&quot;k&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;`json:&quot;gitVersion&quot;`&lt;/span&gt;
+	}
+	&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; err := up.get(ctx, &lt;span class=&quot;s&quot;&gt;&quot;/version&quot;&lt;/span&gt;, &amp;amp;version); err != &lt;span class=&quot;k&quot;&gt;nil&lt;/span&gt; {
+		&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; fmt.Errorf(&lt;span class=&quot;s&quot;&gt;&quot;k8sjobs: %w&quot;&lt;/span&gt;, err)
+	}
+	j.mu.Lock()
+	j.up, j.namespaces = up, namespaces
+	j.mu.Unlock()
+	&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;nil&lt;/span&gt;
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;Connect&lt;/code&gt; receives the adapter&#x27;s block from &lt;code&gt;fendlemark.yaml&lt;/code&gt; as an &lt;code&gt;adapter.Config&lt;/code&gt;. Its helpers do the type juggling: &lt;code&gt;Strings&lt;/code&gt; accepts a YAML list, &lt;code&gt;Duration&lt;/code&gt; accepts &lt;code&gt;&quot;10s&quot;&lt;/code&gt; or a number of seconds, and &lt;code&gt;Secret&lt;/code&gt; is for values that must never appear in logs. The control plane adds the common keys, so &lt;code&gt;cfg.Duration(&quot;timeout&quot;, …)&lt;/code&gt; sees &lt;code&gt;adapters.k8sjobs.timeout&lt;/code&gt;, which defaults to ten seconds.&lt;/p&gt;
+&lt;p&gt;The rule for &lt;code&gt;Connect&lt;/code&gt; is to validate, build clients, and return quickly; it must not fetch facets, and the conformance suite fails it if it takes more than two seconds against the fixture. One request to &lt;code&gt;/version&lt;/code&gt; is cheap and turns a wrong URL into an error at start rather than a confusing first poll. The new client is stored only once that request succeeds, so a failed &lt;code&gt;Connect&lt;/code&gt; leaves the adapter unconnected rather than half connected.&lt;/p&gt;
+&lt;p&gt;For development, &lt;code&gt;kubectl proxy&lt;/code&gt; serves the Kubernetes API on &lt;code&gt;http://127.0.0.1:8001&lt;/code&gt; with your kubeconfig&#x27;s credentials, which is why the token is optional. Inside a cluster, the API server&#x27;s certificate is signed by the cluster&#x27;s own CA, which this adapter does not load: either run &lt;code&gt;kubectl proxy&lt;/code&gt; next to Fendlemark, or extend &lt;code&gt;Connect&lt;/code&gt; to read the service account&#x27;s &lt;code&gt;ca.crt&lt;/code&gt; and &lt;code&gt;token&lt;/code&gt; from &lt;code&gt;/var/run/secrets/kubernetes.io/serviceaccount/&lt;/code&gt;. Either way, the identity needs &lt;code&gt;list&lt;/code&gt; on &lt;code&gt;jobs&lt;/code&gt; in the &lt;code&gt;batch&lt;/code&gt; API group, in those namespaces, and nothing more.&lt;/p&gt;
+
+&lt;h2 id=&quot;decode&quot;&gt;4. Decode only what you use&lt;/h2&gt;
+&lt;pre data-lang=&quot;go&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;// jobList and job decode the parts of the batch/v1 JobList this adapter uses.&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;type&lt;/span&gt; jobList &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; {
+	Metadata &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; {
+		Continue &lt;span class=&quot;k&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;`json:&quot;continue&quot;`&lt;/span&gt;
+	} &lt;span class=&quot;s&quot;&gt;`json:&quot;metadata&quot;`&lt;/span&gt;
+	Items []job &lt;span class=&quot;s&quot;&gt;`json:&quot;items&quot;`&lt;/span&gt;
+}
+
+&lt;span class=&quot;k&quot;&gt;type&lt;/span&gt; job &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; {
+	Metadata &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; {
+		Name              &lt;span class=&quot;k&quot;&gt;string&lt;/span&gt;            &lt;span class=&quot;s&quot;&gt;`json:&quot;name&quot;`&lt;/span&gt;
+		Namespace         &lt;span class=&quot;k&quot;&gt;string&lt;/span&gt;            &lt;span class=&quot;s&quot;&gt;`json:&quot;namespace&quot;`&lt;/span&gt;
+		UID               &lt;span class=&quot;k&quot;&gt;string&lt;/span&gt;            &lt;span class=&quot;s&quot;&gt;`json:&quot;uid&quot;`&lt;/span&gt;
+		CreationTimestamp time.Time         &lt;span class=&quot;s&quot;&gt;`json:&quot;creationTimestamp&quot;`&lt;/span&gt;
+		Labels            &lt;span class=&quot;k&quot;&gt;map&lt;/span&gt;[&lt;span class=&quot;k&quot;&gt;string&lt;/span&gt;]&lt;span class=&quot;k&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;`json:&quot;labels&quot;`&lt;/span&gt;
+		Annotations       &lt;span class=&quot;k&quot;&gt;map&lt;/span&gt;[&lt;span class=&quot;k&quot;&gt;string&lt;/span&gt;]&lt;span class=&quot;k&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;`json:&quot;annotations&quot;`&lt;/span&gt;
+	} &lt;span class=&quot;s&quot;&gt;`json:&quot;metadata&quot;`&lt;/span&gt;
+	Status &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; {
+		StartTime      time.Time &lt;span class=&quot;s&quot;&gt;`json:&quot;startTime&quot;`&lt;/span&gt;
+		CompletionTime time.Time &lt;span class=&quot;s&quot;&gt;`json:&quot;completionTime&quot;`&lt;/span&gt;
+		Active         &lt;span class=&quot;k&quot;&gt;int&lt;/span&gt;       &lt;span class=&quot;s&quot;&gt;`json:&quot;active&quot;`&lt;/span&gt;
+		Succeeded      &lt;span class=&quot;k&quot;&gt;int&lt;/span&gt;       &lt;span class=&quot;s&quot;&gt;`json:&quot;succeeded&quot;`&lt;/span&gt;
+		Failed         &lt;span class=&quot;k&quot;&gt;int&lt;/span&gt;       &lt;span class=&quot;s&quot;&gt;`json:&quot;failed&quot;`&lt;/span&gt;
+		Conditions     []&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; {
+			Type               &lt;span class=&quot;k&quot;&gt;string&lt;/span&gt;    &lt;span class=&quot;s&quot;&gt;`json:&quot;type&quot;`&lt;/span&gt;
+			Status             &lt;span class=&quot;k&quot;&gt;string&lt;/span&gt;    &lt;span class=&quot;s&quot;&gt;`json:&quot;status&quot;`&lt;/span&gt;
+			Reason             &lt;span class=&quot;k&quot;&gt;string&lt;/span&gt;    &lt;span class=&quot;s&quot;&gt;`json:&quot;reason&quot;`&lt;/span&gt;
+			LastTransitionTime time.Time &lt;span class=&quot;s&quot;&gt;`json:&quot;lastTransitionTime&quot;`&lt;/span&gt;
+		} &lt;span class=&quot;s&quot;&gt;`json:&quot;conditions&quot;`&lt;/span&gt;
+	} &lt;span class=&quot;s&quot;&gt;`json:&quot;status&quot;`&lt;/span&gt;
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;A Job has many more fields than these. Decoding only the ones the adapter reads keeps the adapter honest about what it depends on, and makes it indifferent to fields that newer Kubernetes versions add. Kubernetes writes times in RFC 3339, which &lt;code&gt;time.Time&lt;/code&gt; decodes directly; an absent time decodes to the zero value, which the code below relies on.&lt;/p&gt;
+
+&lt;h2 id=&quot;facets&quot;&gt;5. Facets&lt;/h2&gt;
+&lt;pre data-lang=&quot;go&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;func&lt;/span&gt; (j *Jobs) Facets(ctx context.Context, q adapter.Query) ([]adapter.Facet, &lt;span class=&quot;k&quot;&gt;error&lt;/span&gt;) {
+	j.mu.RLock()
+	up, namespaces := j.up, j.namespaces
+	j.mu.RUnlock()
+	&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; up == &lt;span class=&quot;k&quot;&gt;nil&lt;/span&gt; {
+		&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;nil&lt;/span&gt;, adapter.ErrNotConnected
+	}
+	&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; !q.Wants(adapter.KindRun) {
+		&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;nil&lt;/span&gt;, &lt;span class=&quot;k&quot;&gt;nil&lt;/span&gt;
+	}
+	&lt;span class=&quot;k&quot;&gt;var&lt;/span&gt; out []adapter.Facet
+	&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; _, ns := &lt;span class=&quot;k&quot;&gt;range&lt;/span&gt; namespaces {
+		next := &lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt;
+		&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; {
+			v := url.Values{&lt;span class=&quot;s&quot;&gt;&quot;limit&quot;&lt;/span&gt;: {&lt;span class=&quot;s&quot;&gt;&quot;500&quot;&lt;/span&gt;}}
+			&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; next != &lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt; {
+				v.Set(&lt;span class=&quot;s&quot;&gt;&quot;continue&quot;&lt;/span&gt;, next)
+			}
+			&lt;span class=&quot;k&quot;&gt;var&lt;/span&gt; list jobList
+			path := &lt;span class=&quot;s&quot;&gt;&quot;/apis/batch/v1/namespaces/&quot;&lt;/span&gt; + url.PathEscape(ns) + &lt;span class=&quot;s&quot;&gt;&quot;/jobs?&quot;&lt;/span&gt; + v.Encode()
+			&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; err := up.get(ctx, path, &amp;amp;list); err != &lt;span class=&quot;k&quot;&gt;nil&lt;/span&gt; {
+				&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;nil&lt;/span&gt;, fmt.Errorf(&lt;span class=&quot;s&quot;&gt;&quot;k8sjobs: jobs in %s: %w&quot;&lt;/span&gt;, ns, err)
+			}
+			&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; _, jb := &lt;span class=&quot;k&quot;&gt;range&lt;/span&gt; list.Items {
+				f := facetOf(jb)
+				&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; !q.Since.IsZero() &amp;amp;&amp;amp; f.StartedAt.Before(q.Since) {
+					&lt;span class=&quot;k&quot;&gt;continue&lt;/span&gt;
+				}
+				out = &lt;span class=&quot;k&quot;&gt;append&lt;/span&gt;(out, f)
+				&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; q.Limit &amp;gt; 0 &amp;amp;&amp;amp; &lt;span class=&quot;k&quot;&gt;len&lt;/span&gt;(out) &amp;gt;= q.Limit {
+					&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; out, &lt;span class=&quot;k&quot;&gt;nil&lt;/span&gt;
+				}
+			}
+			&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; next = list.Metadata.Continue; next == &lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt; {
+				&lt;span class=&quot;k&quot;&gt;break&lt;/span&gt;
+			}
+		}
+	}
+	&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; out, &lt;span class=&quot;k&quot;&gt;nil&lt;/span&gt;
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;Facets&lt;/code&gt; is called once at start and then on every poll, and returns everything that matches the query. Three details:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;Paging.&lt;/strong&gt; The list endpoint returns at most &lt;code&gt;limit&lt;/code&gt; items and a &lt;code&gt;continue&lt;/code&gt; token when there are more. The loop follows the token until it is empty, so a namespace with ten thousand Jobs costs twenty requests, not one enormous one.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;code&gt;q.Since&lt;/code&gt;&lt;/strong&gt; asks for facets that started after a time. The Jobs API cannot filter on start time, so the adapter filters after decoding.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Errors are whole.&lt;/strong&gt; If one namespace fails, &lt;code&gt;Facets&lt;/code&gt; returns an error rather than a partial list. The control plane then keeps the facets it already has and marks the adapter degraded, which is better than reporting every Job in that namespace as gone.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;phases&quot;&gt;6. From a Job to a facet&lt;/h2&gt;
+&lt;pre data-lang=&quot;go&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;func&lt;/span&gt; facetOf(jb job) adapter.Facet {
+	m, s := jb.Metadata, jb.Status
+	keys := &lt;span class=&quot;k&quot;&gt;map&lt;/span&gt;[&lt;span class=&quot;k&quot;&gt;string&lt;/span&gt;]&lt;span class=&quot;k&quot;&gt;string&lt;/span&gt;{}
+	&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; annotation, key := &lt;span class=&quot;k&quot;&gt;range&lt;/span&gt; Annotations {
+		&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; v := m.Annotations[annotation]; v != &lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt; { &lt;span class=&quot;c&quot;&gt;// empty values fail Facet.Validate&lt;/span&gt;
+			keys[key] = v
+		}
+	}
+	started := s.StartTime
+	&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; started.IsZero() {
+		started = m.CreationTimestamp &lt;span class=&quot;c&quot;&gt;// a suspended Job has no startTime yet&lt;/span&gt;
+	}
+	phase, ended := phaseOf(jb)
+	&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; adapter.Facet{
+		Source:    &lt;span class=&quot;s&quot;&gt;&quot;k8sjobs&quot;&lt;/span&gt;,
+		SourceID:  m.Namespace + &lt;span class=&quot;s&quot;&gt;&quot;/&quot;&lt;/span&gt; + m.Name,
+		Kind:      adapter.KindRun,
+		Title:     m.Name,
+		Status:    phase,
+		StartedAt: started,
+		EndedAt:   ended,
+		Keys:      keys,
+		Fields: &lt;span class=&quot;k&quot;&gt;map&lt;/span&gt;[&lt;span class=&quot;k&quot;&gt;string&lt;/span&gt;]&lt;span class=&quot;k&quot;&gt;any&lt;/span&gt;{
+			&lt;span class=&quot;s&quot;&gt;&quot;namespace&quot;&lt;/span&gt;: m.Namespace, &lt;span class=&quot;s&quot;&gt;&quot;uid&quot;&lt;/span&gt;: m.UID, &lt;span class=&quot;s&quot;&gt;&quot;labels&quot;&lt;/span&gt;: m.Labels,
+			&lt;span class=&quot;s&quot;&gt;&quot;active&quot;&lt;/span&gt;: s.Active, &lt;span class=&quot;s&quot;&gt;&quot;succeeded&quot;&lt;/span&gt;: s.Succeeded, &lt;span class=&quot;s&quot;&gt;&quot;failed&quot;&lt;/span&gt;: s.Failed,
+		},
+	}
+}
+
+&lt;span class=&quot;c&quot;&gt;// phaseOf maps a Job onto Fendlemark&#x27;s five phases and returns when it ended.&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;// completionTime is only set when a Job succeeds, so a failed Job&#x27;s end is&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;// the time its Failed condition became true.&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;func&lt;/span&gt; phaseOf(jb job) (adapter.Phase, time.Time) {
+	&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; _, c := &lt;span class=&quot;k&quot;&gt;range&lt;/span&gt; jb.Status.Conditions {
+		&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; c.Status != &lt;span class=&quot;s&quot;&gt;&quot;True&quot;&lt;/span&gt; {
+			&lt;span class=&quot;k&quot;&gt;continue&lt;/span&gt;
+		}
+		&lt;span class=&quot;k&quot;&gt;switch&lt;/span&gt; c.Type {
+		&lt;span class=&quot;k&quot;&gt;case&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;Complete&quot;&lt;/span&gt;:
+			&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; adapter.Succeeded, jb.Status.CompletionTime
+		&lt;span class=&quot;k&quot;&gt;case&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;Failed&quot;&lt;/span&gt;:
+			&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; adapter.Failed, c.LastTransitionTime
+		&lt;span class=&quot;k&quot;&gt;case&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;Suspended&quot;&lt;/span&gt;:
+			&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; adapter.Pending, time.Time{}
+		}
+	}
+	&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; jb.Status.Active &amp;gt; 0 || !jb.Status.StartTime.IsZero() {
+		&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; adapter.Running, time.Time{}
+	}
+	&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; adapter.Pending, time.Time{}
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This is where an adapter earns its keep, because it is where the upstream tool&#x27;s vocabulary becomes Fendlemark&#x27;s.&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;code&gt;SourceID&lt;/code&gt;&lt;/strong&gt; is the namespace and name, which is unique per facet as the reconciler requires, and is how people refer to a Job.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;code&gt;StartedAt&lt;/code&gt;&lt;/strong&gt; must never be zero: &lt;code&gt;Facet.Validate&lt;/code&gt; rejects it, and the correlation window is measured from it. A Job created suspended has no &lt;code&gt;startTime&lt;/code&gt; until it is resumed, so the adapter falls back to &lt;code&gt;creationTimestamp&lt;/code&gt;.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Keys&lt;/strong&gt; are added only when the annotation has a value. An empty key value also fails &lt;code&gt;Validate&lt;/code&gt;, and a facet that fails validation is dropped by the lattice rather than shown.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Phases&lt;/strong&gt; come from the Job&#x27;s conditions. &lt;code&gt;Complete&lt;/code&gt; and &lt;code&gt;Failed&lt;/code&gt; are terminal, and a Job never has both. The subtle part is the end time: Kubernetes sets &lt;code&gt;completionTime&lt;/code&gt; only when a Job succeeds, so for a failed Job the adapter uses the time the &lt;code&gt;Failed&lt;/code&gt; condition became true. Without that, a failed Job would have no end time, and a zero &lt;code&gt;EndedAt&lt;/code&gt; means a run that is still going. Newer Kubernetes versions can also set a &lt;code&gt;FailureTarget&lt;/code&gt; condition before &lt;code&gt;Failed&lt;/code&gt;; the switch ignores it and waits for &lt;code&gt;Failed&lt;/code&gt;.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;code&gt;Fields&lt;/code&gt;&lt;/strong&gt; is for display only and never used for correlation. The console renders it as a key-value table under the adapter&#x27;s display name until you write a &lt;a href=&quot;https://fendlemark.app/docs/ui/#panels&quot;&gt;facet panel&lt;/a&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;health&quot;&gt;7. Watch and Health&lt;/h2&gt;
+&lt;pre data-lang=&quot;go&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;func&lt;/span&gt; (j *Jobs) Watch(ctx context.Context) (&amp;lt;-&lt;span class=&quot;k&quot;&gt;chan&lt;/span&gt; adapter.Event, &lt;span class=&quot;k&quot;&gt;error&lt;/span&gt;) {
+	&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;nil&lt;/span&gt;, adapter.ErrWatchUnsupported
+}
+
+&lt;span class=&quot;c&quot;&gt;// Health lists one Job per namespace: it proves the permission the adapter&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;// actually needs, not just that the API server answers.&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;func&lt;/span&gt; (j *Jobs) Health(ctx context.Context) adapter.Status {
+	j.mu.RLock()
+	up, namespaces := j.up, j.namespaces
+	j.mu.RUnlock()
+	&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; up == &lt;span class=&quot;k&quot;&gt;nil&lt;/span&gt; {
+		&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; adapter.Status{State: adapter.Disabled, Detail: &lt;span class=&quot;s&quot;&gt;&quot;not connected&quot;&lt;/span&gt;}
+	}
+	start := time.Now()
+	&lt;span class=&quot;k&quot;&gt;var&lt;/span&gt; failed []&lt;span class=&quot;k&quot;&gt;string&lt;/span&gt;
+	&lt;span class=&quot;k&quot;&gt;var&lt;/span&gt; lastErr &lt;span class=&quot;k&quot;&gt;error&lt;/span&gt;
+	&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; _, ns := &lt;span class=&quot;k&quot;&gt;range&lt;/span&gt; namespaces {
+		&lt;span class=&quot;k&quot;&gt;var&lt;/span&gt; list jobList
+		&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; err := up.get(ctx, &lt;span class=&quot;s&quot;&gt;&quot;/apis/batch/v1/namespaces/&quot;&lt;/span&gt;+url.PathEscape(ns)+&lt;span class=&quot;s&quot;&gt;&quot;/jobs?limit=1&quot;&lt;/span&gt;, &amp;amp;list); err != &lt;span class=&quot;k&quot;&gt;nil&lt;/span&gt; {
+			failed, lastErr = &lt;span class=&quot;k&quot;&gt;append&lt;/span&gt;(failed, ns), err
+		}
+	}
+	lat := time.Since(start)
+	&lt;span class=&quot;k&quot;&gt;switch&lt;/span&gt; {
+	&lt;span class=&quot;k&quot;&gt;case&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;len&lt;/span&gt;(failed) == &lt;span class=&quot;k&quot;&gt;len&lt;/span&gt;(namespaces):
+		&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; adapter.Status{State: adapter.Unreachable, Detail: lastErr.Error(), Latency: lat}
+	&lt;span class=&quot;k&quot;&gt;case&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;len&lt;/span&gt;(failed) &amp;gt; 0:
+		&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; adapter.Status{State: adapter.Degraded, Detail: &lt;span class=&quot;s&quot;&gt;&quot;cannot list jobs in &quot;&lt;/span&gt; + strings.Join(failed, &lt;span class=&quot;s&quot;&gt;&quot;, &quot;&lt;/span&gt;), Latency: lat}
+	}
+	&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; adapter.Status{State: adapter.Healthy, Detail: &lt;span class=&quot;s&quot;&gt;&quot;listing jobs in &quot;&lt;/span&gt; + strings.Join(namespaces, &lt;span class=&quot;s&quot;&gt;&quot;, &quot;&lt;/span&gt;), Latency: lat}
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;Watch&lt;/code&gt; returns &lt;code&gt;adapter.ErrWatchUnsupported&lt;/code&gt;, which, with &lt;code&gt;Watchable: false&lt;/code&gt;, is the whole of polling. The conformance suite checks that the two agree in both directions.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Health&lt;/code&gt; is what &lt;code&gt;fendlemark adapters check&lt;/code&gt; and the console&#x27;s adapter view show. It should be cheap and bounded by its context, and it is more useful when it checks what the adapter actually does: here, listing one Job in each namespace. A service account that can reach the API server but cannot list Jobs in one namespace is reported as &lt;code&gt;degraded&lt;/code&gt; with the namespace named, instead of &lt;code&gt;healthy&lt;/code&gt; followed by an empty view.&lt;/p&gt;
+
+&lt;h2 id=&quot;http&quot;&gt;8. The HTTP client&lt;/h2&gt;
+&lt;pre data-lang=&quot;go&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;func&lt;/span&gt; (u *upstream) get(ctx context.Context, path &lt;span class=&quot;k&quot;&gt;string&lt;/span&gt;, v &lt;span class=&quot;k&quot;&gt;any&lt;/span&gt;) &lt;span class=&quot;k&quot;&gt;error&lt;/span&gt; {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.api+path, &lt;span class=&quot;k&quot;&gt;nil&lt;/span&gt;)
+	&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; err != &lt;span class=&quot;k&quot;&gt;nil&lt;/span&gt; {
+		&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; err
+	}
+	req.Header.Set(&lt;span class=&quot;s&quot;&gt;&quot;Accept&quot;&lt;/span&gt;, &lt;span class=&quot;s&quot;&gt;&quot;application/json&quot;&lt;/span&gt;)
+	&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; u.token != &lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt; {
+		req.Header.Set(&lt;span class=&quot;s&quot;&gt;&quot;Authorization&quot;&lt;/span&gt;, &lt;span class=&quot;s&quot;&gt;&quot;Bearer &quot;&lt;/span&gt;+u.token)
+	}
+	resp, err := u.client.Do(req)
+	&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; err != &lt;span class=&quot;k&quot;&gt;nil&lt;/span&gt; {
+		&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; err
+	}
+	&lt;span class=&quot;k&quot;&gt;defer&lt;/span&gt; resp.Body.Close()
+	&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; resp.StatusCode != http.StatusOK {
+		&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; fmt.Errorf(&lt;span class=&quot;s&quot;&gt;&quot;GET %s: %s&quot;&lt;/span&gt;, strings.SplitN(path, &lt;span class=&quot;s&quot;&gt;&quot;?&quot;&lt;/span&gt;, 2)[0], resp.Status)
+	}
+	&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; json.NewDecoder(resp.Body).Decode(v)
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The standard library is enough for an adapter this size. The client&#x27;s timeout and the request&#x27;s context together bound every call, and errors name the path without its query string.&lt;/p&gt;
+
+&lt;h2 id=&quot;test&quot;&gt;9. Test it with the conformance suite&lt;/h2&gt;
+&lt;p&gt;Every adapter, built in or not, must pass &lt;code&gt;adapter/conformance&lt;/code&gt;. It drives the adapter through its whole lifecycle against a fixture and checks the rules the reconciler depends on: a non-empty name, a pure descriptor, &lt;code&gt;Connect&lt;/code&gt; within two seconds, valid facets with unique &lt;code&gt;Source&lt;/code&gt; and &lt;code&gt;SourceID&lt;/code&gt; and only declared keys, &lt;code&gt;Watch&lt;/code&gt; agreeing with &lt;code&gt;Watchable&lt;/code&gt;, and &lt;code&gt;Health&lt;/code&gt; within its bound. It also flags a 32-hex-character value under any key but &lt;code&gt;mlflow.run_id&lt;/code&gt; or &lt;code&gt;kfp.run_id&lt;/code&gt;, which is almost always an MLflow run id filed under the wrong name.&lt;/p&gt;
+&lt;p&gt;The fixture is a recorded &lt;code&gt;JobList&lt;/code&gt;, the response body of &lt;code&gt;GET /apis/batch/v1/namespaces/ml-training/jobs&lt;/code&gt;, trimmed to the fields that matter. It holds three Jobs: a training Job that succeeded, an evaluation Job that failed, and a backfill that is still running. Save it as &lt;code&gt;testdata/jobs.json&lt;/code&gt;:&lt;/p&gt;
+&lt;pre data-lang=&quot;json&quot;&gt;&lt;code&gt;{
+  &quot;kind&quot;: &quot;JobList&quot;,
+  &quot;apiVersion&quot;: &quot;batch/v1&quot;,
+  &quot;metadata&quot;: {&quot;resourceVersion&quot;: &quot;48211903&quot;},
+  &quot;items&quot;: [
+    {
+      &quot;metadata&quot;: {
+        &quot;name&quot;: &quot;train-resnet50-7xk2p&quot;,
+        &quot;namespace&quot;: &quot;ml-training&quot;,
+        &quot;uid&quot;: &quot;0b6f3d1e-58a2-4c7e-9f14-2d8e6a1b3c55&quot;,
+        &quot;creationTimestamp&quot;: &quot;2026-10-22T08:59:58Z&quot;,
+        &quot;labels&quot;: {&quot;team&quot;: &quot;vision&quot;},
+        &quot;annotations&quot;: {
+          &quot;fendlemark.io/mlflow-run-id&quot;: &quot;6f1d2c9a8b7e4f30a1c5d9e8b2a47c13&quot;,
+          &quot;fendlemark.io/git-sha&quot;: &quot;a41c9e07b2d3&quot;,
+          &quot;fendlemark.io/git-repo&quot;: &quot;git@git.example.internal:ml/vision.git&quot;
+        }
+      },
+      &quot;status&quot;: {
+        &quot;startTime&quot;: &quot;2026-10-22T09:00:00Z&quot;,
+        &quot;completionTime&quot;: &quot;2026-10-22T09:41:12Z&quot;,
+        &quot;succeeded&quot;: 1,
+        &quot;conditions&quot;: [
+          {&quot;type&quot;: &quot;Complete&quot;, &quot;status&quot;: &quot;True&quot;, &quot;lastTransitionTime&quot;: &quot;2026-10-22T09:41:12Z&quot;}
+        ]
+      }
+    },
+    {
+      &quot;metadata&quot;: {
+        &quot;name&quot;: &quot;eval-resnet50-q9d4m&quot;,
+        &quot;namespace&quot;: &quot;ml-training&quot;,
+        &quot;uid&quot;: &quot;7c2a9e40-1f6b-4d38-8a5c-e93b0d7f2a61&quot;,
+        &quot;creationTimestamp&quot;: &quot;2026-10-22T09:45:01Z&quot;,
+        &quot;annotations&quot;: {&quot;fendlemark.io/git-sha&quot;: &quot;a41c9e07b2d3&quot;, &quot;fendlemark.io/git-repo&quot;: &quot;git@git.example.internal:ml/vision.git&quot;}
+      },
+      &quot;status&quot;: {
+        &quot;startTime&quot;: &quot;2026-10-22T09:45:02Z&quot;,
+        &quot;failed&quot;: 7,
+        &quot;conditions&quot;: [
+          {&quot;type&quot;: &quot;FailureTarget&quot;, &quot;status&quot;: &quot;True&quot;, &quot;reason&quot;: &quot;BackoffLimitExceeded&quot;, &quot;lastTransitionTime&quot;: &quot;2026-10-22T09:52:40Z&quot;},
+          {&quot;type&quot;: &quot;Failed&quot;, &quot;status&quot;: &quot;True&quot;, &quot;reason&quot;: &quot;BackoffLimitExceeded&quot;, &quot;lastTransitionTime&quot;: &quot;2026-10-22T09:52:41Z&quot;}
+        ]
+      }
+    },
+    {
+      &quot;metadata&quot;: {
+        &quot;name&quot;: &quot;features-backfill-x4n7r&quot;,
+        &quot;namespace&quot;: &quot;ml-training&quot;,
+        &quot;uid&quot;: &quot;e4d8b6a2-93c1-47f0-b25e-6a1c8d0f9e37&quot;,
+        &quot;creationTimestamp&quot;: &quot;2026-10-22T10:15:00Z&quot;,
+        &quot;annotations&quot;: {&quot;fendlemark.io/argo-workflow&quot;: &quot;nightly-features-l2v8c&quot;}
+      },
+      &quot;status&quot;: {&quot;startTime&quot;: &quot;2026-10-22T10:15:01Z&quot;, &quot;active&quot;: 1, &quot;ready&quot;: 1}
+    }
+  ]
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The test serves it from an &lt;code&gt;httptest.Server&lt;/code&gt; the way the API server would, and points the adapter&#x27;s configuration at it. &lt;code&gt;conformance.Run&lt;/code&gt; takes the constructor and a &lt;code&gt;conformance.Options&lt;/code&gt; with the &lt;code&gt;Config&lt;/code&gt; to pass to &lt;code&gt;Connect&lt;/code&gt; and the minimum number of facets to expect:&lt;/p&gt;
+&lt;pre data-lang=&quot;go&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;package&lt;/span&gt; k8sjobs
+
+&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt; (
+	&lt;span class=&quot;s&quot;&gt;&quot;context&quot;&lt;/span&gt;
+	&lt;span class=&quot;s&quot;&gt;&quot;net/http&quot;&lt;/span&gt;
+	&lt;span class=&quot;s&quot;&gt;&quot;net/http/httptest&quot;&lt;/span&gt;
+	&lt;span class=&quot;s&quot;&gt;&quot;os&quot;&lt;/span&gt;
+	&lt;span class=&quot;s&quot;&gt;&quot;testing&quot;&lt;/span&gt;
+	&lt;span class=&quot;s&quot;&gt;&quot;time&quot;&lt;/span&gt;
+
+	&lt;span class=&quot;s&quot;&gt;&quot;fendlemark.app/fendlemark/adapter&quot;&lt;/span&gt;
+	&lt;span class=&quot;s&quot;&gt;&quot;fendlemark.app/fendlemark/adapter/conformance&quot;&lt;/span&gt;
+	&lt;span class=&quot;s&quot;&gt;&quot;fendlemark.app/fendlemark/lattice&quot;&lt;/span&gt;
+)
+
+&lt;span class=&quot;c&quot;&gt;// fixture serves a recorded JobList the way the API server would.&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;func&lt;/span&gt; fixture(t *testing.T) *httptest.Server {
+	t.Helper()
+	jobs, err := os.ReadFile(&lt;span class=&quot;s&quot;&gt;&quot;testdata/jobs.json&quot;&lt;/span&gt;)
+	&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; err != &lt;span class=&quot;k&quot;&gt;nil&lt;/span&gt; {
+		t.Fatal(err)
+	}
+	mux := http.NewServeMux()
+	mux.HandleFunc(&lt;span class=&quot;s&quot;&gt;&quot;GET /version&quot;&lt;/span&gt;, &lt;span class=&quot;k&quot;&gt;func&lt;/span&gt;(w http.ResponseWriter, r *http.Request) {
+		w.Write([]&lt;span class=&quot;k&quot;&gt;byte&lt;/span&gt;(&lt;span class=&quot;s&quot;&gt;`{&quot;major&quot;:&quot;1&quot;,&quot;minor&quot;:&quot;31&quot;,&quot;gitVersion&quot;:&quot;v1.31.2&quot;}`&lt;/span&gt;))
+	})
+	mux.HandleFunc(&lt;span class=&quot;s&quot;&gt;&quot;GET /apis/batch/v1/namespaces/ml-training/jobs&quot;&lt;/span&gt;, &lt;span class=&quot;k&quot;&gt;func&lt;/span&gt;(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set(&lt;span class=&quot;s&quot;&gt;&quot;Content-Type&quot;&lt;/span&gt;, &lt;span class=&quot;s&quot;&gt;&quot;application/json&quot;&lt;/span&gt;)
+		w.Write(jobs)
+	})
+	srv := httptest.NewServer(mux)
+	t.Cleanup(srv.Close)
+	&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; srv
+}
+
+&lt;span class=&quot;k&quot;&gt;func&lt;/span&gt; config(srv *httptest.Server) adapter.Config {
+	&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; adapter.Config{&lt;span class=&quot;s&quot;&gt;&quot;api_url&quot;&lt;/span&gt;: srv.URL, &lt;span class=&quot;s&quot;&gt;&quot;namespaces&quot;&lt;/span&gt;: []&lt;span class=&quot;k&quot;&gt;any&lt;/span&gt;{&lt;span class=&quot;s&quot;&gt;&quot;ml-training&quot;&lt;/span&gt;}}
+}
+
+&lt;span class=&quot;k&quot;&gt;func&lt;/span&gt; TestConformance(t *testing.T) {
+	conformance.Run(t, New, conformance.Options{Config: config(fixture(t)), MinFacets: 3})
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Conformance checks the contract, not the meaning. Two more tests check the meaning: that the phases and end times come out right, and that a Job and its MLflow run really do reconcile into one entity. The second builds a lattice in-process with the &lt;code&gt;lattice&lt;/code&gt; package and an MLflow facet written by hand:&lt;/p&gt;
+&lt;pre data-lang=&quot;go&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;func&lt;/span&gt; TestFacets(t *testing.T) {
+	a := New()
+	&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; err := a.Connect(context.Background(), config(fixture(t))); err != &lt;span class=&quot;k&quot;&gt;nil&lt;/span&gt; {
+		t.Fatal(err)
+	}
+	facets, err := a.Facets(context.Background(), adapter.Query{})
+	&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; err != &lt;span class=&quot;k&quot;&gt;nil&lt;/span&gt; {
+		t.Fatal(err)
+	}
+	got := &lt;span class=&quot;k&quot;&gt;map&lt;/span&gt;[&lt;span class=&quot;k&quot;&gt;string&lt;/span&gt;]adapter.Facet{}
+	&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; _, f := &lt;span class=&quot;k&quot;&gt;range&lt;/span&gt; facets {
+		got[f.SourceID] = f
+	}
+	train := got[&lt;span class=&quot;s&quot;&gt;&quot;ml-training/train-resnet50-7xk2p&quot;&lt;/span&gt;]
+	&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; train.Status != adapter.Succeeded || train.Keys[adapter.KeyMLflowRunID] != &lt;span class=&quot;s&quot;&gt;&quot;6f1d2c9a8b7e4f30a1c5d9e8b2a47c13&quot;&lt;/span&gt; {
+		t.Errorf(&lt;span class=&quot;s&quot;&gt;&quot;train: %+v&quot;&lt;/span&gt;, train)
+	}
+	eval := got[&lt;span class=&quot;s&quot;&gt;&quot;ml-training/eval-resnet50-q9d4m&quot;&lt;/span&gt;]
+	&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; eval.Status != adapter.Failed || !eval.EndedAt.Equal(time.Date(2026, 10, 22, 9, 52, 41, 0, time.UTC)) {
+		t.Errorf(&lt;span class=&quot;s&quot;&gt;&quot;eval: status %s, ended %s&quot;&lt;/span&gt;, eval.Status, eval.EndedAt)
+	}
+	&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; backfill := got[&lt;span class=&quot;s&quot;&gt;&quot;ml-training/features-backfill-x4n7r&quot;&lt;/span&gt;]; backfill.Status != adapter.Running || !backfill.EndedAt.IsZero() {
+		t.Errorf(&lt;span class=&quot;s&quot;&gt;&quot;backfill: %+v&quot;&lt;/span&gt;, backfill)
+	}
+}
+
+&lt;span class=&quot;c&quot;&gt;// TestCorrelates checks the point of the exercise: a Job and the MLflow run&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;// it logs to become one entity. The run was created just before the Job.&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;func&lt;/span&gt; TestCorrelates(t *testing.T) {
+	a := New()
+	&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; err := a.Connect(context.Background(), config(fixture(t))); err != &lt;span class=&quot;k&quot;&gt;nil&lt;/span&gt; {
+		t.Fatal(err)
+	}
+	facets, err := a.Facets(context.Background(), adapter.Query{})
+	&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; err != &lt;span class=&quot;k&quot;&gt;nil&lt;/span&gt; {
+		t.Fatal(err)
+	}
+	run := adapter.Facet{
+		Source: &lt;span class=&quot;s&quot;&gt;&quot;mlflow&quot;&lt;/span&gt;, SourceID: &lt;span class=&quot;s&quot;&gt;&quot;6f1d2c9a8b7e4f30a1c5d9e8b2a47c13&quot;&lt;/span&gt;, Kind: adapter.KindRun,
+		Title: &lt;span class=&quot;s&quot;&gt;&quot;resnet50 lr=3e-4&quot;&lt;/span&gt;, Status: adapter.Succeeded,
+		StartedAt: time.Date(2026, 10, 22, 8, 59, 57, 0, time.UTC),
+		Keys:      &lt;span class=&quot;k&quot;&gt;map&lt;/span&gt;[&lt;span class=&quot;k&quot;&gt;string&lt;/span&gt;]&lt;span class=&quot;k&quot;&gt;string&lt;/span&gt;{adapter.KeyMLflowRunID: &lt;span class=&quot;s&quot;&gt;&quot;6f1d2c9a8b7e4f30a1c5d9e8b2a47c13&quot;&lt;/span&gt;},
+	}
+	l := lattice.New(lattice.Options{})
+	l.Apply(&lt;span class=&quot;k&quot;&gt;append&lt;/span&gt;(facets, run))
+	ents := l.Query(lattice.Query{Keys: &lt;span class=&quot;k&quot;&gt;map&lt;/span&gt;[&lt;span class=&quot;k&quot;&gt;string&lt;/span&gt;]&lt;span class=&quot;k&quot;&gt;string&lt;/span&gt;{adapter.KeyMLflowRunID: run.SourceID}})
+	&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;len&lt;/span&gt;(ents) != 1 || &lt;span class=&quot;k&quot;&gt;len&lt;/span&gt;(ents[0].Facets) != 2 {
+		t.Fatalf(&lt;span class=&quot;s&quot;&gt;&quot;want one entity with two facets, got %+v&quot;&lt;/span&gt;, ents)
+	}
+	ex, _ := l.Explain(ents[0].ID)
+	&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;len&lt;/span&gt;(ex.Merges) != 1 || ex.Merges[0].Key != adapter.KeyMLflowRunID || ex.Merges[0].Gap != 3*time.Second {
+		t.Fatalf(&lt;span class=&quot;s&quot;&gt;&quot;unexpected merges: %+v&quot;&lt;/span&gt;, ex.Merges)
+	}
+	t.Logf(&lt;span class=&quot;s&quot;&gt;&quot;%s %q: merged on %s, gap %s&quot;&lt;/span&gt;, ents[0].ID, ents[0].Title, ex.Merges[0].Key, ex.Merges[0].Gap)
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;pre data-lang=&quot;shell&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;$&lt;/span&gt; go mod tidy
+&lt;span class=&quot;p&quot;&gt;$&lt;/span&gt; go test -v .
+=== RUN   TestConformance
+--- PASS: TestConformance (0.02s)
+=== RUN   TestFacets
+--- PASS: TestFacets (0.00s)
+=== RUN   TestCorrelates
+    k8sjobs_test.go:97: lt_074076a9a9bb28f9 &quot;resnet50 lr=3e-4&quot;: merged on mlflow.run_id, gap 3s
+--- PASS: TestCorrelates (0.00s)
+PASS
+ok  	example.com/k8sjobs	0.157s&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The merged entity takes the MLflow run&#x27;s title, because facets are ordered with the built-in adapters first and an entity is titled after its first facet. The training and evaluation Jobs are not merged, because they share only the weak keys &lt;code&gt;git.sha&lt;/code&gt; and &lt;code&gt;git.repo&lt;/code&gt;; the lattice relates them with a &lt;code&gt;SharesCommit&lt;/code&gt; edge instead.&lt;/p&gt;
+
+&lt;h2 id=&quot;binary&quot;&gt;10. Run it&lt;/h2&gt;
+&lt;p&gt;Fendlemark loads no plugins at runtime; adapters are compiled in. You do not need to change Fendlemark&#x27;s own source to do that. A small &lt;code&gt;main&lt;/code&gt; package that imports the adapter for its side effect, and then does what &lt;a href=&quot;https://fendlemark.app/docs/api/#embedding&quot;&gt;embedding&lt;/a&gt; describes, is a complete Fendlemark with one more adapter. Save it as &lt;code&gt;cmd/platform/main.go&lt;/code&gt;:&lt;/p&gt;
+&lt;pre data-lang=&quot;go&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;// Command platform is Fendlemark with one more adapter compiled in.&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;package&lt;/span&gt; main
+
+&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt; (
+	&lt;span class=&quot;s&quot;&gt;&quot;context&quot;&lt;/span&gt;
+	&lt;span class=&quot;s&quot;&gt;&quot;log&quot;&lt;/span&gt;
+	&lt;span class=&quot;s&quot;&gt;&quot;os/signal&quot;&lt;/span&gt;
+	&lt;span class=&quot;s&quot;&gt;&quot;syscall&quot;&lt;/span&gt;
+
+	&lt;span class=&quot;s&quot;&gt;&quot;fendlemark.app/fendlemark&quot;&lt;/span&gt;
+	&lt;span class=&quot;s&quot;&gt;&quot;fendlemark.app/fendlemark/config&quot;&lt;/span&gt;
+
+	_ &lt;span class=&quot;s&quot;&gt;&quot;example.com/k8sjobs&quot;&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;// registers &quot;k8sjobs&quot;&lt;/span&gt;
+)
+
+&lt;span class=&quot;k&quot;&gt;func&lt;/span&gt; main() {
+	&lt;span class=&quot;c&quot;&gt;// Configuration validation accepts only adapters it knows about (DOC-110).&lt;/span&gt;
+	config.KnownAdapters = &lt;span class=&quot;k&quot;&gt;append&lt;/span&gt;(config.KnownAdapters, &lt;span class=&quot;s&quot;&gt;&quot;k8sjobs&quot;&lt;/span&gt;)
+
+	cfg, _, err := config.Load(&lt;span class=&quot;s&quot;&gt;&quot;fendlemark.yaml&quot;&lt;/span&gt;)
+	&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; err != &lt;span class=&quot;k&quot;&gt;nil&lt;/span&gt; {
+		log.Fatal(err)
+	}
+	fm, err := fendlemark.New(cfg)
+	&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; err != &lt;span class=&quot;k&quot;&gt;nil&lt;/span&gt; {
+		log.Fatal(err)
+	}
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	&lt;span class=&quot;k&quot;&gt;defer&lt;/span&gt; stop()
+	&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; err := fm.Run(ctx); err != &lt;span class=&quot;k&quot;&gt;nil&lt;/span&gt; {
+		log.Fatal(err)
+	}
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Importing &lt;code&gt;fendlemark.app/fendlemark&lt;/code&gt; registers the four built-in adapters too, so this binary can read MLflow, Metaflow, Argo, and Kubeflow as well as Jobs. Configuration validation rejects an &lt;code&gt;adapters.&amp;lt;name&amp;gt;&lt;/code&gt; block for an adapter it does not know, with &lt;code&gt;DOC-110&lt;/code&gt;, so &lt;code&gt;main&lt;/code&gt; adds the new name to &lt;code&gt;config.KnownAdapters&lt;/code&gt; before loading the file.&lt;/p&gt;
+&lt;p&gt;Point it at the API through &lt;code&gt;kubectl proxy&lt;/code&gt;:&lt;/p&gt;
+&lt;pre data-lang=&quot;yaml&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;adapters&lt;/span&gt;:
+  &lt;span class=&quot;k&quot;&gt;k8sjobs&lt;/span&gt;:
+    &lt;span class=&quot;k&quot;&gt;enabled&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;true&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;api_url&lt;/span&gt;: &lt;span class=&quot;s&quot;&gt;&quot;http://127.0.0.1:8001&quot;&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;namespaces&lt;/span&gt;: [&lt;span class=&quot;s&quot;&gt;&quot;ml-training&quot;&lt;/span&gt;]&lt;/code&gt;&lt;/pre&gt;
+&lt;pre data-lang=&quot;shell&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;$&lt;/span&gt; kubectl proxy &amp;amp;
+&lt;span class=&quot;p&quot;&gt;$&lt;/span&gt; go build -o platform ./cmd/platform
+&lt;span class=&quot;p&quot;&gt;$&lt;/span&gt; ./platform
+INFO fendlemark starting version=0.9.5 adapters=k8sjobs
+INFO adapter connected adapter=k8sjobs took=19ms
+INFO lattice reconciled entities=3 facets=3 generation=1 took=0s
+INFO console listening addr=127.0.0.1:7411&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(The log&#x27;s timestamps are trimmed here.) The console is on &lt;a href=&quot;http://localhost:7411&quot;&gt;http://localhost:7411&lt;/a&gt; as usual, and the API reports the new adapter alongside any others you enable:&lt;/p&gt;
+&lt;pre data-lang=&quot;shell&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;$&lt;/span&gt; curl -s http://127.0.0.1:7411/api/v1/adapters | jq &#x27;.adapters[0] | {name, state, detail, maturity}&#x27;
+{
+  &quot;name&quot;: &quot;k8sjobs&quot;,
+  &quot;state&quot;: &quot;healthy&quot;,
+  &quot;detail&quot;: &quot;listing jobs in ml-training · 3 facets&quot;,
+  &quot;maturity&quot;: &quot;Provisional&quot;
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Enable the &lt;code&gt;mlflow&lt;/code&gt; adapter in the same file, and every Job annotated with &lt;code&gt;fendlemark.io/mlflow-run-id&lt;/code&gt; appears once, with both facets attached, as &lt;code&gt;TestCorrelates&lt;/code&gt; showed. That holds as long as the run and the Job start within the correlation window of each other, which they do when the run is created just before the Job.&lt;/p&gt;
+
+&lt;h2 id=&quot;next&quot;&gt;Where to go from here&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;Watch.&lt;/strong&gt; The Kubernetes API supports watching Jobs. To use it, set &lt;code&gt;Watchable: true&lt;/code&gt; and return a channel of &lt;code&gt;adapter.Event&lt;/code&gt; values that closes when the context passed to &lt;code&gt;Watch&lt;/code&gt; is cancelled. The control plane calls &lt;code&gt;Facets&lt;/code&gt; once for the initial load and reconnects with backoff when the channel closes, and the conformance suite checks the channel closes within two seconds of cancellation.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;A facet panel.&lt;/strong&gt; The default key-value table is fine for &lt;code&gt;Fields&lt;/code&gt; this small. A Job with many pods deserves a panel; &lt;a href=&quot;https://fendlemark.app/docs/ui/#panels&quot;&gt;The console&lt;/a&gt; explains how panels are written and registered.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Upstream.&lt;/strong&gt; If your adapter would be useful to everyone, the &lt;a href=&quot;https://fendlemark.app/governance/contributing/&quot;&gt;Fendlemark Contribution Protocol&lt;/a&gt; describes how to propose it. It would enter at Provisional, and Provisional adapters are not compiled into release binaries; the &lt;a href=&quot;https://fendlemark.app/governance/#maturity&quot;&gt;maturity ladder&lt;/a&gt; describes what it takes to reach Settled, when they are.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;reading&quot;&gt;Further reading&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://fendlemark.app/docs/adapters/writing-an-adapter/&quot;&gt;Writing an adapter&lt;/a&gt;: the interface, facets, lifecycle, and conformance rules&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://fendlemark.app/docs/adapters/&quot;&gt;Adapters&lt;/a&gt;: what the four built-in adapters read and which keys they provide&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://fendlemark.app/docs/architecture/#correlation&quot;&gt;Architecture: correlation keys&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://fendlemark.app/docs/api/#adapter&quot;&gt;Go API reference: package adapter&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</content>
+  </entry>
+</feed>

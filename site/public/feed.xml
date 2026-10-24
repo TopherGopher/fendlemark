@@ -12,15 +12,11 @@
     <link href="https://fendlemark.app/changelog/#0-9-5"/>
     <id>https://fendlemark.app/changelog/#0-9-5</id>
     <updated>2026-10-24T00:00:00Z</updated>
-    <summary>Accommodations
-
- - The project now lives at fendlemark.app. The Go module path is fendlemark.app/fendlemark: update your imports and go install commands. fendlemark.develops.guru/fendlemark remains at 0.9.4, where it will stay.
-
-Clarifications
+    <summary>Clarifications
 
  - fendlemark lattice explain and GET /api/v1/entities/{id}/explain now list every merge for an entity assembled from three or more facets. The merges always happened. Now all of them are explained.
 
-Reading of the Diff took longer than usual: the diff was mostly a domain name, read aloud in full each time.</summary>
+The Reading of the Diff was the shortest on record. The Sceptic remained sceptical.</summary>
   </entry>
   <entry>
     <title>Fendlemark 0.9.4</title>

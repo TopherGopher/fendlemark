@@ -91,3 +91,5 @@ Which keys connect which adapters, out of the box, with no configuration beyond 
 ## A fifth tool?
 
 Write an adapter. The interface has six methods and is documented in [Writing an adapter](https://fendlemark.app/docs/adapters/writing-an-adapter/). Proposing it for inclusion in the binary is governed by [FCP-1](https://fendlemark.app/governance/contributing/), which the Keepers describe as "thorough".
+
+Related reading: [Running MLflow and Argo Workflows together](https://fendlemark.app/blog/running-mlflow-and-argo-workflows-together/), on tagging MLflow runs with the workflow that started them.

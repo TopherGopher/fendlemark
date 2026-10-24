@@ -61,6 +61,8 @@ $ fendlemark lattice stats
 - `explain` prints why an entity has the facets it has: which keys matched, within what time distance, and which rule merged them. The single most useful command for "why are these two things one thing" and "why are these one thing two things".
 - `stats` prints entity counts by kind, facets by adapter, correlation counts by key, and the generation number.
 
+Related reading: [Fendlemark 0.9.5](https://fendlemark.app/blog/fendlemark-0-9-5/), on reading the output of `lattice explain`.
+
 ## fendlemark auth
 
 ```shell

@@ -43,11 +43,28 @@ NAV = [
         ("Governance", "/governance/"),
         ("Contributing (FCP-1)", "/governance/contributing/"),
         ("Changelog", "/changelog/"),
+        ("Blog", "/blog/"),
         ("Packages", "/fendlemark/"),
         ("FAQ", "/faq/"),
         ("About", "/about/"),
     ]),
 ]
+
+# The blog. Posts live at /blog/<slug>/ and are dated; the sidebar and header link the
+# index only, which stays marked as the current section on every post. Posts are not part
+# of the documentation's previous/next sequence.
+BLOG = "/blog/"
+SECTION_INDEXES = {BLOG}
+
+def is_post(url):
+    return url.startswith(BLOG) and url != BLOG
+
+def current_attrs(path, current):
+    if path == current:
+        return ' aria-current="page"'
+    if path in SECTION_INDEXES and current.startswith(path):
+        return ' aria-current="true"'
+    return ""
 
 META_RE = re.compile(r"^\s*<!--\s*meta\s*(\{.*?\})\s*-->", re.S)
 
@@ -80,6 +97,7 @@ TOPNAV = [
     ("Philosophy", "/philosophy/", "/philosophy/"),
     ("Governance", "/governance/", "/governance/"),
     ("Changelog", "/changelog/", "/changelog/"),
+    ("Blog", BLOG, BLOG),
     ("Packages", "/fendlemark/", "/fendlemark/"),
 ]
 
@@ -89,7 +107,8 @@ def sidebar(current):
         gid = "nav-" + re.sub(r"\W+", "-", group.lower()).strip("-")
         parts.append(f'<div class="nav-group"><p class="nav-group-title" id="{gid}">{html.escape(group)}</p><ul aria-labelledby="{gid}">')
         for label, path in items:
-            cls = ' class="active" aria-current="page"' if path == current else ""
+            aria = current_attrs(path, current)
+            cls = f' class="active"{aria}' if aria else ""
             parts.append(f'<li><a href="{path}"{cls}>{html.escape(label)}</a></li>')
         parts.append("</ul></div>")
     return "\n".join(parts)
@@ -97,7 +116,7 @@ def sidebar(current):
 def topnav(current):
     parts = []
     for label, path, prefix in TOPNAV:
-        attrs = ' aria-current="page"' if path == current else ""
+        attrs = current_attrs(path, current)
         if current.startswith(prefix):
             attrs += ' class="in-section"'
         parts.append(f'<a href="{path}"{attrs}>{html.escape(label)}</a>')
@@ -106,7 +125,8 @@ def topnav(current):
 # HTML-only enhancements. The Markdown copies are built from the untouched fragments, so
 # nothing here can change their text. Adds keyboard-scrollable, labelled regions for code,
 # tables, and diagrams; header scopes; and self-links on section headings.
-LANGS = {"shell": "Shell", "yaml": "YAML", "go": "Go", "ts": "TypeScript", "vue": "Vue", "css": "CSS", "text": "Text"}
+LANGS = {"shell": "Shell", "yaml": "YAML", "go": "Go", "ts": "TypeScript", "vue": "Vue", "css": "CSS", "text": "Text",
+         "python": "Python", "json": "JSON"}
 ENHANCE_RE = re.compile(
     r'<h([1-3])((?: [^>]*)?)>(.*?)</h\1>'
     r'|<div class="table-wrap">(<table>.*?</table>)</div>'
@@ -147,7 +167,7 @@ def enhance(body):
     return ENHANCE_RE.sub(sub, body)
 
 def flat_nav():
-    return [item for _, items in NAV for item in items]
+    return [item for _, items in NAV for item in items if not item[1].startswith(BLOG)]
 
 def prev_next(current):
     items = flat_nav()
@@ -171,6 +191,8 @@ def breadcrumbs(url, title):
         crumbs.append(("Documentation", "/docs/"))
     if url.startswith("/governance/") and url != "/governance/":
         crumbs.append(("Governance", "/governance/"))
+    if is_post(url):
+        crumbs.append(("Blog", BLOG))
     if url != "/":
         crumbs.append((title, url))
     items = []
@@ -178,7 +200,19 @@ def breadcrumbs(url, title):
         items.append({"@type": "ListItem", "position": i, "name": name, "item": BASE + path})
     return {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": items}
 
-def jsonld(meta, url, title, description):
+KEEPERS = {"@type": "Organization", "name": "The Fendlemark Keepers", "url": BASE + "/governance/"}
+OG_IMAGE = BASE + "/assets/og-image.png"
+MONTHS = ("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
+
+def human_date(iso):
+    y, m, d = (int(x) for x in iso[:10].split("-"))
+    return f"{d} {MONTHS[m - 1]} {y}"
+
+def post_dates(meta):
+    published = meta["published"]
+    return published, meta.get("modified", published)
+
+def jsonld(meta, url, title, description, posts=()):
     blocks = [breadcrumbs(url, title)]
     kind = meta.get("type", "TechArticle")
     if url == "/":
@@ -206,6 +240,44 @@ def jsonld(meta, url, title, description):
                 "https://www.npmjs.com/package/@fendlemark/ui",
             ],
         })
+    elif url == BLOG:
+        blocks.append({
+            "@context": "https://schema.org",
+            "@type": "Blog",
+            "name": "Fendlemark blog",
+            "description": description,
+            "url": BASE + BLOG,
+            "inLanguage": "en",
+            "publisher": KEEPERS,
+            "blogPost": [{
+                "@type": "BlogPosting",
+                "headline": m["title"],
+                "description": m["description"],
+                "url": BASE + u,
+                "datePublished": post_dates(m)[0],
+                "dateModified": post_dates(m)[1],
+                "author": KEEPERS,
+            } for u, m in posts],
+        })
+    elif is_post(url):
+        published, modified = post_dates(meta)
+        post = {
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            "headline": title,
+            "description": description,
+            "url": BASE + url,
+            "mainEntityOfPage": {"@type": "WebPage", "@id": BASE + url},
+            "image": OG_IMAGE,
+            "datePublished": published,
+            "dateModified": modified,
+            "author": KEEPERS,
+            "publisher": KEEPERS,
+            "inLanguage": "en",
+        }
+        if meta.get("section"):
+            post["articleSection"] = meta["section"]
+        blocks.append(post)
     elif kind == "FAQPage" and meta.get("faq"):
         blocks.append({
             "@context": "https://schema.org",
@@ -232,9 +304,49 @@ def jsonld(meta, url, title, description):
         '<script type="application/ld+json">' + json.dumps(b, ensure_ascii=False) + "</script>" for b in blocks
     )
 
-def render(src_path):
-    meta, body = read_fragment(src_path)
-    url = url_for(src_path)
+# Blog pages: a byline under each post's <h1>, the post list on the blog index, and the
+# latest posts on the home page. These go into the fragment before it is rendered, so the
+# HTML page and its Markdown copy say the same thing.
+def byline(meta):
+    published, modified = post_dates(meta)
+    out = (f'<p class="byline">By <a href="/governance/#keepers">the Fendlemark Keepers</a> · '
+           f'<time datetime="{published}">{human_date(published)}</time>')
+    if modified != published:
+        out += f' · Updated <time datetime="{modified}">{human_date(modified)}</time>'
+    return out + "</p>"
+
+def post_list(posts, level):
+    items = []
+    for url, meta in posts:
+        published = post_dates(meta)[0]
+        section = f' · {html.escape(meta["section"])}' if meta.get("section") else ""
+        items.append(f'<li class="post-item"><p class="post-meta"><time datetime="{published}">{human_date(published)}</time>{section}</p>'
+                     f'<h{level} class="post-title"><a href="{url}">{html.escape(meta["title"])}</a></h{level}>'
+                     f'<p class="post-summary">{html.escape(meta["summary"])}</p></li>')
+    return '<ul class="post-list">\n' + "\n".join(items) + "\n</ul>"
+
+def prepare(url, meta, body, posts):
+    if is_post(url):
+        body = re.sub(r"(<h1[^>]*>.*?</h1>)", lambda m: m.group(1) + "\n" + byline(meta), body, count=1, flags=re.S)
+    body = body.replace("<!-- blog:posts -->", post_list(posts, 2))
+    body = body.replace("<!-- blog:latest -->", post_list(posts[:3], 3))
+    return body
+
+def og_article(url, meta):
+    if not is_post(url):
+        return ""
+    published, modified = post_dates(meta)
+    tags = [("article:published_time", published), ("article:modified_time", modified), ("article:author", BASE + "/governance/")]
+    if meta.get("section"):
+        tags.append(("article:section", meta["section"]))
+    return "".join(f'<meta property="{p}" content="{html.escape(v)}">\n' for p, v in tags)
+
+def feeds(url):
+    if url.startswith(BLOG):
+        return '<link rel="alternate" type="application/atom+xml" title="Fendlemark blog" href="/blog/feed.xml">\n'
+    return ""
+
+def render(url, meta, body, posts):
     title = meta["title"]
     description = meta["description"]
     full_title = "Fendlemark: one console for MLflow, Metaflow, Argo Workflows, and Kubeflow" if url == "/" else f"{title} · Fendlemark"
@@ -245,15 +357,18 @@ def render(src_path):
         "{{description}}": html.escape(description),
         "{{canonical}}": BASE + url,
         "{{markdown}}": url + "index.md",
-        "{{body}}": enhance(body),
+        "{{og_type}}": "article" if is_post(url) else "website",
+        "{{og_article}}": og_article(url, meta),
+        "{{feeds}}": feeds(url),
         "{{sidebar}}": sidebar(url),
         "{{topnav}}": topnav(url),
         "{{pager}}": prev_next(url) if layout == "docs" else "",
-        "{{jsonld}}": jsonld(meta, url, title, description),
+        "{{jsonld}}": jsonld(meta, url, title, description, posts),
         "{{layout}}": layout,
         "{{page}}": url.strip("/").replace("/", "-") or "home",
         "{{year}}": "2026",
         "{{version}}": "0.9.5",
+        "{{body}}": enhance(body),   # last, so text in a page can never be taken for a placeholder
     }
     for k, v in repl.items():
         page = page.replace(k, v)
@@ -285,8 +400,10 @@ MD_PREP = [
     (r'<span class="tag">(.*?)</span>(<h3>.*?</h3>)', r"\2<p><code>\1</code></p>"),
     (r'<p class="callout-title">(.*?)</p>', r"<p><strong>\1</strong></p>"),
     (r'<div class="callout">\s*<div>(.*?)</div>\s*</div>', r"<blockquote>\1</blockquote>"),
+    (r'<li class="post-item"><p class="post-meta">(.*?)</p><h[23] class="post-title"><a href="([^"]+)">(.*?)</a></h[23]><p class="post-summary">(.*?)</p></li>',
+     r'<li><a href="\2">\3</a> (\1): \4</li>'),
 ]
-INLINE = {"a", "b", "strong", "em", "i", "code", "span", "small", "kbd", "sup", "sub"}
+INLINE = {"a", "b", "strong", "em", "i", "code", "span", "small", "kbd", "sup", "sub", "time"}
 VOID = {"br", "hr", "img", "wbr"}
 
 class Tree(HTMLParser):
@@ -429,7 +546,7 @@ def write_feed(changelog_body):
 """
     open(os.path.join(ROOT, "feed.xml"), "w", encoding="utf-8").write(feed)
 
-def write_llms(pages):
+def write_llms(pages, posts):
     lines = ["# Fendlemark", "",
              "> Fendlemark is an open-source Go and Vue 3 framework that unifies the user experiences of MLflow, Metaflow, Argo Workflows, and Kubeflow into a single ML platform console. One binary, four read-only adapters, one deterministic entity graph (the lattice), one console.",
              "", "Module path: fendlemark.app/fendlemark · npm: @fendlemark/ui · Licence: MIT · Current version: 0.9.5", "",
@@ -439,8 +556,11 @@ def write_llms(pages):
             lines.append(f"- [{meta['title']}]({BASE}{url}index.md): {meta['description']}")
     lines += ["", "## Project", ""]
     for url, meta in pages:
-        if not url.startswith("/docs/") and url != "/":
+        if not url.startswith(("/docs/", BLOG)) and url != "/":
             lines.append(f"- [{meta['title']}]({BASE}{url}index.md): {meta['description']}")
+    lines += ["", "## Blog", ""]
+    for url, meta in [p for p in pages if p[0] == BLOG] + list(posts):
+        lines.append(f"- [{meta['title']}]({BASE}{url}index.md): {meta.get('summary', meta['description'])}")
     lines += ["", "## Optional", "", f"- [Full documentation as one text file]({BASE}/llms-full.txt)"]
     open(os.path.join(ROOT, "llms.txt"), "w", encoding="utf-8").write("\n".join(lines) + "\n")
     full = ["# Fendlemark: complete documentation", ""]
@@ -457,35 +577,81 @@ def write_404():
     for k, v in {"{{title}}": "Not found · Fendlemark", "{{description}}": "Page not found.", "{{canonical}}": BASE + "/404.html",
                  "{{body}}": enhance(body), "{{sidebar}}": sidebar("/404"), "{{topnav}}": topnav("/404"), "{{pager}}": "",
                  "{{jsonld}}": "", "{{layout}}": "docs", "{{page}}": "not-found",
+                 "{{og_type}}": "website", "{{og_article}}": "", "{{feeds}}": "",
                  "{{year}}": "2026", "{{version}}": "0.9.5"}.items():
         page = page.replace(k, v)
     page = page.replace('<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">', '<meta name="robots" content="noindex">')
     open(os.path.join(ROOT, "404.html"), "w", encoding="utf-8").write(page)
 
+def write_blog_feed(posts, bodies):
+    entries = []
+    for url, meta in posts:
+        published, modified = post_dates(meta)
+        content = re.sub(r'<p class="eyebrow">.*?</p>|<h1[^>]*>.*?</h1>|<p class="byline">.*?</p>', "", bodies[url], count=3, flags=re.S).strip()
+        content = re.sub(r'(href|src)="/', rf'\1="{BASE}/', content)
+        entries.append(f"""  <entry>
+    <title>{html.escape(meta["title"])}</title>
+    <link href="{BASE}{url}"/>
+    <id>{BASE}{url}</id>
+    <published>{published}T00:00:00Z</published>
+    <updated>{modified}T00:00:00Z</updated>
+    <author><name>The Fendlemark Keepers</name><uri>{BASE}/governance/</uri></author>
+    <summary>{html.escape(meta["description"])}</summary>
+    <content type="html">{html.escape(content)}</content>
+  </entry>""")
+    updated = max((post_dates(m)[1] for _, m in posts), default=DEFAULT_DATE)
+    feed = f"""<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Fendlemark blog</title>
+  <subtitle>Release posts, how-tos, and walkthroughs from the Fendlemark Keepers.</subtitle>
+  <link href="{BASE}/blog/feed.xml" rel="self"/>
+  <link href="{BASE}/blog/"/>
+  <id>{BASE}/blog/</id>
+  <updated>{updated}T00:00:00Z</updated>
+  <author><name>The Fendlemark Keepers</name><uri>{BASE}/governance/</uri></author>
+{chr(10).join(entries)}
+</feed>
+"""
+    os.makedirs(os.path.join(ROOT, "blog"), exist_ok=True)
+    open(os.path.join(ROOT, "blog", "feed.xml"), "w", encoding="utf-8").write(feed)
+
 def main():
-    urls = []
-    pages = []
+    sources = []
     for dirpath, _, files in os.walk(SRC):
         for f in sorted(files):
             if f.endswith(".html"):
                 src = os.path.join(dirpath, f)
-                url = render(src)
-                urls.append(url)
                 meta, body = read_fragment(src)
-                meta["_md"] = markdown_page(url, meta, body)
-                open(os.path.splitext(out_for(url))[0] + ".md", "w", encoding="utf-8").write(meta["_md"])
-                pages.append((url, meta))
-                if url_for(src) == "/changelog/":
-                    write_feed(body)
+                sources.append((url_for(src), meta, body))
+    # Newest first; posts published the same day keep their URL order.
+    posts = sorted(((u, m) for u, m, _ in sources if is_post(u)), key=lambda t: t[0])
+    posts.sort(key=lambda t: post_dates(t[1])[0], reverse=True)
+    urls = []
+    pages = []
+    bodies = {}
+    for url, meta, body in sources:
+        body = prepare(url, meta, body, posts)
+        bodies[url] = body
+        render(url, meta, body, posts)
+        urls.append(url)
+        meta["_md"] = markdown_page(url, meta, body)
+        open(os.path.splitext(out_for(url))[0] + ".md", "w", encoding="utf-8").write(meta["_md"])
+        pages.append((url, meta))
+        if url == "/changelog/":
+            write_feed(body)
     pages.sort(key=lambda t: (t[0] != "/", t[0]))
-    write_llms(pages)
+    write_llms(pages, posts)
+    write_blog_feed(posts, bodies)
     write_404()
     urls.sort(key=lambda u: (u != "/", u))
+    lastmod = {u: post_dates(m)[1] for u, m in posts}
+    if posts:
+        lastmod[BLOG] = max(lastmod.values())
     sm = ['<?xml version="1.0" encoding="UTF-8"?>',
-          '<urlset xmlns="http://www.sitemap.org/schemas/sitemap/0.9">']
+          '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
     for u in urls:
         pri = "1.0" if u == "/" else ("0.9" if u == "/docs/getting-started/" else "0.7")
-        sm.append(f"  <url><loc>{BASE}{u}</loc><lastmod>{DEFAULT_DATE}</lastmod><priority>{pri}</priority></url>")
+        sm.append(f"  <url><loc>{BASE}{u}</loc><lastmod>{lastmod.get(u, DEFAULT_DATE)}</lastmod><priority>{pri}</priority></url>")
     sm.append("</urlset>")
     open(os.path.join(ROOT, "sitemap.xml"), "w").write("\n".join(sm) + "\n")
     print(f"built {len(urls)} pages")

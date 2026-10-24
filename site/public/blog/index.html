@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en" data-layout="docs" data-page="blog">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blog · Fendlemark</title>
+<meta name="description" content="The Fendlemark blog: release posts, guides to running MLflow, Metaflow, Argo Workflows, and Kubeflow together, and walkthroughs of extending Fendlemark.">
+<link rel="canonical" href="https://fendlemark.app/blog/">
+<link rel="alternate" type="text/markdown" href="/blog/index.md">
+<link rel="describedby" href="/llms.txt">
+<link rel="api-catalog" href="/.well-known/api-catalog" type="application/linkset+json">
+<link rel="service-desc" href="/openapi.json" type="application/openapi+json">
+<link rel="service-doc" href="/docs/api/#http" type="text/html">
+<meta name="go-import" content="fendlemark.app/fendlemark git https://github.com/TopherGopher/fendlemark">
+<link rel="alternate" type="application/atom+xml" title="Fendlemark releases" href="/feed.xml">
+<link rel="alternate" type="application/atom+xml" title="Fendlemark blog" href="/blog/feed.xml">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+<meta name="theme-color" content="#0f5c54" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0b1513" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Fendlemark">
+<meta property="og:title" content="Blog · Fendlemark">
+<meta property="og:description" content="The Fendlemark blog: release posts, guides to running MLflow, Metaflow, Argo Workflows, and Kubeflow together, and walkthroughs of extending Fendlemark.">
+<meta property="og:url" content="https://fendlemark.app/blog/">
+<meta property="og:image" content="https://fendlemark.app/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Blog · Fendlemark">
+<meta name="twitter:description" content="The Fendlemark blog: release posts, guides to running MLflow, Metaflow, Argo Workflows, and Kubeflow together, and walkthroughs of extending Fendlemark.">
+<meta name="twitter:image" content="https://fendlemark.app/assets/og-image.png">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="preload" href="/assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/jetbrains-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css">
+<script>document.documentElement.classList.add('js');try{var t=localStorage.getItem('fm-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Fendlemark", "item": "https://fendlemark.app/"}, {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://fendlemark.app/blog/"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Blog", "name": "Fendlemark blog", "description": "The Fendlemark blog: release posts, guides to running MLflow, Metaflow, Argo Workflows, and Kubeflow together, and walkthroughs of extending Fendlemark.", "url": "https://fendlemark.app/blog/", "inLanguage": "en", "publisher": {"@type": "Organization", "name": "The Fendlemark Keepers", "url": "https://fendlemark.app/governance/"}, "blogPost": [{"@type": "BlogPosting", "headline": "Fendlemark 0.9.5: every merge, explained", "description": "Fendlemark 0.9.5 makes lattice explain list every merge for entities built from three or more facets. How to read an explanation, and how to upgrade.", "url": "https://fendlemark.app/blog/fendlemark-0-9-5/", "datePublished": "2026-10-24", "dateModified": "2026-10-24", "author": {"@type": "Organization", "name": "The Fendlemark Keepers", "url": "https://fendlemark.app/governance/"}}, {"@type": "BlogPosting", "headline": "Running MLflow and Argo Workflows together", "description": "Run MLflow-tracked training steps in Argo Workflows: set MLFLOW_TRACKING_URI, tag each run with the workflow name and uid, and find each from the other.", "url": "https://fendlemark.app/blog/running-mlflow-and-argo-workflows-together/", "datePublished": "2026-10-24", "dateModified": "2026-10-24", "author": {"@type": "Organization", "name": "The Fendlemark Keepers", "url": "https://fendlemark.app/governance/"}}, {"@type": "BlogPosting", "headline": "Writing a Fendlemark adapter, step by step", "description": "Build a working Fendlemark adapter for Kubernetes Jobs: descriptor, facets, phases, correlation keys, health, conformance tests, and a binary to run it in.", "url": "https://fendlemark.app/blog/writing-a-fendlemark-adapter/", "datePublished": "2026-10-24", "dateModified": "2026-10-24", "author": {"@type": "Organization", "name": "The Fendlemark Keepers", "url": "https://fendlemark.app/governance/"}}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="site-header-inner">
+    <a class="brand" href="/" aria-label="Fendlemark home">
+      <svg class="brand-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
+      <span class="brand-name">Fendlemark</span>
+    </a>
+    <span class="brand-version">v0.9.5</span>
+    <nav class="top-nav" aria-label="Primary">
+      <a href="/docs/getting-started/">Docs</a>
+      <a href="/philosophy/">Philosophy</a>
+      <a href="/governance/">Governance</a>
+      <a href="/changelog/">Changelog</a>
+      <a href="/blog/" aria-current="page" class="in-section">Blog</a>
+      <a href="/fendlemark/">Packages</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-btn js-only" id="theme-toggle" type="button" aria-label="Dark theme" aria-pressed="false" title="Dark theme">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><g class="sun"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/></g><path class="moon" d="M20.5 14.2A8.5 8.5 0 1 1 9.8 3.5a6.8 6.8 0 0 0 10.7 10.7z"/></svg>
+      </button>
+      <button class="icon-btn menu-btn js-only" id="menu-toggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="sidebar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path class="bars" d="M4 7h16M4 12h16M4 17h16"/><path class="cross" d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="page">
+  <nav class="sidebar" id="sidebar" aria-label="Documentation">
+<div class="nav-group"><p class="nav-group-title" id="nav-documentation">Documentation</p><ul aria-labelledby="nav-documentation">
+<li><a href="/docs/">Overview</a></li>
+<li><a href="/docs/getting-started/">Getting started</a></li>
+<li><a href="/docs/architecture/">Architecture</a></li>
+<li><a href="/docs/configuration/">Configuration</a></li>
+<li><a href="/docs/adapters/">Adapters</a></li>
+<li><a href="/docs/adapters/writing-an-adapter/">Writing an adapter</a></li>
+<li><a href="/docs/ui/">The console (UI)</a></li>
+<li><a href="/docs/auth/">Authentication</a></li>
+<li><a href="/docs/cli/">CLI reference</a></li>
+<li><a href="/docs/api/">Go API reference</a></li>
+<li><a href="/docs/migration/">Migrating 0.8 to 0.9</a></li>
+</ul></div>
+<div class="nav-group"><p class="nav-group-title" id="nav-project">Project</p><ul aria-labelledby="nav-project">
+<li><a href="/philosophy/">Philosophy</a></li>
+<li><a href="/governance/">Governance</a></li>
+<li><a href="/governance/contributing/">Contributing (FCP-1)</a></li>
+<li><a href="/changelog/">Changelog</a></li>
+<li><a href="/blog/" class="active" aria-current="page">Blog</a></li>
+<li><a href="/fendlemark/">Packages</a></li>
+<li><a href="/faq/">FAQ</a></li>
+<li><a href="/about/">About</a></li>
+</ul></div>
+  </nav>
+  <main class="main" id="main">
+<p class="eyebrow">Project</p>
+<h1>Blog</h1>
+<p class="lede">Release posts, how-tos, and walkthroughs, written by the Keepers when something deserves more room than a changelog entry. There is no publishing schedule, for the reasons the <a href="/philosophy/#roadmap">Philosophy</a> gives for there being no roadmap.</p>
+<ul class="post-list">
+<li class="post-item"><p class="post-meta"><time datetime="2026-10-24">24 October 2026</time> · Release notes</p><h2 class="post-title"><a href="/blog/fendlemark-0-9-5/">Fendlemark 0.9.5: every merge, explained</a></h2><p class="post-summary">Explain now lists every merge for entities assembled from three or more facets. How to read an explanation, and how to upgrade.</p></li>
+<li class="post-item"><p class="post-meta"><time datetime="2026-10-24">24 October 2026</time> · How-to</p><h2 class="post-title"><a href="/blog/running-mlflow-and-argo-workflows-together/">Running MLflow and Argo Workflows together</a></h2><p class="post-summary">Point Argo steps at MLflow, tag every run with the workflow&#x27;s identity, hand the run id back to Argo, and find either from the other.</p></li>
+<li class="post-item"><p class="post-meta"><time datetime="2026-10-24">24 October 2026</time> · Walkthrough</p><h2 class="post-title"><a href="/blog/writing-a-fendlemark-adapter/">Writing a Fendlemark adapter, step by step</a></h2><p class="post-summary">Build a working adapter for Kubernetes Jobs, test it with the conformance suite, and compile it into your own Fendlemark binary.</p></li>
+</ul>
+<p class="fine">Follow new posts with the <a href="/blog/feed.xml">blog's Atom feed</a>. Release notes alone are in the <a href="/changelog/">changelog</a> and on <a href="/feed.xml">their own feed</a>.</p>
+
+  </main>
+</div>
+
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <svg class="footer-mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="2" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="2" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="16" y="16" width="10" height="10" rx="2" fill="currentColor" opacity=".55"/><rect x="8" y="8" width="12" height="12" rx="3" fill="currentColor"/></svg>
+    <div class="footer-text">
+      <p>Fendlemark is released under the MIT licence and maintained by the Fendlemark Keepers. Documentation for v0.9.5.</p>
+      <p class="fine">MLflow, Metaflow, Argo Workflows, and Kubeflow are trademarks of their respective owners. Fendlemark is an independent project and is not affiliated with, endorsed by, or sponsored by any of them.</p>
+      <p class="fine footer-links"><a href="/about/">About this site</a> · <a href="https://contact.fendlemark.app/">Contact</a> · <a href="/governance/">Governance</a> · <a href="/changelog/">Changelog</a> · <a href="/sitemap.xml">Sitemap</a></p>
+    </div>
+  </div>
+</footer>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "a453832d2b2f43eab267259df60fc9f4"}'></script>
+<script src="/assets/site.js" defer data-ga="G-26P3Z52D45"></script>
+</body>
+</html>

@@ -29,12 +29,12 @@ Partly because it was funny to write. Partly as a gentle commentary on governanc
 
 ## Privacy
 
-Every page loads Cloudflare Web Analytics, which counts visits without cookies and without identifying you: which pages were read, roughly where from, and in what kind of browser. Google Analytics, which does set cookies, loads only if you choose **Allow** in the bar that appears on your first visit. Until then, nothing is sent to Google. Your choice is kept in your own browser, and the **Analytics choices** link at the foot of every page changes it; choosing **No thanks** after allowing turns Google Analytics off and deletes its cookies. Nothing else on these pages is loaded from anyone else's servers. The site is static HTML served from GitHub Pages.
+Every page loads Cloudflare Web Analytics, which counts visits without cookies and without identifying you: which pages were read, roughly where from, and in what kind of browser. Google Analytics, which does set cookies, loads only if you choose **Allow** in the bar that appears on your first visit. Until then, nothing is sent to Google. Your choice is kept in your own browser, and the **Analytics choices** link at the foot of every page changes it; choosing **No thanks** after allowing turns Google Analytics off and deletes its cookies. Nothing else on these pages is loaded from anyone else's servers. The contact form, at contact.fendlemark.app, is a separate page: it uses Cloudflare Turnstile to block spam, which loads a script from Cloudflare. The site is static HTML served from GitHub Pages.
 
 ## Colophon
 
-Plain HTML and CSS, about a hundred and thirty lines of JavaScript for the theme toggle, navigation, copy buttons, and the analytics choice, and a five-hundred-line Python script that stamps pages into a shared layout. Typeset in Inter and JetBrains Mono. Hosted on GitHub Pages. No framework was used in the making of this framework.
+Plain HTML and CSS, a little JavaScript for the theme toggle, navigation, copy buttons, and the analytics choice, and a few hundred lines of Python that stamp pages into a shared layout. Typeset in Inter and JetBrains Mono. Hosted on GitHub Pages. No framework was used in the making of this framework.
 
 ## Contact
 
-If you would like to say hello, report an error about one of the real tools, or ask that something be changed, the site's maintainer can be reached at [admin@fendlemark.app](mailto:admin@fendlemark.app). Pre-Intent Notices are not required.
+If you would like to say hello, report an error about one of the real tools, or ask that something be changed, the site's maintainer can be reached through the [contact form](https://contact.fendlemark.app/). Pre-Intent Notices are not required.

@@ -28,6 +28,13 @@ Module path: fendlemark.app/fendlemark · npm: @fendlemark/ui · Licence: MIT ·
 - [Contributing: the Fendlemark Contribution Protocol (FCP-1)](https://fendlemark.app/governance/contributing/index.md): The 112 numbered steps a contributor completes, in order, before opening a pull request to Fendlemark. Preparation, Intent, Design, Implementation, Verification, and Ceremony.
 - [Philosophy](https://fendlemark.app/philosophy/index.md): The Fendlemark Philosophy: why there is one console, why there is no roadmap, why there are no loading spinners, and why we strive for perfection and achieve it easily.
 
+## Blog
+
+- [Blog](https://fendlemark.app/blog/index.md): The Fendlemark blog: release posts, guides to running MLflow, Metaflow, Argo Workflows, and Kubeflow together, and walkthroughs of extending Fendlemark.
+- [Fendlemark 0.9.5: every merge, explained](https://fendlemark.app/blog/fendlemark-0-9-5/index.md): Explain now lists every merge for entities assembled from three or more facets. How to read an explanation, and how to upgrade.
+- [Running MLflow and Argo Workflows together](https://fendlemark.app/blog/running-mlflow-and-argo-workflows-together/index.md): Point Argo steps at MLflow, tag every run with the workflow's identity, hand the run id back to Argo, and find either from the other.
+- [Writing a Fendlemark adapter, step by step](https://fendlemark.app/blog/writing-a-fendlemark-adapter/index.md): Build a working adapter for Kubernetes Jobs, test it with the conformance suite, and compile it into your own Fendlemark binary.
+
 ## Optional
 
 - [Full documentation as one text file](https://fendlemark.app/llms-full.txt)

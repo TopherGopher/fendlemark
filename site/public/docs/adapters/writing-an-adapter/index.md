@@ -174,3 +174,5 @@ To propose your adapter for inclusion in the official binary, so that everyone g
 ## The facet panel
 
 By default the console renders your facet's `Fields` as a key-value table under your adapter's display name. For a custom panel, add a Vue component to `console/src/panels/example/` and register it in `console/src/panels/index.ts`. The component receives the facet as a prop and is rendered inside `<FmFacetPanel>`, which provides the header, the deep links, and the collapse state. See [The console](https://fendlemark.app/docs/ui/#panels).
+
+Related reading: [Writing a Fendlemark adapter, step by step](https://fendlemark.app/blog/writing-a-fendlemark-adapter/), a complete adapter for Kubernetes Jobs with its conformance tests.
