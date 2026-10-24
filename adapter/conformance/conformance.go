@@ -5,9 +5,14 @@ package conformance
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"net/http"
+	"net/http/httptest"
+	"os"
 	"reflect"
 	"regexp"
+	"strings"
 	"testing"
 	"time"
 
@@ -16,7 +21,14 @@ import (
 
 // Options configures a conformance run.
 type Options struct {
-	// Config is passed to Connect. Point it at a fixture server.
+	// Fixture is a recorded upstream response, such as testdata/jobs.json.
+	// When set, the suite serves it at http://fixture: every request gets the
+	// file, and any string in Config beginning http://fixture is pointed at
+	// it. Once the other checks pass, the fixture stops and Health must still
+	// return within HealthWithin. Leave it empty to run your own fixture
+	// server and put its URL in Config.
+	Fixture string
+	// Config is passed to Connect.
 	Config adapter.Config
 	// MinFacets is the minimum number of facets Facets must return.
 	MinFacets int
@@ -36,6 +48,12 @@ func Run(t testing.TB, ctor func() adapter.Adapter, opts Options) {
 	}
 	if opts.HealthWithin == 0 {
 		opts.HealthWithin = 10 * time.Second
+	}
+	var stopFixture func()
+	if opts.Fixture != "" {
+		srv := serveFixture(t, opts.Fixture)
+		opts.Config = pointAt(opts.Config, srv.URL)
+		stopFixture = srv.Close
 	}
 	a := ctor()
 	if a.Name() == "" {
@@ -135,4 +153,53 @@ func Run(t testing.TB, ctor func() adapter.Adapter, opts Options) {
 	if took := time.Since(start); took > opts.HealthWithin {
 		t.Fatalf("Health took %s, over the bound of %s", took, opts.HealthWithin)
 	}
+
+	if stopFixture == nil {
+		return
+	}
+	stopFixture()
+	hctx, hcancel = context.WithTimeout(context.Background(), opts.HealthWithin)
+	start = time.Now()
+	st = a.Health(hctx)
+	hcancel()
+	if st.State == "" {
+		t.Fatal("Health returned an empty State with the upstream unreachable")
+	}
+	if took := time.Since(start); took > opts.HealthWithin {
+		t.Fatalf("Health took %s with the upstream unreachable, over the bound of %s", took, opts.HealthWithin)
+	}
+}
+
+// fixtureURL is the placeholder upstream that Options.Fixture replaces.
+const fixtureURL = "http://fixture"
+
+func serveFixture(t testing.TB, path string) *httptest.Server {
+	t.Helper()
+	body, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatalf("Fixture: %v", err)
+	}
+	isJSON := json.Valid(body)
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if isJSON {
+			w.Header().Set("Content-Type", "application/json")
+		}
+		w.Write(body)
+	}))
+	t.Cleanup(srv.Close)
+	return srv
+}
+
+// pointAt returns a copy of cfg with http://fixture replaced by url.
+func pointAt(cfg adapter.Config, url string) adapter.Config {
+	out := adapter.Config{}
+	for k, v := range cfg {
+		if s, ok := v.(string); ok && strings.HasPrefix(s, fixtureURL) {
+			if rest := s[len(fixtureURL):]; rest == "" || strings.ContainsRune("/?#", rune(rest[0])) {
+				v = url + rest
+			}
+		}
+		out[k] = v
+	}
+	return out
 }

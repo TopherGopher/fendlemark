@@ -188,6 +188,7 @@ func (l *Lattice) Apply(facets []adapter.Facet) Delta {
 		if err := f.Validate(); err != nil {
 			continue
 		}
+		f = withoutEmptyValues(f)
 		present[f.Source] = true
 		incoming[f.Ref()] = true
 		l.facets[f.Ref()] = stored{facet: f, seen: now}
@@ -212,9 +213,29 @@ func (l *Lattice) ApplyEvent(ev adapter.Event) Delta {
 		if err := ev.Facet.Validate(); err != nil {
 			return Delta{Generation: l.gen}
 		}
-		l.facets[ref] = stored{facet: ev.Facet, seen: l.opts.Now()}
+		l.facets[ref] = stored{facet: withoutEmptyValues(ev.Facet), seen: l.opts.Now()}
 	}
 	return l.reconcile()
+}
+
+// withoutEmptyValues drops correlation keys whose value is empty. An empty
+// value means the facet has no value for that key, and two facets that both
+// lack one must not merge on it.
+func withoutEmptyValues(f adapter.Facet) adapter.Facet {
+	for _, v := range f.Keys {
+		if v != "" {
+			continue
+		}
+		keys := make(map[string]string, len(f.Keys))
+		for k, v := range f.Keys {
+			if v != "" {
+				keys[k] = v
+			}
+		}
+		f.Keys = keys
+		break
+	}
+	return f
 }
 
 type dsu struct{ parent []int }

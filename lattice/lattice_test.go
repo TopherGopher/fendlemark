@@ -129,3 +129,27 @@ func TestIncrementalDelta(t *testing.T) {
 		t.Fatalf("expected one removal, got %+v", d)
 	}
 }
+
+func TestEmptyKeyValuesAreIgnored(t *testing.T) {
+	t0 := time.Date(2026, 9, 30, 9, 0, 0, 0, time.UTC)
+	jobs := []adapter.Facet{
+		{Source: "example", SourceID: "job-1", Kind: adapter.KindRun, StartedAt: t0,
+			Keys: map[string]string{"example.job_id": "job-1", adapter.KeyMLflowRunID: ""}},
+		{Source: "example", SourceID: "job-2", Kind: adapter.KindRun, StartedAt: t0.Add(time.Second),
+			Keys: map[string]string{"example.job_id": "job-2", adapter.KeyMLflowRunID: ""}},
+	}
+	l := New(Options{})
+	l.Apply(jobs)
+	ents := l.Query(Query{})
+	if len(ents) != 2 {
+		t.Fatalf("two jobs without an MLflow run must stay apart and both be kept, got %+v", ents)
+	}
+	for _, e := range ents {
+		if _, ok := e.Facets[0].Keys[adapter.KeyMLflowRunID]; ok {
+			t.Fatalf("empty value should be dropped: %+v", e.Facets[0].Keys)
+		}
+	}
+	if jobs[0].Keys[adapter.KeyMLflowRunID] != "" || len(jobs[0].Keys) != 2 {
+		t.Fatal("the adapter's own map must not be modified")
+	}
+}

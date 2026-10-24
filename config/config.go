@@ -16,6 +16,9 @@ import (
 	"time"
 
 	"gopkg.in/yaml.v3"
+
+	"fendlemark.app/fendlemark/adapter"
+	"fendlemark.app/fendlemark/internal/schema"
 )
 
 // Config is the whole file.
@@ -26,6 +29,8 @@ type Config struct {
 	Lattice   Lattice            `yaml:"lattice"`
 	Auth      Auth               `yaml:"auth"`
 	Telemetry Telemetry          `yaml:"telemetry"`
+
+	findings []Finding
 }
 
 type Server struct {
@@ -111,7 +116,8 @@ type Tracing struct {
 	Endpoint string `yaml:"endpoint"`
 }
 
-// KnownAdapters are the adapters compiled into the release binary.
+// KnownAdapters are the adapters compiled into the release binary. Any other
+// adapter registered with adapter.Register is accepted as well.
 var KnownAdapters = []string{"mlflow", "metaflow", "argo", "kubeflow"}
 
 // Default returns the built-in defaults.
@@ -143,15 +149,17 @@ type Finding struct {
 
 // Load reads path (or defaults only when path is "") and applies environment
 // overrides. Deprecated spellings are accepted with findings; see Validate.
-func Load(path string) (*Config, []Finding, error) {
+// The findings, warnings included, are on the returned Config's Findings.
+// When a finding is an error, Load returns it together with the Config.
+func Load(path string) (*Config, error) {
 	raw := map[string]any{}
 	if path != "" {
 		b, err := os.ReadFile(path)
 		if err != nil {
-			return nil, nil, err
+			return nil, err
 		}
 		if err := yaml.Unmarshal(b, &raw); err != nil {
-			return nil, nil, fmt.Errorf("%s: %w", path, err)
+			return nil, fmt.Errorf("%s: %w", path, err)
 		}
 	}
 	findings := applyDeprecations(raw)
@@ -159,15 +167,24 @@ func Load(path string) (*Config, []Finding, error) {
 	expand(raw)
 	cfg, err := decode(raw)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	findings = append(findings, Validate(cfg)...)
-	for _, f := range findings {
+	cfg.findings = append(findings, Validate(cfg)...)
+	for _, f := range cfg.findings {
 		if f.Level == "error" {
-			return cfg, findings, fmt.Errorf("%s: %s", f.Code, f.Message)
+			return cfg, fmt.Errorf("%s: %s", f.Code, f.Message)
 		}
 	}
-	return cfg, findings, nil
+	return cfg, nil
+}
+
+// Findings returns what Load had to say about the file, in order: deprecated
+// spellings first, then Validate's findings.
+func (c *Config) Findings() []Finding {
+	if c == nil {
+		return nil
+	}
+	return c.findings
 }
 
 func decode(raw map[string]any) (*Config, error) {
@@ -336,7 +353,8 @@ func Validate(c *Config) []Finding {
 		out = append(out, Finding{Code: "DOC-102", Level: "error", Message: fmt.Sprintf("console.theme %q is not one of auto, light, dark", c.Console.Theme)})
 	}
 	for name, a := range c.Adapters {
-		known := false
+		registered, ok := adapter.Lookup(name)
+		known := ok
 		for _, k := range KnownAdapters {
 			if k == name {
 				known = true
@@ -348,6 +366,7 @@ func Validate(c *Config) []Finding {
 		if !a.Enabled {
 			continue
 		}
+		before := len(out)
 		req := map[string]string{"mlflow": "tracking_uri", "metaflow": "metadata_url", "kubeflow": "pipelines_url"}[name]
 		if req != "" {
 			if s, _ := a.Options[req].(string); s == "" {
@@ -362,6 +381,12 @@ func Validate(c *Config) []Finding {
 			}
 			if ns, _ := a.Options["namespaces"].([]any); len(ns) == 0 {
 				out = append(out, Finding{Code: "DOC-112", Level: "error", Message: "adapters.argo.namespaces must list at least one namespace"})
+			}
+		}
+		// The adapter's own schema, unless the checks above already found the problem.
+		if registered != nil && len(out) == before {
+			if err := schema.Check(registered.Describe().ConfigSchema, a.Options); err != nil {
+				out = append(out, Finding{Code: "DOC-113", Level: "error", Message: fmt.Sprintf("adapters.%s: %v", name, err)})
 			}
 		}
 	}

@@ -172,13 +172,15 @@ func (s sereneHandler) WithAttrs(a []slog.Attr) slog.Handler {
 func (s sereneHandler) WithGroup(n string) slog.Handler { return sereneHandler{s.Handler.WithGroup(n)} }
 
 func loadConfig() (*config.Config, []config.Finding, error) {
-	if _, err := os.Stat(configPath); errors.Is(err, os.ErrNotExist) {
-		if configPath == "./fendlemark.yaml" {
-			return config.Load("")
+	path := configPath
+	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
+		if path != "./fendlemark.yaml" {
+			return nil, nil, fmt.Errorf("config: %s does not exist", path)
 		}
-		return nil, nil, fmt.Errorf("config: %s does not exist", configPath)
+		path = ""
 	}
-	return config.Load(configPath)
+	cfg, err := config.Load(path)
+	return cfg, cfg.Findings(), err
 }
 
 func signalContext() (context.Context, context.CancelFunc) {
