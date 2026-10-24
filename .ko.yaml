@@ -1,0 +1,17 @@
+# ko builds the container image: the static fendlemark binary on an empty
+# (FROM scratch) base that .github/workflows/image.yml makes for these
+# platforms. Without that base, ko falls back to its own default.
+defaultPlatforms:
+  - linux/amd64
+  - linux/arm64
+  - linux/arm/v7
+builds:
+  - id: fendlemark
+    main: ./cmd/fendlemark
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    ldflags:
+      - -s
+      - -w

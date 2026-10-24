@@ -49,30 +49,27 @@ var (
 	configPath = "./fendlemark.yaml"
 	logLevel   = ""
 	logFormat  = "text"
+	noColor    = false
 )
 
 func main() { os.Exit(run(os.Args[1:])) }
 
 func run(args []string) int {
-	global := flag.NewFlagSet("fendlemark", flag.ContinueOnError)
-	global.SetOutput(os.Stderr)
-	global.StringVar(&configPath, "config", envOr("FENDLEMARK_CONFIG", "./fendlemark.yaml"), "path to fendlemark.yaml")
-	global.StringVar(&configPath, "c", envOr("FENDLEMARK_CONFIG", "./fendlemark.yaml"), "path to fendlemark.yaml (shorthand)")
-	global.StringVar(&logLevel, "log-level", "", "debug, info, warn, error, serene")
-	global.StringVar(&logFormat, "log-format", "text", "text or json")
-	global.Usage = usage
-	// Allow global flags before or after the subcommand.
-	var cmd string
-	var rest []string
-	for i := 0; i < len(args); i++ {
-		if !strings.HasPrefix(args[i], "-") && cmd == "" {
-			cmd = args[i]
-			rest = args[i+1:]
-			args = args[:i]
-			break
-		}
-	}
+	global := globalFlags()
+	// Global flags come before the command, and may follow it as well.
 	if err := global.Parse(args); err != nil {
+		if errors.Is(err, flag.ErrHelp) {
+			return exitOK
+		}
+		return exitUsage
+	}
+	cmd, rest := global.Arg(0), global.Args()
+	if len(rest) > 0 {
+		rest = rest[1:]
+	}
+	rest, err := takeGlobalFlags(global, rest)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "fendlemark:", err)
 		return exitUsage
 	}
 	switch cmd {
@@ -90,13 +87,61 @@ func run(args []string) int {
 		return cmdDoctor(rest)
 	case "version":
 		return cmdVersion(rest)
-	case "", "help", "-h", "--help":
+	case "", "help":
 		usage()
 		return exitOK
 	}
 	fmt.Fprintf(os.Stderr, "fendlemark: unknown command %q\n\n", cmd)
 	usage()
 	return exitUsage
+}
+
+// globalFlags defines the global flags, resetting each to its default.
+func globalFlags() *flag.FlagSet {
+	global := flag.NewFlagSet("fendlemark", flag.ContinueOnError)
+	global.SetOutput(os.Stderr)
+	global.StringVar(&configPath, "config", envOr("FENDLEMARK_CONFIG", "./fendlemark.yaml"), "path to fendlemark.yaml")
+	global.StringVar(&configPath, "c", envOr("FENDLEMARK_CONFIG", "./fendlemark.yaml"), "path to fendlemark.yaml (shorthand)")
+	global.StringVar(&logLevel, "log-level", "", "debug, info, warn, error, serene")
+	global.StringVar(&logFormat, "log-format", "text", "text or json")
+	// Nothing the CLI prints is coloured, so there is nothing for this to
+	// turn off; it is accepted so that scripts which pass it keep working.
+	global.BoolVar(&noColor, "no-color", os.Getenv("NO_COLOR") != "", "disable ANSI colour (also NO_COLOR)")
+	global.Usage = usage
+	return global
+}
+
+// takeGlobalFlags applies the global flags found among a command's arguments
+// and returns the arguments without them. No command defines a flag with a
+// global flag's name, so there is nothing to confuse them with. Arguments
+// after "--" are left alone.
+func takeGlobalFlags(global *flag.FlagSet, args []string) ([]string, error) {
+	out := make([]string, 0, len(args))
+	for i := 0; i < len(args); i++ {
+		a := args[i]
+		if a == "--" {
+			return append(out, args[i:]...), nil
+		}
+		name, value, hasValue := strings.Cut(strings.TrimLeft(a, "-"), "=")
+		f := global.Lookup(name)
+		if !strings.HasPrefix(a, "-") || f == nil {
+			out = append(out, a)
+			continue
+		}
+		if b, ok := f.Value.(interface{ IsBoolFlag() bool }); ok && b.IsBoolFlag() && !hasValue {
+			value = "true"
+		} else if !hasValue {
+			if i+1 == len(args) {
+				return nil, fmt.Errorf("flag needs an argument: %s", a)
+			}
+			i++
+			value = args[i]
+		}
+		if err := global.Set(name, value); err != nil {
+			return nil, fmt.Errorf("invalid value %q for %s: %w", value, a, err)
+		}
+	}
+	return out, nil
 }
 
 func usage() {
@@ -118,6 +163,7 @@ Global flags:
   -c, --config   path to fendlemark.yaml (default ./fendlemark.yaml)
   --log-level    debug, info, warn, error, serene
   --log-format   text or json
+  --no-color     disable ANSI colour (also NO_COLOR)
 
 Documentation: https://fendlemark.app/docs/cli/
 `)
@@ -239,13 +285,14 @@ func cmdServe(args []string) int {
 		return exitUsage
 	}
 	cfg, findings, err := loadConfig()
+	log := logger(cfg)
+	// The notice comes first, even when the configuration is wrong.
+	if noticesOn(cfg) {
+		showNotice(log, noticeURL)
+	}
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "serve:", err)
 		return exitUsage
-	}
-	log := logger(cfg)
-	if cfg.Server.Notices {
-		showNotice(log, noticeURL)
 	}
 	for _, f := range findings {
 		if f.Level == "warn" {

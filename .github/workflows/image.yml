@@ -1,0 +1,66 @@
+name: Publish the container image
+
+# A version tag (vX.Y.Z) builds the fendlemark binary with ko for each
+# platform in .ko.yaml, on an empty (FROM scratch) base, and pushes it to
+# ghcr.io/tophergopher/fendlemark as X.Y.Z, X.Y, and latest. Run by hand on
+# a branch, it pushes edge instead.
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  image:
+    runs-on: ubuntu-latest
+    services:
+      # Holds the empty base for the length of the job.
+      registry:
+        image: registry:3
+        ports: ['5000:5000']
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+      - name: Check the tag matches fendlemark.Version
+        if: github.ref_type == 'tag'
+        run: grep -q "const Version = \"${GITHUB_REF_NAME#v}\"" fendlemark.go
+      # Logs in to ghcr.io with the job's token and sets KO_DOCKER_REPO.
+      - uses: ko-build/setup-ko@v0.10
+        with:
+          version: v0.19.1
+      - name: Make the empty base
+        run: |
+          platforms=$(sed -n '/^defaultPlatforms:/,/^[a-z]/s/^  - //p' .ko.yaml)
+          python3 -I .github/scratch-base.py "$RUNNER_TEMP/scratch" $platforms
+          go run github.com/google/go-containerregistry/cmd/crane@v0.22.1 push --index "$RUNNER_TEMP/scratch" localhost:5000/scratch:latest
+      - name: Build and push
+        env:
+          KO_DEFAULTBASEIMAGE: localhost:5000/scratch:latest
+          DESCRIPTION: One console for your entire ML platform
+        run: |
+          if [ "$GITHUB_REF_TYPE" = tag ]; then
+            version=${GITHUB_REF_NAME#v}
+            tags="$version,${version%.*},latest"
+          else
+            version=edge
+            tags=edge
+          fi
+          SOURCE_DATE_EPOCH=$(git log -1 --format=%ct) ko build ./cmd/fendlemark \
+            --bare --tags "$tags" --sbom none --image-user 65532:65532 \
+            --image-label "org.opencontainers.image.source=https://github.com/$GITHUB_REPOSITORY" \
+            --image-label "org.opencontainers.image.url=https://fendlemark.app" \
+            --image-label "org.opencontainers.image.description=$DESCRIPTION" \
+            --image-label "org.opencontainers.image.licenses=MIT" \
+            --image-label "org.opencontainers.image.version=$version" \
+            --image-label "org.opencontainers.image.revision=$GITHUB_SHA" \
+            --image-annotation "org.opencontainers.image.description=$DESCRIPTION"
+          echo "IMAGE=$KO_DOCKER_REPO:${tags%%,*}" >> "$GITHUB_ENV"
+      # version only: serve would fetch the startup notice into the job log.
+      - name: Smoke test
+        run: docker run --rm "$IMAGE" version

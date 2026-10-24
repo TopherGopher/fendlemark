@@ -17,6 +17,7 @@ import (
 	"unicode"
 
 	"fendlemark.app/fendlemark"
+	"fendlemark.app/fendlemark/config"
 )
 
 // At startup, serve asks the project whether there is anything to say about
@@ -24,10 +25,12 @@ import (
 // waits at most noticeTimeout and starts either way. server.notices: false
 // skips it.
 const (
-	noticeURL     = "https://info.fendlemark.app/about-this-app"
 	noticeTimeout = 2 * time.Second
 	noticeMaxSize = 64 << 10
 )
+
+// noticeURL is where serve looks. The tests point it somewhere else.
+var noticeURL = "https://info.fendlemark.app/about-this-app"
 
 // noticeKey signs the day's token, which the notice service requires. It is
 // not a secret; it keeps the service quiet for anything that isn't fendlemark.
@@ -82,8 +85,18 @@ func printable(s string) string {
 	return strings.TrimRight(s, " \t\n")
 }
 
+// noticesOn reports whether server.notices is set. A file that could not be
+// read leaves only the environment to go by.
+func noticesOn(cfg *config.Config) bool {
+	if cfg != nil {
+		return cfg.Server.Notices
+	}
+	return !strings.EqualFold(os.Getenv("FENDLEMARK_SERVER__NOTICES"), "false")
+}
+
 // showNotice prints the notice at url, if there is one. With --log-format
-// json it is a log record instead, so the output stays parseable.
+// json it is a log record instead, so the output stays parseable; it is
+// written whatever the log level, as the text form is.
 func showNotice(log *slog.Logger, url string) {
 	msg, err := fetchNotice(context.Background(), url)
 	if err != nil {
@@ -94,7 +107,7 @@ func showNotice(log *slog.Logger, url string) {
 		return
 	}
 	if logFormat == "json" {
-		log.Warn("notice", "text", msg)
+		slog.New(slog.NewJSONHandler(os.Stderr, nil)).Warn("notice", "text", msg)
 		return
 	}
 	fmt.Fprintf(os.Stderr, "\n%s\n\n", msg)

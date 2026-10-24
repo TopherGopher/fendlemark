@@ -24,6 +24,13 @@ fendlemark adapters check
 fendlemark serve          # console on http://localhost:7411
 ```
 
+Or run the container image, built `FROM scratch` for `linux/amd64`, `linux/arm64`, and `linux/arm/v7`:
+
+```sh
+docker run --rm -p 127.0.0.1:7411:7411 -v "$PWD/fendlemark.yaml:/fendlemark.yaml:ro" \
+  ghcr.io/tophergopher/fendlemark serve --listen :7411
+```
+
 Or, from Go, integrate every tool you have credentials for in one call:
 
 ```go

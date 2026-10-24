@@ -6,14 +6,21 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strings"
 	"testing"
 	"time"
 )
 
-// The tests never fetch noticeURL. They use the service's test notice, which
-// has the same shape and says only what the documentation says.
+// The tests never fetch the real notice. TestMain points noticeURL at a port
+// nothing listens on, and the one test that reaches the service uses its test
+// notice, which has the same shape and says only what the documentation says.
 const testNoticeURL = "https://info.fendlemark.app/test-post"
+
+func TestMain(m *testing.M) {
+	noticeURL = "http://127.0.0.1:1/"
+	os.Exit(m.Run())
+}
 
 func TestNoticeToken(t *testing.T) {
 	// The same vector is checked against the service's implementation.
