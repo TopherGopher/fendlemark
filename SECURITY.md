@@ -4,8 +4,8 @@
 
 | Version | Supported |
 |---|---|
-| 0.9.7 (`fendlemark.app/fendlemark`) | Yes |
-| 0.9.6 and earlier | No |
+| 0.9.8 (`fendlemark.app/fendlemark`) | Yes |
+| 0.9.7 and earlier | No |
 
 ## Reporting a vulnerability
 

@@ -20,6 +20,15 @@ Issues are not the place to report bugs, because Fendlemark has none. Report a
 behaviour you misunderstood with the **Clarification request** template, and a
 Keeper will help make it harder to misunderstand.
 
+## Spelling
+
+Fendlemark is written in British English: *behaviour*, *colour*, *recognise*,
+*licence* for the noun, *enrolment*. That covers documentation, comments, help
+text, error messages, changelog entries, and commit messages, and the Tone
+Review (step 88) checks it. Names that come from elsewhere keep their own
+spelling (CSS `color`, `NO_COLOR`, MLflow's *artifacts*), and existing
+identifiers are never renamed just to change their spelling.
+
 ## Developing
 
 You need Go 1.26.10 or later and Node.js 22.12 or later.

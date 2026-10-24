@@ -41,6 +41,7 @@ type Server struct {
 	ShutdownGrace time.Duration `yaml:"shutdown_grace"`
 	TLS           TLS           `yaml:"tls"`
 	LogLevel      string        `yaml:"log_level"`
+	Notices       bool          `yaml:"notices"`
 }
 
 type TLS struct {
@@ -123,7 +124,7 @@ var KnownAdapters = []string{"mlflow", "metaflow", "argo", "kubeflow"}
 // Default returns the built-in defaults.
 func Default() *Config {
 	c := &Config{
-		Server:    Server{Listen: "127.0.0.1:7411", DataDir: "./.fendlemark", ReadTimeout: 15 * time.Second, ShutdownGrace: 10 * time.Second, LogLevel: "info"},
+		Server:    Server{Listen: "127.0.0.1:7411", DataDir: "./.fendlemark", ReadTimeout: 15 * time.Second, ShutdownGrace: 10 * time.Second, LogLevel: "info", Notices: true},
 		Console:   Console{Title: "Fendlemark", DefaultView: "overview", Theme: "auto", Motto: true, PageSize: 50, DeepLinks: true, HideEmptyPanels: true, GenerationInFooter: true},
 		Lattice:   Lattice{Correlation: Correlation{Window: 90 * time.Second, WeakKeys: true}, ReconcileInterval: 5 * time.Second, RetainOrphans: time.Hour, MaxEntities: 200000},
 		Auth:      Auth{Mode: "none", Respiratory: Respiratory{Sensitivity: 0.62, EnrolmentBreaths: 3, SessionTTL: 8 * time.Hour}},

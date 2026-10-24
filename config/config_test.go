@@ -144,3 +144,17 @@ func TestConfigSchemaCheckedOnLoad(t *testing.T) {
 		}
 	}
 }
+
+func TestNoticesDefaultAndOverride(t *testing.T) {
+	if !Default().Server.Notices {
+		t.Fatal("server.notices should default to true")
+	}
+	t.Setenv("FENDLEMARK_SERVER__NOTICES", "false")
+	cfg, err := Load("")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cfg.Server.Notices {
+		t.Fatal("FENDLEMARK_SERVER__NOTICES=false should turn notices off")
+	}
+}

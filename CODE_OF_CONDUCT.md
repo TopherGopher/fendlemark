@@ -90,5 +90,10 @@ Addendum extends it to govern the tone of commit messages, changelog entries,
 and code comments, which must be written "as if to a respected colleague who
 will read them in ten years and has not yet had coffee".
 
+The Addendum also requires British spelling: *behaviour*, *colour*,
+*recognise*, *licence* for the noun, *enrolment*. The Covenant above is quoted
+as published, and names that come from elsewhere (CSS `color`, MLflow's
+*artifacts*, Kubeflow's `CANCELED`) keep the spelling they arrived with.
+
 Enforcement is by Tone Review ([FCP-1](https://fendlemark.app/governance/contributing/),
 step 88). See [Governance](https://fendlemark.app/governance/) for the rest.

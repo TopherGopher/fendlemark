@@ -244,6 +244,9 @@ func cmdServe(args []string) int {
 		return exitUsage
 	}
 	log := logger(cfg)
+	if cfg.Server.Notices {
+		showNotice(log, noticeURL)
+	}
 	for _, f := range findings {
 		if f.Level == "warn" {
 			log.Warn(f.Message, "code", f.Code)
