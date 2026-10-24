@@ -109,7 +109,7 @@ Partly because it was funny to write. Partly as a gentle commentary on governanc
 
 ## Privacy
 
-Every page loads Cloudflare Web Analytics, which counts visits without cookies and without identifying you: which pages were read, roughly where from, and in what kind of browser. Google Analytics, which does set cookies, loads only if you choose **Allow** in the bar that appears on your first visit. Until then, nothing is sent to Google. Your choice is kept in your own browser, and the **Analytics choices** link at the foot of every page changes it; choosing **No thanks** after allowing turns Google Analytics off and deletes its cookies. Nothing else on these pages is loaded from anyone else's servers. The contact form, at contact.fendlemark.app, is a separate page: it uses Cloudflare Turnstile to block spam, which loads a script from Cloudflare. The site is static HTML served from GitHub Pages.
+Every page loads Cloudflare Web Analytics, which counts visits without cookies and without identifying you: which pages were read, roughly where from, and in what kind of browser. Google Analytics, which does set cookies, loads only if you choose **Allow** in the bar that appears on your first visit. Until then, nothing is sent to Google. Your choice is kept in your own browser, and the **Analytics choices** link at the foot of every page changes it; choosing **No thanks** after allowing turns Google Analytics off and deletes its cookies. Nothing else on these pages is loaded from anyone else's servers. The introduction video on [Getting started](https://fendlemark.app/docs/getting-started/) is stored with Cloudflare and served from media.fendlemark.app, and loads only when you press play. The contact form, at contact.fendlemark.app, is a separate page: it uses Cloudflare Turnstile to block spam, which loads a script from Cloudflare. The site is static HTML served from GitHub Pages.
 
 ## Colophon
 
@@ -2407,6 +2407,10 @@ telemetry:
 Source: https://fendlemark.app/docs/getting-started/
 
 This guide takes you from nothing to a running Fendlemark console connected to at least one of your existing ML platform tools. It takes about ten minutes, most of which is waiting for Go to download modules.
+
+[Watch Introducing Fendlemark (MP4, 30 seconds)](https://media.fendlemark.app/introducing-fendlemark.mp4)
+
+Introducing Fendlemark, in thirty seconds.
 
 ## Requirements
 

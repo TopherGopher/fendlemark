@@ -4,6 +4,10 @@ Source: https://fendlemark.app/docs/getting-started/
 
 This guide takes you from nothing to a running Fendlemark console connected to at least one of your existing ML platform tools. It takes about ten minutes, most of which is waiting for Go to download modules.
 
+[Watch Introducing Fendlemark (MP4, 30 seconds)](https://media.fendlemark.app/introducing-fendlemark.mp4)
+
+Introducing Fendlemark, in thirty seconds.
+
 ## Requirements
 
 - **Go 1.23 or later** to install the CLI. Prebuilt binaries are distributed to Keepers and Stewards following each Silence Period; see [release governance](https://fendlemark.app/governance/#releases).

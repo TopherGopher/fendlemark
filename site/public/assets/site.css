@@ -223,6 +223,9 @@ a.anchor:hover { color: inherit; }
 .lede { font-size: 1.25rem; line-height: 1.6; letter-spacing: -.006em; color: var(--ink-2); max-width: 32em; margin: 0 0 2.75rem; }
 .main > .lede { max-width: 32em; }
 .lede code { font-size: .8em; }
+.video { margin: -1rem 0 2.75rem; max-width: 40rem; }
+.video video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; border-radius: 14px; background: var(--code-bg); box-shadow: var(--shadow-code); }
+.video figcaption { margin-top: .65rem; font-size: .875rem; line-height: 1.5; color: var(--ink-3); }
 .fine { font-size: .875rem; line-height: 1.6; color: var(--ink-2); }
 .main hr { border: 0; border-top: 1px solid var(--rule); margin: 3rem 0 1.5rem; max-width: var(--measure); }
 .main blockquote { margin: 1.75rem 0; padding: .15rem 0 .15rem 1.25rem; border-left: 3px solid var(--teal); color: var(--ink); font-size: 1.125rem; line-height: 1.6; }
