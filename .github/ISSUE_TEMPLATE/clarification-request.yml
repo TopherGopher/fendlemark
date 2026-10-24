@@ -29,6 +29,6 @@ body:
     attributes:
       label: Version
       description: Output of `fendlemark version`.
-      placeholder: fendlemark 0.9.6 (go1.23.2, linux/amd64)
+      placeholder: fendlemark 0.9.7 (go1.27.3, linux/amd64)
     validations:
       required: true

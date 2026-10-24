@@ -22,7 +22,7 @@ Keeper will help make it harder to misunderstand.
 
 ## Developing
 
-You need Go 1.23 or later and Node.js 22.12 or later.
+You need Go 1.26.10 or later and Node.js 22.12 or later.
 
 ```sh
 go test ./...                       # control plane, adapters, lattice, end-to-end
