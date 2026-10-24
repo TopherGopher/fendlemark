@@ -4,7 +4,7 @@
   "description": "Vue 3 components, design tokens, and lattice client for the Fendlemark ML platform console. Embed Fendlemark views of MLflow, Metaflow, Argo Workflows, and Kubeflow in your own portal.",
   "license": "MIT",
   "homepage": "https://fendlemark.develops.guru/docs/ui/",
-  "repository": { "type": "git", "url": "https://github.com/TopherGopher/fendlemark.git", "directory": "ui" },
+  "repository": { "type": "git", "url": "git+https://github.com/TopherGopher/fendlemark.git", "directory": "ui" },
   "keywords": ["vue", "vue3", "mlops", "mlflow", "metaflow", "argo-workflows", "kubeflow", "console", "fendlemark"],
   "type": "module",
   "files": ["dist", "src", "README.md"],

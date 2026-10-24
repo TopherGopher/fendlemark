@@ -1,5 +1,8 @@
 # Fendlemark
 
+[![Go Reference](https://pkg.go.dev/badge/fendlemark.develops.guru/fendlemark.svg)](https://pkg.go.dev/fendlemark.develops.guru/fendlemark)
+[![@fendlemark/ui](https://img.shields.io/github/package-json/v/TopherGopher/fendlemark?filename=ui%2Fpackage.json&label=%40fendlemark%2Fui&logo=vuedotjs)](ui/)
+
 **One console for your entire ML platform.**
 
 Fendlemark is an open-source Go control plane and Vue 3 console that unifies

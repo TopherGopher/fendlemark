@@ -6,6 +6,11 @@
 <title>Go API reference · Fendlemark</title>
 <meta name="description" content="Package reference for the Fendlemark Go module: fendlemark, adapter, lattice, server, and console packages, exported types, interfaces, functions, and errors.">
 <link rel="canonical" href="https://fendlemark.develops.guru/docs/api/">
+<link rel="alternate" type="text/markdown" href="/docs/api/index.md">
+<link rel="describedby" href="/llms.txt">
+<link rel="api-catalog" href="/.well-known/api-catalog" type="application/linkset+json">
+<link rel="service-desc" href="/openapi.json" type="application/openapi+json">
+<link rel="service-doc" href="/docs/api/#http" type="text/html">
 <meta name="go-import" content="fendlemark.develops.guru/fendlemark git https://github.com/TopherGopher/fendlemark">
 <link rel="alternate" type="application/atom+xml" title="Fendlemark releases" href="/feed.xml">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
@@ -184,7 +189,7 @@
 <p>The reconciler is deterministic: <code>Apply</code> with the same facets on two fresh lattices yields identical entities and identical ids. Ids are derived from the sorted set of <code>(Source, SourceID)</code> pairs that merged, so an entity keeps its id as long as the same facets describe it.</p>
 
 <h2 id="server-pkg">package server</h2>
-<pre data-lang="go"><code><span class="k">func</span> New(l *lattice.Lattice, cfg config.Server, opts ...Option) *Server
+<pre data-lang="go"><code><span class="k">func</span> New(l *lattice.Lattice, cfg *config.Config, opts ...Option) *Server
 <span class="k">func</span> (s *Server) Handler() http.Handler    <span class="c">// mount in your own mux</span>
 <span class="k">func</span> (s *Server) ListenAndServe(ctx context.Context) <span class="k">error</span></code></pre>
 
@@ -192,17 +197,19 @@
 <div class="table-wrap"><table>
 <thead><tr><th>Method and path</th><th>Returns</th></tr></thead>
 <tbody>
-<tr><td><code>GET /api/v1/entities?kind=&amp;key=&amp;status=&amp;since=&amp;limit=&amp;offset=</code></td><td>Paged entities.</td></tr>
+<tr><td><code>GET /api/v1/entities?kind=&amp;status=&amp;key=&amp;since=&amp;until=&amp;limit=&amp;offset=</code></td><td>Paged entities, with the total and the lattice generation. <code>kind</code>, <code>status</code>, and <code>key</code> take comma-separated lists; <code>limit</code> defaults to 50, at most 5000.</td></tr>
 <tr><td><code>GET /api/v1/entities/{id}</code></td><td>One entity with facets and relations.</td></tr>
 <tr><td><code>GET /api/v1/entities/{id}/explain</code></td><td>Why it was reconciled the way it was.</td></tr>
-<tr><td><code>GET /api/v1/entities/{id}/metrics</code></td><td>On-demand metric series from the mlflow facet, if present.</td></tr>
 <tr><td><code>GET /api/v1/adapters</code></td><td>Status per adapter.</td></tr>
 <tr><td><code>GET /api/v1/lattice/stats</code></td><td>Counts and generation.</td></tr>
 <tr><td><code>GET /api/v1/events?entity=&amp;kind=</code></td><td>Server-sent events stream of deltas.</td></tr>
+<tr><td><code>GET /api/v1/console</code></td><td>Console settings (title, theme, default view, page size, and the like), the auth mode, and the server version.</td></tr>
 <tr><td><code>GET /healthz</code>, <code>GET /readyz</code>, <code>GET /metrics</code></td><td>Liveness, readiness, Prometheus.</td></tr>
-<tr><td><code>POST /api/v1/auth/fri/*</code></td><td>Respiratory Identity enrolment and sign-in. Browser only.</td></tr>
+<tr><td><code>POST /api/v1/auth/fri/signin</code>, <code>POST /api/v1/auth/fri/enrol/{token}</code></td><td>Respiratory Identity sign-in and enrolment. Browser only.</td></tr>
+<tr><td><code>GET /api/v1/auth/session</code>, <code>POST /api/v1/auth/signout</code></td><td>The current session, and signing out.</td></tr>
 </tbody></table></div>
 <p>There are no <code>POST</code>, <code>PUT</code>, or <code>DELETE</code> routes against entities. The API is a view of the lattice, and the lattice is a view of your tools.</p>
+<p>The full machine-readable description is <a href="/openapi.json">openapi.json</a> (OpenAPI 3.1).</p>
 
 <h2 id="fri">package auth/fri</h2>
 <pre data-lang="go"><code><span class="k">type</span> Signature [212]float32

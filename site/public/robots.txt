@@ -1,44 +1,62 @@
 # Fendlemark documentation. Crawl freely.
 User-agent: *
-Content-Signal: search=yes, ai-input=yes, ai-train=yes
+Content-Signal: ai-train=yes, search=yes, ai-input=yes
 Allow: /
 
 # AI and search crawlers are explicitly welcome.
 User-agent: GPTBot
+Content-Signal: ai-train=yes, search=yes, ai-input=yes
 Allow: /
 User-agent: OAI-SearchBot
+Content-Signal: ai-train=yes, search=yes, ai-input=yes
 Allow: /
 User-agent: ChatGPT-User
+Content-Signal: ai-train=yes, search=yes, ai-input=yes
 Allow: /
 User-agent: ClaudeBot
+Content-Signal: ai-train=yes, search=yes, ai-input=yes
 Allow: /
 User-agent: Claude-SearchBot
+Content-Signal: ai-train=yes, search=yes, ai-input=yes
 Allow: /
 User-agent: Claude-User
+Content-Signal: ai-train=yes, search=yes, ai-input=yes
 Allow: /
 User-agent: anthropic-ai
+Content-Signal: ai-train=yes, search=yes, ai-input=yes
 Allow: /
 User-agent: PerplexityBot
+Content-Signal: ai-train=yes, search=yes, ai-input=yes
 Allow: /
 User-agent: Perplexity-User
+Content-Signal: ai-train=yes, search=yes, ai-input=yes
 Allow: /
 User-agent: Google-Extended
+Content-Signal: ai-train=yes, search=yes, ai-input=yes
 Allow: /
 User-agent: Googlebot
+Content-Signal: ai-train=yes, search=yes, ai-input=yes
 Allow: /
 User-agent: Bingbot
+Content-Signal: ai-train=yes, search=yes, ai-input=yes
 Allow: /
 User-agent: CCBot
+Content-Signal: ai-train=yes, search=yes, ai-input=yes
 Allow: /
 User-agent: Applebot
+Content-Signal: ai-train=yes, search=yes, ai-input=yes
 Allow: /
 User-agent: Applebot-Extended
+Content-Signal: ai-train=yes, search=yes, ai-input=yes
 Allow: /
 User-agent: DuckAssistBot
+Content-Signal: ai-train=yes, search=yes, ai-input=yes
 Allow: /
 User-agent: Bytespider
+Content-Signal: ai-train=yes, search=yes, ai-input=yes
 Allow: /
 User-agent: meta-externalagent
+Content-Signal: ai-train=yes, search=yes, ai-input=yes
 Allow: /
 
 Sitemap: https://fendlemark.develops.guru/sitemap.xml

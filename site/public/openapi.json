@@ -1,0 +1,806 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Fendlemark server HTTP API",
+    "version": "0.9.4",
+    "summary": "JSON API, server-sent events, and health endpoints of a self-hosted Fendlemark server.",
+    "description": "Fendlemark is self-hosted: every installation runs its own server, and there is no hosted Fendlemark API. By default the server listens on 127.0.0.1:7411 (`server.listen` in fendlemark.yaml).\n\nThe API is a read-only view of the lattice. There are no POST, PUT, or DELETE routes against entities; the only POST routes are the sign-in, enrolment, and sign-out routes under `/api/v1/auth`.\n\nAuthentication depends on `auth.mode`. With the default `auth.mode: none`, every route is open. With `auth.mode: respiratory`, the routes that list the `fmSession` security scheme require the `fm_session` cookie set by `POST /api/v1/auth/fri/signin`, and answer `401` with code `FRI-0063` without it.\n\nJSON errors have the shape `{\"code\": \"...\", \"error\": \"...\"}`. Every response carries an `X-Fendlemark-Version` header. Paths not listed here are served by the embedded console.",
+    "license": {
+      "name": "MIT",
+      "identifier": "MIT"
+    }
+  },
+  "externalDocs": {
+    "description": "HTTP API section of the Go API reference",
+    "url": "https://fendlemark.develops.guru/docs/api/#http"
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:7411",
+      "description": "Your own Fendlemark server at its default listen address. Not a public service: replace it with the address your server listens on."
+    }
+  ],
+  "tags": [
+    { "name": "Entities", "description": "Entities reconciled in the lattice." },
+    { "name": "Adapters", "description": "Status of the configured adapters." },
+    { "name": "Lattice", "description": "Lattice statistics and live updates." },
+    { "name": "Console", "description": "Settings for the embedded console." },
+    { "name": "Authentication", "description": "Sessions, sign-out, and Respiratory Identity sign-in and enrolment. See https://fendlemark.develops.guru/docs/auth/." },
+    { "name": "Operations", "description": "Liveness, readiness, and Prometheus metrics." }
+  ],
+  "paths": {
+    "/healthz": {
+      "get": {
+        "tags": ["Operations"],
+        "operationId": "getHealthz",
+        "security": [],
+        "summary": "Liveness",
+        "description": "Returns 200 while the process is serving.",
+        "responses": {
+          "200": {
+            "description": "The server is alive.",
+            "content": {
+              "text/plain": {
+                "schema": { "type": "string" },
+                "example": "ok\n"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/readyz": {
+      "get": {
+        "tags": ["Operations"],
+        "operationId": "getReadyz",
+        "security": [],
+        "summary": "Readiness",
+        "description": "Returns 200 once the initial reconciliation has completed, and 503 until then.",
+        "responses": {
+          "200": {
+            "description": "The initial reconciliation has completed.",
+            "content": {
+              "text/plain": {
+                "schema": { "type": "string" },
+                "example": "ready\n"
+              }
+            }
+          },
+          "503": {
+            "description": "The initial reconciliation is still in progress.",
+            "content": {
+              "text/plain": {
+                "schema": { "type": "string" },
+                "example": "initial reconciliation in progress\n"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/metrics": {
+      "get": {
+        "tags": ["Operations"],
+        "operationId": "getMetrics",
+        "security": [],
+        "summary": "Prometheus metrics",
+        "description": "Prometheus text exposition format. Series: `fendlemark_lattice_generation` (counter), `fendlemark_entities` (gauge), `fendlemark_facets{source}` (gauge), `fendlemark_correlations{key}` (gauge), `fendlemark_adapter_up{adapter}` (gauge, 1 when the adapter is healthy), and `fendlemark_loading_spinners_total` (counter). Returns 404 when `telemetry.metrics.enabled` is false.",
+        "responses": {
+          "200": {
+            "description": "Current metrics.",
+            "content": {
+              "text/plain; version=0.0.4": {
+                "schema": { "type": "string" }
+              }
+            }
+          },
+          "404": {
+            "description": "Metrics are disabled (`telemetry.metrics.enabled: false`).",
+            "content": {
+              "text/plain": {
+                "schema": { "type": "string" },
+                "example": "404 page not found\n"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/entities": {
+      "get": {
+        "tags": ["Entities"],
+        "operationId": "listEntities",
+        "summary": "List entities",
+        "description": "Returns entities matching every given filter, newest first (by `started_at`, then by `id`). `total` counts all matches, ignoring `limit` and `offset`.",
+        "security": [{}, { "fmSession": [] }],
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "query",
+            "description": "Comma-separated entity kinds. An entity matches if its kind is any of them.",
+            "style": "form",
+            "explode": false,
+            "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Kind" } },
+            "example": ["run", "model"]
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Comma-separated phases. An entity matches if its status is any of them.",
+            "style": "form",
+            "explode": false,
+            "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Phase" } },
+            "example": ["Running", "Failed"]
+          },
+          {
+            "name": "key",
+            "in": "query",
+            "description": "Comma-separated `name=value` correlation-key pairs. An entity matches if, for every pair, at least one of its facets has that key with that value.",
+            "schema": { "type": "string" },
+            "example": "mlflow.experiment_id=12,git.sha=4e1d9a0"
+          },
+          {
+            "name": "since",
+            "in": "query",
+            "description": "RFC 3339 time. Only entities that started at or after it. A value that does not parse is ignored.",
+            "schema": { "type": "string", "format": "date-time" }
+          },
+          {
+            "name": "until",
+            "in": "query",
+            "description": "RFC 3339 time. Only entities that started at or before it. A value that does not parse is ignored.",
+            "schema": { "type": "string", "format": "date-time" }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Page size. Defaults to `console.page_size` (50 unless configured). Values above 5000 are reduced to 5000; values that are not positive integers are ignored.",
+            "schema": { "type": "integer" }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of matching entities to skip. Defaults to 0; negative values are ignored.",
+            "schema": { "type": "integer", "default": 0 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of entities.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["entities", "total", "generation"],
+                  "properties": {
+                    "entities": { "type": "array", "items": { "$ref": "#/components/schemas/Entity" } },
+                    "total": { "type": "integer", "minimum": 0, "description": "Number of entities matching the filters." },
+                    "generation": { "$ref": "#/components/schemas/Generation" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/SessionRequired" }
+        }
+      }
+    },
+    "/api/v1/entities/{id}": {
+      "get": {
+        "tags": ["Entities"],
+        "operationId": "getEntity",
+        "summary": "Get one entity",
+        "description": "Returns one entity with its facets and relations.",
+        "security": [{}, { "fmSession": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/EntityIDPath" }],
+        "responses": {
+          "200": {
+            "description": "The entity.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Entity" }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/SessionRequired" },
+          "404": { "$ref": "#/components/responses/EntityNotFound" }
+        }
+      }
+    },
+    "/api/v1/entities/{id}/explain": {
+      "get": {
+        "tags": ["Entities"],
+        "operationId": "explainEntity",
+        "summary": "Explain an entity",
+        "description": "Returns the entity together with the merges that joined its facets and the steps that created its relations.",
+        "security": [{}, { "fmSession": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/EntityIDPath" }],
+        "responses": {
+          "200": {
+            "description": "The explanation.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Explanation" }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/SessionRequired" },
+          "404": { "$ref": "#/components/responses/EntityNotFound" }
+        }
+      }
+    },
+    "/api/v1/adapters": {
+      "get": {
+        "tags": ["Adapters"],
+        "operationId": "listAdapters",
+        "summary": "Adapter status",
+        "description": "Returns the health of each configured adapter. Health checks share a 10-second timeout.",
+        "security": [{}, { "fmSession": [] }],
+        "responses": {
+          "200": {
+            "description": "Status per adapter.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["adapters"],
+                  "properties": {
+                    "adapters": { "type": "array", "items": { "$ref": "#/components/schemas/AdapterStatus" } }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/SessionRequired" }
+        }
+      }
+    },
+    "/api/v1/lattice/stats": {
+      "get": {
+        "tags": ["Lattice"],
+        "operationId": "getLatticeStats",
+        "summary": "Lattice statistics",
+        "description": "Returns counts and the current reconciliation generation.",
+        "security": [{}, { "fmSession": [] }],
+        "responses": {
+          "200": {
+            "description": "Lattice statistics.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Stats" }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/SessionRequired" }
+        }
+      }
+    },
+    "/api/v1/events": {
+      "get": {
+        "tags": ["Lattice"],
+        "operationId": "streamEvents",
+        "summary": "Stream lattice deltas",
+        "description": "Server-sent events. The stream opens with a `hello` event whose data is `{\"generation\": N}`. Each reconciliation that changes matching entities sends a `delta` event whose data is a `Delta` object (`#/components/schemas/Delta`). A `: keepalive` comment is sent every 25 seconds. Deltas are not replayed: a subscriber that falls behind misses deltas and can detect the gap from `generation`, then refetch.",
+        "security": [{}, { "fmSession": [] }],
+        "parameters": [
+          {
+            "name": "entity",
+            "in": "query",
+            "description": "Only report changes to this entity id.",
+            "schema": { "$ref": "#/components/schemas/EntityID" }
+          },
+          {
+            "name": "kind",
+            "in": "query",
+            "description": "Only report changes to entities of this kind. Removed ids are always reported, since their kind is no longer known.",
+            "schema": { "$ref": "#/components/schemas/Kind" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An event stream that stays open until the client disconnects.",
+            "headers": {
+              "Cache-Control": { "schema": { "type": "string", "const": "no-cache" } }
+            },
+            "content": {
+              "text/event-stream": {
+                "schema": { "type": "string" },
+                "example": "event: hello\ndata: {\"generation\":42}\n\nevent: delta\ndata: {\"upserted\":[\"lt_8f2c1d4e6a9b0c37\"],\"removed\":null,\"generation\":43}\n\n: keepalive\n\n"
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/SessionRequired" },
+          "500": {
+            "description": "The connection does not support streaming (code `SSE-001`).",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "code": "SSE-001", "error": "streaming unsupported" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/console": {
+      "get": {
+        "tags": ["Console"],
+        "operationId": "getConsoleConfig",
+        "security": [],
+        "summary": "Console settings",
+        "description": "Returns the `console` settings from fendlemark.yaml, the authentication mode, and the server version. Open even when `auth.mode` is `respiratory`, so that the console can render its sign-in page.",
+        "responses": {
+          "200": {
+            "description": "Console settings.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ConsoleConfig" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/fri/signin": {
+      "post": {
+        "tags": ["Authentication"],
+        "operationId": "friSignIn",
+        "security": [],
+        "summary": "Sign in",
+        "description": "Matches a signature against the user's enrolment and, on success, sets the `fm_session` cookie (HttpOnly, SameSite=Lax, Path=/, Secure when served over TLS) for `auth.respiratory.session_ttl` (8 hours by default). The signature is computed in the browser; only the 212-number vector is sent. When `auth.respiratory.second_factor` is true, `slow` is also required. Returns 404 unless `auth.mode` is `respiratory`.",
+        "requestBody": {
+          "required": true,
+          "description": "At most 1 MiB.",
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/SignInRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Signed in.",
+            "headers": {
+              "Set-Cookie": {
+                "description": "`fm_session=<token>; Path=/; Max-Age=<session_ttl seconds>; HttpOnly; SameSite=Lax`, plus `Secure` over TLS.",
+                "schema": { "type": "string" }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SignInResponse" }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not valid JSON or exceeds 1 MiB (code `FRI-0400`).",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          },
+          "401": {
+            "description": "Not signed in. Codes: `FRI-0042` (no match, including an unknown user), `FRI-0024` (mouth-dominant signature, when `auth.respiratory.allow_mouth_breathing` is false), `FRI-0050` (second factor missing or not matched).",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          },
+          "404": { "$ref": "#/components/responses/FRIDisabled" },
+          "425": {
+            "description": "The signature shows excited breathing; retry after a pause (code `FRI-0031`).",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/fri/enrol/{token}": {
+      "post": {
+        "tags": ["Authentication"],
+        "operationId": "friEnrol",
+        "security": [],
+        "summary": "Complete an enrolment",
+        "description": "Completes an enrolment started with `fendlemark auth enrol`, which prints a one-time link valid for 15 minutes. The body carries at least `auth.respiratory.enrolment_breaths` signatures (never fewer than 3) and, optionally, the slow signature used as a second factor. The token is consumed on success.",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "description": "One-time enrolment token from the enrolment link.",
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "At most 1 MiB.",
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/EnrolRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Enrolled.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/EnrolResponse" }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not valid JSON or exceeds 1 MiB (code `FRI-0400`).",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          },
+          "404": { "$ref": "#/components/responses/FRIDisabled" },
+          "410": {
+            "description": "The token is unknown, already used, or expired (code `FRI-0012`).",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "code": "FRI-0012", "error": "enrolment link expired" }
+              }
+            }
+          },
+          "422": {
+            "description": "The signatures cannot be enrolled. Codes: `FRI-0019` (too few signatures), `FRI-0024` (a mouth-dominant signature, when `auth.respiratory.allow_mouth_breathing` is false).",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          },
+          "500": {
+            "description": "The enrolment could not be stored (code `FRI-0500`).",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/session": {
+      "get": {
+        "tags": ["Authentication"],
+        "operationId": "getSession",
+        "summary": "Current session",
+        "description": "With `auth.mode: none`, always returns `{\"mode\": \"none\", \"user\": \"anonymous\", \"role\": \"keeper\"}`. With `auth.mode: respiratory`, returns the signed-in user, or 401 (code `FRI-0063`) without a valid `fm_session` cookie.",
+        "security": [{}, { "fmSession": [] }],
+        "responses": {
+          "200": {
+            "description": "The current session.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Session" }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/SessionRequired" }
+        }
+      }
+    },
+    "/api/v1/auth/signout": {
+      "post": {
+        "tags": ["Authentication"],
+        "operationId": "signOut",
+        "security": [],
+        "summary": "Sign out",
+        "description": "Ends the session named by the `fm_session` cookie, if any, and clears the cookie. Always returns 204.",
+        "responses": {
+          "204": {
+            "description": "Signed out.",
+            "headers": {
+              "Set-Cookie": {
+                "description": "Clears `fm_session`.",
+                "schema": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "fmSession": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "fm_session",
+        "description": "Session cookie set by `POST /api/v1/auth/fri/signin`. Checked only when `auth.mode` is `respiratory`; with the default `auth.mode: none` no credentials are needed."
+      }
+    },
+    "parameters": {
+      "EntityIDPath": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "description": "Entity id.",
+        "schema": { "type": "string" },
+        "example": "lt_8f2c1d4e6a9b0c37"
+      }
+    },
+    "responses": {
+      "SessionRequired": {
+        "description": "`auth.mode` is `respiratory` and the request has no valid `fm_session` cookie (code `FRI-0063`).",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" },
+            "example": { "code": "FRI-0063", "error": "session expired; breathe again" }
+          }
+        }
+      },
+      "EntityNotFound": {
+        "description": "No entity has this id (code `LT-404`).",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" },
+            "example": { "code": "LT-404", "error": "no such entity" }
+          }
+        }
+      },
+      "FRIDisabled": {
+        "description": "Respiratory Identity is not enabled on this server (code `FRI-0000`).",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" },
+            "example": { "code": "FRI-0000", "error": "respiratory identity is not enabled" }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "required": ["code", "error"],
+        "properties": {
+          "code": { "type": "string", "description": "Stable error code." },
+          "error": { "type": "string", "description": "Human-readable message." }
+        }
+      },
+      "Generation": {
+        "type": "integer",
+        "minimum": 0,
+        "description": "Reconciliation generation. Increases each time a reconciliation changes the lattice."
+      },
+      "Timestamp": {
+        "type": "string",
+        "format": "date-time",
+        "description": "RFC 3339 time with optional fractional seconds."
+      },
+      "EntityID": {
+        "type": "string",
+        "pattern": "^lt_[0-9a-f]{16}$",
+        "description": "Stable entity id: `lt_` followed by 16 hex characters derived from the facets that merged into the entity.",
+        "examples": ["lt_8f2c1d4e6a9b0c37"]
+      },
+      "Kind": {
+        "type": "string",
+        "enum": ["run", "workflow", "pipeline", "model", "artifact", "notebook"]
+      },
+      "Phase": {
+        "type": "string",
+        "enum": ["Pending", "Running", "Succeeded", "Failed", "Unknown"],
+        "description": "Tool-agnostic lifecycle state."
+      },
+      "RelKind": {
+        "type": "string",
+        "enum": ["ProducedBy", "DerivedFrom", "DeployedAs", "SharesCommit"]
+      },
+      "Role": {
+        "type": "string",
+        "enum": ["viewer", "operator", "keeper"]
+      },
+      "Link": {
+        "type": "object",
+        "description": "Deep link into the upstream tool.",
+        "required": ["label", "url"],
+        "properties": {
+          "label": { "type": "string" },
+          "url": { "type": "string" }
+        }
+      },
+      "Facet": {
+        "type": "object",
+        "description": "One tool's view of one thing.",
+        "required": ["source", "source_id", "kind", "title", "status", "started_at", "ended_at"],
+        "properties": {
+          "source": { "type": "string", "description": "Adapter name.", "examples": ["mlflow"] },
+          "source_id": { "type": "string", "description": "Identifier in the upstream tool." },
+          "kind": { "$ref": "#/components/schemas/Kind" },
+          "title": { "type": "string" },
+          "status": { "$ref": "#/components/schemas/Phase" },
+          "started_at": { "$ref": "#/components/schemas/Timestamp" },
+          "ended_at": {
+            "$ref": "#/components/schemas/Timestamp",
+            "description": "`0001-01-01T00:00:00Z` when the thing has not ended."
+          },
+          "keys": {
+            "type": "object",
+            "description": "Correlation keys, such as `mlflow.run_id` or `git.sha`. Omitted when empty.",
+            "additionalProperties": { "type": "string" }
+          },
+          "fields": {
+            "type": "object",
+            "description": "Adapter-specific fields. Omitted when empty.",
+            "additionalProperties": true
+          },
+          "links": {
+            "type": "array",
+            "description": "Omitted when empty.",
+            "items": { "$ref": "#/components/schemas/Link" }
+          }
+        }
+      },
+      "Relation": {
+        "type": "object",
+        "description": "Directed edge to another entity.",
+        "required": ["to", "via", "rel"],
+        "properties": {
+          "to": { "$ref": "#/components/schemas/EntityID" },
+          "via": { "type": "string", "description": "What created the edge: a correlation key such as `mlflow.run_id`, or `<git.repo>@<git.sha>` for `SharesCommit`." },
+          "rel": { "$ref": "#/components/schemas/RelKind" }
+        }
+      },
+      "Entity": {
+        "type": "object",
+        "description": "One real-world thing, reconciled from the facets that describe it.",
+        "required": ["id", "kind", "title", "status", "started_at", "ended_at", "facets"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/EntityID" },
+          "kind": { "$ref": "#/components/schemas/Kind" },
+          "title": { "type": "string" },
+          "status": { "$ref": "#/components/schemas/Phase" },
+          "started_at": { "$ref": "#/components/schemas/Timestamp", "description": "Earliest `started_at` of its facets." },
+          "ended_at": {
+            "$ref": "#/components/schemas/Timestamp",
+            "description": "Latest `ended_at` of its facets; `0001-01-01T00:00:00Z` while running or not ended."
+          },
+          "facets": { "type": "array", "items": { "$ref": "#/components/schemas/Facet" } },
+          "related": {
+            "type": "array",
+            "description": "Omitted when the entity has no relations.",
+            "items": { "$ref": "#/components/schemas/Relation" }
+          }
+        }
+      },
+      "MergeStep": {
+        "type": "object",
+        "description": "Why two facets became one entity.",
+        "required": ["a", "b", "key", "value", "gap"],
+        "properties": {
+          "a": { "type": "string", "description": "Facet reference: `source`, a NUL character, then `source_id`." },
+          "b": { "type": "string", "description": "Facet reference: `source`, a NUL character, then `source_id`." },
+          "key": { "type": "string", "description": "Correlation key shared by the two facets." },
+          "value": { "type": "string", "description": "Shared value of the key." },
+          "gap": { "type": "integer", "description": "Time between the two facets' `started_at`, in nanoseconds." }
+        }
+      },
+      "RelationStep": {
+        "type": "object",
+        "description": "Why an edge exists.",
+        "required": ["from", "to", "key", "rel"],
+        "properties": {
+          "from": { "$ref": "#/components/schemas/EntityID" },
+          "to": { "$ref": "#/components/schemas/EntityID" },
+          "key": { "type": "string" },
+          "rel": { "$ref": "#/components/schemas/RelKind" }
+        }
+      },
+      "Explanation": {
+        "type": "object",
+        "required": ["entity", "merges", "relations"],
+        "properties": {
+          "entity": { "$ref": "#/components/schemas/Entity" },
+          "merges": {
+            "type": ["array", "null"],
+            "description": "`null` when no merges are recorded, as for an entity with a single facet.",
+            "items": { "$ref": "#/components/schemas/MergeStep" }
+          },
+          "relations": {
+            "type": ["array", "null"],
+            "description": "`null` when the entity has no outgoing relations.",
+            "items": { "$ref": "#/components/schemas/RelationStep" }
+          }
+        }
+      },
+      "Stats": {
+        "type": "object",
+        "required": ["generation", "entities", "facets", "by_kind", "by_source", "correlations"],
+        "properties": {
+          "generation": { "$ref": "#/components/schemas/Generation" },
+          "entities": { "type": "integer", "minimum": 0 },
+          "facets": { "type": "integer", "minimum": 0 },
+          "by_kind": { "type": "object", "description": "Entities per kind.", "additionalProperties": { "type": "integer" } },
+          "by_source": { "type": "object", "description": "Facets per adapter.", "additionalProperties": { "type": "integer" } },
+          "correlations": { "type": "object", "description": "Merges performed in the last reconciliation, per correlation key.", "additionalProperties": { "type": "integer" } }
+        }
+      },
+      "AdapterStatus": {
+        "type": "object",
+        "required": ["name", "display_name", "state", "detail", "latency_ms", "facets", "maturity"],
+        "properties": {
+          "name": { "type": "string", "examples": ["mlflow"] },
+          "display_name": { "type": "string", "examples": ["MLflow"] },
+          "state": { "type": "string", "enum": ["healthy", "degraded", "unreachable", "disabled"] },
+          "detail": { "type": "string", "description": "One-line status detail." },
+          "latency_ms": { "type": "integer", "description": "Latency of the health check, in milliseconds." },
+          "facets": { "type": "integer", "description": "Facets the adapter currently contributes." },
+          "maturity": { "type": "string", "enum": ["Provisional", "Settled", "Established", "Canonical"] },
+          "keys": { "type": "array", "description": "Correlation keys the adapter provides. Omitted when empty.", "items": { "type": "string" } }
+        }
+      },
+      "Delta": {
+        "type": "object",
+        "description": "What changed in one reconciliation. Data of the `delta` server-sent event.",
+        "required": ["upserted", "removed", "generation"],
+        "properties": {
+          "upserted": { "type": ["array", "null"], "description": "Ids added or changed; `null` when none.", "items": { "$ref": "#/components/schemas/EntityID" } },
+          "removed": { "type": ["array", "null"], "description": "Ids removed; `null` when none.", "items": { "$ref": "#/components/schemas/EntityID" } },
+          "generation": { "$ref": "#/components/schemas/Generation" }
+        }
+      },
+      "ConsoleConfig": {
+        "type": "object",
+        "required": ["title", "default_view", "theme", "motto", "page_size", "deep_links", "hide_empty_panels", "generation_in_footer", "auth_mode", "version"],
+        "properties": {
+          "title": { "type": "string", "examples": ["Fendlemark"] },
+          "default_view": { "type": "string", "description": "View shown after sign-in, such as `overview` or `runs`.", "examples": ["overview"] },
+          "theme": { "type": "string", "enum": ["auto", "light", "dark"] },
+          "motto": { "type": "boolean" },
+          "page_size": { "type": "integer" },
+          "deep_links": { "type": "boolean" },
+          "hide_empty_panels": { "type": "boolean" },
+          "generation_in_footer": { "type": "boolean" },
+          "auth_mode": { "type": "string", "enum": ["none", "respiratory"] },
+          "version": { "type": "string", "description": "Server version.", "examples": ["0.9.4"] }
+        }
+      },
+      "Signature": {
+        "type": "array",
+        "description": "Respiratory Identity signature: 212 numbers computed in the browser.",
+        "minItems": 212,
+        "maxItems": 212,
+        "items": { "type": "number" }
+      },
+      "SignInRequest": {
+        "type": "object",
+        "required": ["user", "signature"],
+        "properties": {
+          "user": { "type": "string", "description": "Enrolled user name." },
+          "signature": { "$ref": "#/components/schemas/Signature" },
+          "slow": { "$ref": "#/components/schemas/Signature", "description": "Second-factor signature. Required when `auth.respiratory.second_factor` is true." }
+        }
+      },
+      "SignInResponse": {
+        "type": "object",
+        "required": ["user", "role", "score", "expires"],
+        "properties": {
+          "user": { "type": "string" },
+          "role": { "$ref": "#/components/schemas/Role" },
+          "score": { "type": "number", "minimum": 0, "maximum": 1, "description": "Similarity to the enrolment." },
+          "expires": { "$ref": "#/components/schemas/Timestamp" }
+        }
+      },
+      "EnrolRequest": {
+        "type": "object",
+        "required": ["signatures"],
+        "properties": {
+          "signatures": {
+            "type": "array",
+            "minItems": 3,
+            "description": "At least `auth.respiratory.enrolment_breaths` signatures (default 3).",
+            "items": { "$ref": "#/components/schemas/Signature" }
+          },
+          "slow": { "$ref": "#/components/schemas/Signature", "description": "Optional second-factor signature, stored for later sign-ins." }
+        }
+      },
+      "EnrolResponse": {
+        "type": "object",
+        "required": ["user", "role", "samples"],
+        "properties": {
+          "user": { "type": "string" },
+          "role": { "$ref": "#/components/schemas/Role" },
+          "samples": { "type": "integer", "description": "Number of signatures enrolled." }
+        }
+      },
+      "Session": {
+        "type": "object",
+        "required": ["mode", "user", "role"],
+        "properties": {
+          "mode": { "type": "string", "enum": ["none", "respiratory"] },
+          "user": { "type": "string", "description": "`anonymous` when `mode` is `none`." },
+          "role": { "$ref": "#/components/schemas/Role" },
+          "expires": { "$ref": "#/components/schemas/Timestamp", "description": "Present only when `mode` is `respiratory`." }
+        }
+      }
+    }
+  }
+}

@@ -5,6 +5,7 @@ No dependencies. Run from the repo root:  python3 tools/build.py
 Output HTML is committed so GitHub Pages serves it as-is.
 """
 import json, os, re, sys, html
+from html.parser import HTMLParser
 
 DEFAULT_DATE = "2026-10-24"  # bump when content changes; keeps builds reproducible
 
@@ -173,6 +174,7 @@ def render(src_path):
         "{{title}}": html.escape(full_title),
         "{{description}}": html.escape(description),
         "{{canonical}}": BASE + url,
+        "{{markdown}}": url + "index.md",
         "{{body}}": body,
         "{{sidebar}}": sidebar(url),
         "{{pager}}": prev_next(url) if layout == "docs" else "",
@@ -201,6 +203,133 @@ def text_of(body):
     t = re.sub(r"[ \t]+", " ", t)
     t = re.sub(r"\n{3,}", "\n\n", t)
     return t.strip()
+
+# Page chrome rewritten to plain structure before conversion; the page title replaces <h1>.
+MD_PREP = [
+    (r'<p class="eyebrow">.*?</p>|<h1[^>]*>.*?</h1>|<(\w+)[^>]*aria-hidden="true"[^>]*>.*?</\1>', ""),
+    (r'<a class="card" href="([^"]+)"><h3>(.*?)</h3><p>(.*?)</p></a>', r'<li><a href="\1">\2</a>: \3</li>'),
+    (r'<div class="stat"><b>(.*?)</b><span>(.*?)</span></div>', r"<li><b>\1</b> \2</li>"),
+    (r'<div class="(?:cards|stat-row)">(.*?)</div>', r"<ul>\1</ul>"),
+    (r'<span class="tag">(.*?)</span>(<h3>.*?</h3>)', r"\2<p><code>\1</code></p>"),
+    (r'<p class="callout-title">(.*?)</p>', r"<p><strong>\1</strong></p>"),
+    (r'<div class="callout">\s*<div>(.*?)</div>\s*</div>', r"<blockquote>\1</blockquote>"),
+]
+INLINE = {"a", "b", "strong", "em", "i", "code", "span", "small", "kbd", "sup", "sub"}
+VOID = {"br", "hr", "img", "wbr"}
+
+class Tree(HTMLParser):
+    def __init__(self, src):
+        super().__init__()
+        self.root = ["root", {}, []]
+        self.stack = [self.root]
+        self.feed(src)
+        self.close()
+    def handle_starttag(self, tag, attrs):
+        node = [tag, dict(attrs), []]
+        self.stack[-1][2].append(node)
+        if tag not in VOID:
+            self.stack.append(node)
+    def handle_endtag(self, tag):
+        for i in range(len(self.stack) - 1, 0, -1):
+            if self.stack[i][0] == tag:
+                del self.stack[i:]
+                break
+    def handle_data(self, data):
+        self.stack[-1][2].append(data)
+
+def raw(n):
+    return n if isinstance(n, str) else "".join(raw(k) for k in n[2])
+
+def find(n, tag):
+    for k in n[2]:
+        if not isinstance(k, str):
+            yield from ([k] if k[0] == tag else find(k, tag))
+
+def inline(n, url):
+    if isinstance(n, str):
+        return re.sub(r"([\\`*_\[\]<])", r"\\\1", re.sub(r"\s+", " ", n))
+    tag, attrs, kids = n
+    if tag == "code":
+        t = re.sub(r"\s+", " ", raw(n))
+        return f"`` {t} ``" if "`" in t else f"`{t}`"
+    s = "".join(inline(k, url) for k in kids)
+    if tag in ("b", "strong") and s.strip():
+        return f"**{s.strip()}**"
+    if tag in ("em", "i") and s.strip():
+        return f"*{s.strip()}*"
+    if tag == "a" and attrs.get("href"):
+        h = attrs["href"]
+        h = BASE + url + h if h.startswith("#") else BASE + h if h.startswith("/") else h
+        return f"[{s.strip()}]({h})"
+    return s
+
+def blocks(kids, url):
+    out, buf = [], []
+    def flush():
+        t = "".join(buf).strip()
+        buf.clear()
+        if t:
+            out.append(t)
+    for k in kids:
+        if isinstance(k, str) or k[0] in INLINE:
+            buf.append(inline(k, url))
+        else:
+            flush()
+            out += block(k, url)
+    flush()
+    return out
+
+def block(n, url):
+    tag, attrs, kids = n
+    if tag in ("h2", "h3", "h4", "h5", "h6"):
+        return ["#" * int(tag[1]) + " " + "".join(inline(k, url) for k in kids).strip()]
+    if tag == "pre":
+        code, fence = raw(n).strip("\n"), "```"
+        while fence in code:
+            fence += "`"
+        return [f"{fence}{attrs.get('data-lang', '')}\n{code}\n{fence}"]
+    if tag in ("ul", "ol"):
+        n0, items = int(attrs.get("start", 1)), []
+        for i, li in enumerate(k for k in kids if not isinstance(k, str) and k[0] == "li"):
+            mark = f"{n0 + i}. " if tag == "ol" else "- "
+            body = "\n\n".join(blocks(li[2], url)).replace("\n", "\n" + " " * len(mark))
+            items.append(mark + re.sub(r"\n +\n", "\n\n", body))
+        return ["\n".join(items)] if items else []
+    if tag == "blockquote":
+        return ["\n".join(("> " + l).rstrip() for l in "\n\n".join(blocks(kids, url)).split("\n"))]
+    if tag == "cite":
+        return ["— " + "".join(inline(k, url) for k in kids).strip()]
+    if tag == "table":
+        rows = [[re.sub(r"\s+", " ", "".join(inline(k, url) for k in c[2])).strip().replace("|", r"\|")
+                 for c in r[2] if not isinstance(c, str) and c[0] in ("th", "td")] for r in find(n, "tr")]
+        if not rows:
+            return []
+        w = max(len(r) for r in rows)
+        rows = [r + [""] * (w - len(r)) for r in rows]
+        lines = ["| " + " | ".join(r) + " |" for r in rows]
+        return ["\n".join([lines[0], "|" + " --- |" * w] + lines[1:])]
+    if tag == "svg":
+        t = next(find(n, "title"), None)
+        return [f"*Diagram: {raw(t).strip()}*"] if t else []
+    if tag == "hr":
+        return ["---"]
+    if tag in ("script", "style"):
+        return []
+    return blocks(kids, url)
+
+def markdown_of(body, url):
+    for pat, rep in MD_PREP:
+        body = re.sub(pat, rep, body, flags=re.S)
+    return "\n\n".join(blocks(Tree(body).root[2], url))
+
+def markdown_page(url, meta, body):
+    head = f"# {meta['title']}\n\nSource: {BASE}{url}\n\n"
+    h1 = re.search(r"<h1[^>]*>(.*?)</h1>", body, re.S)
+    lede = html.unescape(re.sub(r"<[^>]+>", "", h1.group(1))).strip() if h1 else ""
+    a, b = lede.lower(), meta["title"].lower()
+    if lede and a not in b and b not in a:   # keep an <h1> that says more than the title, like the home tagline
+        head += f"**{lede}**\n\n"
+    return head + markdown_of(body, url) + "\n"
 
 def write_feed(changelog_body):
     entries = re.findall(r'<h2 id="([^"]+)">([\d.]+) <small>· ([\d-]+)</small></h2>(.*?)(?=<h2 id=|$)', changelog_body, flags=re.S)
@@ -235,20 +364,20 @@ def write_llms(pages):
              "## Documentation", ""]
     for url, meta in pages:
         if url.startswith("/docs/"):
-            lines.append(f"- [{meta['title']}]({BASE}{url}): {meta['description']}")
+            lines.append(f"- [{meta['title']}]({BASE}{url}index.md): {meta['description']}")
     lines += ["", "## Project", ""]
     for url, meta in pages:
         if not url.startswith("/docs/") and url != "/":
-            lines.append(f"- [{meta['title']}]({BASE}{url}): {meta['description']}")
+            lines.append(f"- [{meta['title']}]({BASE}{url}index.md): {meta['description']}")
     lines += ["", "## Optional", "", f"- [Full documentation as one text file]({BASE}/llms-full.txt)"]
     open(os.path.join(ROOT, "llms.txt"), "w", encoding="utf-8").write("\n".join(lines) + "\n")
     full = ["# Fendlemark: complete documentation", ""]
     for url, meta in pages:
-        full += [f"# {meta['title']}", f"Source: {BASE}{url}", "", meta['_text'], "", "---", ""]
+        full += [meta["_md"].rstrip("\n"), "", "---", ""]
     open(os.path.join(ROOT, "llms-full.txt"), "w", encoding="utf-8").write("\n".join(full))
 
 def write_404():
-    page = LAYOUT
+    page = LAYOUT.replace('<link rel="alternate" type="text/markdown" href="{{markdown}}">\n', "")
     body = ('<p class="eyebrow">404</p><h1>There is nothing here.</h1>'
             '<p class="lede">The page you asked for is not part of Fendlemark. Nothing has ever been removed, so it was never here. '
             'Try the <a href="/docs/">documentation</a>, the <a href="/docs/getting-started/">getting started guide</a>, or the <a href="/">home page</a>.</p>'
@@ -267,10 +396,12 @@ def main():
         for f in sorted(files):
             if f.endswith(".html"):
                 src = os.path.join(dirpath, f)
-                urls.append(render(src))
+                url = render(src)
+                urls.append(url)
                 meta, body = read_fragment(src)
-                meta["_text"] = text_of(body)
-                pages.append((url_for(src), meta))
+                meta["_md"] = markdown_page(url, meta, body)
+                open(os.path.splitext(out_for(url))[0] + ".md", "w", encoding="utf-8").write(meta["_md"])
+                pages.append((url, meta))
                 if url_for(src) == "/changelog/":
                     write_feed(body)
     pages.sort(key=lambda t: (t[0] != "/", t[0]))

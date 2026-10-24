@@ -9,7 +9,7 @@ bad = []
 for p in pages:
     for h in re.findall(r'href="([^"]+)"', open(p, encoding='utf-8').read()):
         if h.startswith(('http', 'mailto:')): continue
-        if h.startswith('/assets/') or h.endswith(('.xml', '.txt')):
+        if h.startswith(('/assets/', '/.well-known/')) or h.endswith(('.xml', '.txt', '.md', '.json')):
             if not os.path.exists(h.lstrip('/')): bad.append((url(p), h, 'missing file'))
             continue
         path, _, frag = h.partition('#')
