@@ -4,33 +4,62 @@
   "description": "Vue 3 components, design tokens, and lattice client for the Fendlemark ML platform console. Embed Fendlemark views of MLflow, Metaflow, Argo Workflows, and Kubeflow in your own portal.",
   "license": "MIT",
   "homepage": "https://fendlemark.app/docs/ui/",
-  "repository": { "type": "git", "url": "git+https://github.com/TopherGopher/fendlemark.git", "directory": "ui" },
-  "keywords": ["vue", "vue3", "mlops", "mlflow", "metaflow", "argo-workflows", "kubeflow", "console", "fendlemark"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TopherGopher/fendlemark.git",
+    "directory": "ui"
+  },
+  "keywords": [
+    "vue",
+    "vue3",
+    "mlops",
+    "mlflow",
+    "metaflow",
+    "argo-workflows",
+    "kubeflow",
+    "console",
+    "fendlemark"
+  ],
   "type": "module",
-  "files": ["dist", "src", "README.md"],
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
   "main": "./dist/fendlemark-ui.umd.cjs",
   "module": "./dist/fendlemark-ui.js",
   "types": "./dist/index.d.ts",
   "exports": {
-    ".": { "types": "./dist/index.d.ts", "import": "./dist/fendlemark-ui.js", "require": "./dist/fendlemark-ui.umd.cjs" },
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/fendlemark-ui.js",
+      "require": "./dist/fendlemark-ui.umd.cjs"
+    },
     "./tokens.css": "./dist/tokens.css",
     "./package.json": "./package.json"
   },
-  "sideEffects": ["**/*.css"],
+  "sideEffects": [
+    "**/*.css"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit -p tsconfig.json && vite build",
     "typecheck": "vue-tsc --noEmit -p tsconfig.json"
   },
-  "peerDependencies": { "vue": "^3.4.0" },
-  "devDependencies": {
-    "@types/node": "^22.7.0",
-    "@vitejs/plugin-vue": "^5.1.4",
-    "typescript": "^5.6.2",
-    "vite": "^5.4.8",
-    "vite-plugin-dts": "^4.2.3",
-    "vue": "^3.5.12",
-    "vue-tsc": "^2.1.6"
+  "peerDependencies": {
+    "vue": "^3.4.0"
   },
-  "engines": { "node": ">=20" }
+  "devDependencies": {
+    "@microsoft/api-extractor": "^7.59.4",
+    "@types/node": "^22.20.5",
+    "@vitejs/plugin-vue": "^6.0.10",
+    "typescript": "~5.9.3",
+    "vite": "^8.3.5",
+    "vite-plugin-dts": "^5.1.2",
+    "vue": "^3.5.44",
+    "vue-tsc": "^3.3.13"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
 }

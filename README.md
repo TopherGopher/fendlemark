@@ -4,6 +4,7 @@
 [![Go Reference](https://pkg.go.dev/badge/fendlemark.app/fendlemark.svg)](https://pkg.go.dev/fendlemark.app/fendlemark)
 [![@fendlemark/ui](https://img.shields.io/npm/v/@fendlemark/ui?label=%40fendlemark%2Fui&logo=vuedotjs)](https://www.npmjs.com/package/@fendlemark/ui)
 [![Go version](https://img.shields.io/github/go-mod/go-version/TopherGopher/fendlemark)](go.mod)
+[![Dependabot](https://github.com/TopherGopher/fendlemark/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/TopherGopher/fendlemark/actions/workflows/dependabot/dependabot-updates)
 [![License: MIT](https://img.shields.io/github/license/TopherGopher/fendlemark)](LICENSE)
 
 **One console for your entire ML platform.**
