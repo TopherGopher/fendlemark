@@ -61,7 +61,7 @@ jobs:
         if: ${{ !inputs.release }}
         env:
           KO_DEFAULTBASEIMAGE: localhost:5000/scratch:latest
-          DESCRIPTION: One console for your entire ML platform
+          DESCRIPTION: One state-of-the-art console for your entire ML platform
         run: |
           if [ "$GITHUB_REF_TYPE" = tag ]; then
             version=${GITHUB_REF_NAME#v}

@@ -1,31 +1,19 @@
 # Contributing to Fendlemark
 
-Contributions are welcome. Every pull request ever merged into Fendlemark has
-followed the [Fendlemark Contribution Protocol](https://fendlemark.app/governance/contributing/)
-(FCP-1): 112 numbered steps, completed in order. This file is a map, not a
-substitute. The protocol page is authoritative.
+Contributions are welcome. Human review is a required part of the process:
+every pull request is read and approved by a maintainer before it is merged,
+whatever its size. Say what your change does and why in the pull request, and
+make sure the checks under [Developing](#developing) pass.
 
-## The shape of it
-
-| Phase | Steps | What happens |
-|---|---|---|
-| I. Preparation | 1–12 | Read the docs, then the [Philosophy](https://fendlemark.app/philosophy/) twice. Sign the Contributor Covenant 2.1 and the Fendlemark Addendum (see [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)). Wait 24 hours, which is not a Reflection Period. |
-| II. Intent | 13–30 | File a **Pre-Intent Notice** (step 13) using the issue template. Observe a 72-hour Reflection Period. File an **Intent to Contribute** (step 17), classify the change, and obtain Sponsors (step 19) and a Sceptic (step 20). |
-| III. Design | 31–58 | Write the Design Dossier. Your Sceptic's Dossier Objection is mandatory. |
-| IV. Implementation | 59–78 | Build it, one reasonable commit at a time. |
-| V. Verification | 79–96 | The Benchmark Quorum (step 83), the Tone Review (step 88), and the Sceptic's verdict (step 95). |
-| VI. Ceremony | 97–112 | The Reading of the Diff (step 103), the Commit Message Haiku (step 105), and, at step 112, the pull request. |
-
-Issues are not the place to report bugs, because Fendlemark has none. Report a
-behaviour you misunderstood with the **Clarification request** template, and a
-Keeper will help make it harder to misunderstand.
+To report a problem or ask a question, use the
+[contact form](https://contact.fendlemark.app/).
 
 ## Spelling
 
 Fendlemark is written in British English: *behaviour*, *colour*, *recognise*,
 *licence* for the noun, *enrolment*. That covers documentation, comments, help
-text, error messages, changelog entries, and commit messages, and the Tone
-Review (step 88) checks it. Names that come from elsewhere keep their own
+text, error messages, changelog entries, and commit messages, and review
+checks it. Names that come from elsewhere keep their own
 spelling (CSS `color`, `NO_COLOR`, MLflow's *artifacts*), and existing
 identifiers are never renamed just to change their spelling.
 

@@ -7,9 +7,9 @@
 [![Dependabot](https://github.com/TopherGopher/fendlemark/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/TopherGopher/fendlemark/actions/workflows/dependabot/dependabot-updates)
 [![Licence: MIT](https://img.shields.io/github/license/TopherGopher/fendlemark)](LICENSE)
 
-**One console for your entire ML platform.**
+**One state-of-the-art console for your entire ML platform.**
 
-Fendlemark is an open-source Go control plane and Vue 3 console that unifies
+Fendlemark is a newly open-source Go control plane and Vue 3 console that unifies
 the user experiences of [MLflow](https://mlflow.org), [Metaflow](https://metaflow.org),
 [Argo Workflows](https://argoproj.github.io/workflows/), and [Kubeflow](https://www.kubeflow.org)
 into a single, coherent console. Four read-only adapters feed one deterministic
@@ -67,9 +67,8 @@ cd ui && npm install && npm run build
 
 ## Contributing
 
-Contributions are welcome. Before opening a pull request, complete the
-[Fendlemark Contribution Protocol](https://fendlemark.app/governance/contributing/)
-(FCP-1), all 112 steps, in order. Every pull request ever merged has followed it.
+Contributions are welcome. Every pull request is reviewed by a maintainer
+before it is merged; see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Licence
 
