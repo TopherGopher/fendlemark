@@ -3,6 +3,7 @@
 [![CI](https://github.com/TopherGopher/fendlemark/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/TopherGopher/fendlemark/actions/workflows/ci.yml)
 [![Go Reference](https://pkg.go.dev/badge/fendlemark.app/fendlemark.svg)](https://pkg.go.dev/fendlemark.app/fendlemark)
 [![@fendlemark/ui](https://img.shields.io/npm/v/@fendlemark/ui?label=%40fendlemark%2Fui&logo=vuedotjs)](https://www.npmjs.com/package/@fendlemark/ui)
+[![Docker Hub](https://img.shields.io/docker/v/tophergopher/fendlemark?sort=semver&label=Docker%20Hub&logo=docker)](https://hub.docker.com/r/tophergopher/fendlemark)
 [![Go version](https://img.shields.io/github/go-mod/go-version/TopherGopher/fendlemark)](go.mod)
 [![Dependabot](https://github.com/TopherGopher/fendlemark/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/TopherGopher/fendlemark/actions/workflows/dependabot/dependabot-updates)
 [![Licence: MIT](https://img.shields.io/github/license/TopherGopher/fendlemark)](LICENSE)
@@ -24,7 +25,7 @@ fendlemark adapters check
 fendlemark serve          # console on http://localhost:7411
 ```
 
-Or run the container image, built `FROM scratch` for `linux/amd64`, `linux/arm64`, and `linux/arm/v7` (also on Docker Hub as `tophergopher/fendlemark`):
+Or run the container image, built `FROM scratch` for `linux/amd64`, `linux/arm64`, and `linux/arm/v7` (also on [Docker Hub](https://hub.docker.com/r/tophergopher/fendlemark) as `tophergopher/fendlemark`):
 
 ```sh
 docker run --rm -p 127.0.0.1:7411:7411 -v "$PWD/fendlemark.yaml:/fendlemark.yaml:ro" \

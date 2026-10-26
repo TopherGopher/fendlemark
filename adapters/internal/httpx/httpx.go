@@ -82,7 +82,7 @@ func (c *Client) do(ctx context.Context, method, path string, query url.Values, 
 		return err
 	}
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("User-Agent", "fendlemark/0.9.9")
+	req.Header.Set("User-Agent", "fendlemark/0.9.10")
 	if body != nil {
 		req.Header.Set("Content-Type", "application/json")
 	}

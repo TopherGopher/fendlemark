@@ -145,7 +145,7 @@ func takeGlobalFlags(global *flag.FlagSet, args []string) ([]string, error) {
 }
 
 func usage() {
-	fmt.Fprint(os.Stderr, `fendlemark `+fendlemark.Version+` · one console for your entire ML platform
+	fmt.Fprint(os.Stderr, `fendlemark `+fendlemark.Version+` · one state-of-the-art console for your entire ML platform
 
 Usage:
   fendlemark <command> [flags]
