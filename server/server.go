@@ -1,9 +1,12 @@
 // Package server exposes the lattice over HTTP: a JSON API under /api/v1,
 // server-sent events for live updates, liveness and readiness, Prometheus
-// metrics, Respiratory Identity endpoints, and the embedded console.
+// metrics, Respiratory Identity endpoints, and the embedded Fendlemark console.
 //
 // There are no POST, PUT, or DELETE routes against entities. The API is a
 // view of the lattice, and the lattice is a view of your tools.
+//
+// See https://fendlemark.app/docs/api/#server-pkg in the Fendlemark
+// documentation.
 package server
 
 import (

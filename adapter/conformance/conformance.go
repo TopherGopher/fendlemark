@@ -1,6 +1,8 @@
 // Package conformance is the test harness every adapter must pass before it
 // is compiled into the binary. It encodes the rules on the Writing an adapter
 // page plus a few that are only obvious after someone has broken them.
+//
+// See https://fendlemark.app/docs/adapters/writing-an-adapter/ for that page.
 package conformance
 
 import (

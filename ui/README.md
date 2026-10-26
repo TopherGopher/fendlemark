@@ -3,7 +3,7 @@
 Vue 3 components, design tokens, and the lattice client for the
 [Fendlemark](https://fendlemark.app) ML platform console. Use it to
 embed Fendlemark views of MLflow, Metaflow, Argo Workflows, and Kubeflow in
-your own internal portal with the exact look of the console.
+your own internal portal with the exact look of the Fendlemark console.
 
 ```sh
 npm install @fendlemark/ui

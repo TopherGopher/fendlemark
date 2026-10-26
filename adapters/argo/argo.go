@@ -1,6 +1,9 @@
 // Package argo reads Workflows, WorkflowTemplates, and CronWorkflows from
 // Argo Server's REST API, with optional direct watching of Workflow
 // resources through the Kubernetes API.
+//
+// See https://fendlemark.app/docs/adapters/#argo for its facets,
+// correlation keys, and limits.
 package argo
 
 import (

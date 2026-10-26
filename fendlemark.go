@@ -1,9 +1,13 @@
 // Package fendlemark is the control plane: it constructs adapters from
 // configuration, connects them, reconciles their facets into the lattice,
-// keeps the lattice current by polling or watching, and serves the console.
+// keeps the lattice current by polling or watching, and serves the Fendlemark
+// console.
 //
 // Most embedders want every adapter they have credentials for, connected and
 // reconciled, without writing configuration. That is IntegrateEasy.
+//
+// See https://fendlemark.app/docs/ for the documentation, from Getting
+// started to writing an adapter.
 package fendlemark
 
 import (

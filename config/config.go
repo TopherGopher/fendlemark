@@ -1,6 +1,9 @@
 // Package config loads fendlemark.yaml with defaults, environment overrides
 // and ${VAR} expansion. Unknown keys are errors, not warnings: the Keepers
 // believe a configuration file should be exactly right or not at all.
+//
+// See https://fendlemark.app/docs/configuration/ for every key, its type, and
+// its default.
 package config
 
 import (

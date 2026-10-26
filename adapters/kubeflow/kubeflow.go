@@ -1,6 +1,9 @@
 // Package kubeflow reads pipelines, runs, and recurring runs from the
 // Kubeflow Pipelines API (v2beta1), with Katib and Notebooks disabled in
 // this build unless a Kubernetes client is configured.
+//
+// See https://fendlemark.app/docs/adapters/#kubeflow for its facets,
+// correlation keys, and limits.
 package kubeflow
 
 import (

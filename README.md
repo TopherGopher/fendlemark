@@ -14,7 +14,8 @@ Fendlemark is a newly open-source Go control plane and Vue 3 console that unifie
 the user experiences of [MLflow](https://mlflow.org), [Metaflow](https://metaflow.org),
 [Argo Workflows](https://argoproj.github.io/workflows/), and [Kubeflow](https://www.kubeflow.org)
 into a single, coherent console. Four read-only adapters feed one deterministic
-entity graph, the lattice, and the console renders the lattice rather than the tools.
+entity graph, the lattice, and the Fendlemark console renders the lattice rather than
+the tools. The whole Fendlemark app is one binary.
 
 Documentation: **https://fendlemark.app**
 
@@ -22,10 +23,10 @@ Documentation: **https://fendlemark.app**
 go install fendlemark.app/fendlemark/cmd/fendlemark@latest
 fendlemark init my-platform && cd my-platform
 fendlemark adapters check
-fendlemark serve          # console on http://localhost:7411
+fendlemark serve          # the Fendlemark console on http://localhost:7411
 ```
 
-Or run the container image, built `FROM scratch` for `linux/amd64`, `linux/arm64`, and `linux/arm/v7` (also on [Docker Hub](https://hub.docker.com/r/tophergopher/fendlemark) as `tophergopher/fendlemark`):
+Or run the Fendlemark app as a container image, built `FROM scratch` for `linux/amd64`, `linux/arm64`, and `linux/arm/v7` (also on [Docker Hub](https://hub.docker.com/r/tophergopher/fendlemark) as `tophergopher/fendlemark`):
 
 ```sh
 docker run --rm -p 127.0.0.1:7411:7411 -v "$PWD/fendlemark.yaml:/fendlemark.yaml:ro" \

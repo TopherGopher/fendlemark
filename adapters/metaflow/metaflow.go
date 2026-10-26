@@ -1,5 +1,8 @@
 // Package metaflow reads flows, runs, steps, and tasks from the Metaflow
 // metadata service, the same service the Metaflow client and UI read.
+//
+// See https://fendlemark.app/docs/adapters/#metaflow for its facets,
+// correlation keys, and limits.
 package metaflow
 
 import (

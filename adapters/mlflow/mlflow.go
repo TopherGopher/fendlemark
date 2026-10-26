@@ -1,5 +1,8 @@
 // Package mlflow reads experiments, runs, and the Model Registry from an
 // MLflow tracking server over its REST API. It never writes.
+//
+// See https://fendlemark.app/docs/adapters/#mlflow for its facets,
+// correlation keys, and limits.
 package mlflow
 
 import (

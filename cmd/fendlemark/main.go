@@ -1,4 +1,5 @@
-// Command fendlemark is both the server and the operator's tool.
+// Command fendlemark is the whole Fendlemark app: the server, with the
+// Fendlemark console embedded, and the operator's tool.
 //
 //	fendlemark init [dir] [--adapters mlflow,argo] [--force]
 //	fendlemark serve [--listen 127.0.0.1:7411] [--adapters ...] [--no-reconcile-on-start]
@@ -7,6 +8,8 @@
 //	fendlemark auth enrol|list|revoke|recovery
 //	fendlemark doctor [--fix] [--json]
 //	fendlemark version [--json]
+//
+// See https://fendlemark.app/docs/cli/ for every command, flag, and exit code.
 package main
 
 import (

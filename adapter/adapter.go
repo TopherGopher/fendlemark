@@ -4,6 +4,9 @@
 // Kubeflow Pipelines API) into Facets. Adapters are strictly read-only.
 //
 // The interface has six methods and has been stable since 0.6.0 (FDR-027).
+//
+// See https://fendlemark.app/docs/adapters/writing-an-adapter/ for a
+// walkthrough of writing one.
 package adapter
 
 import (

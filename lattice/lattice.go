@@ -5,6 +5,9 @@
 // strong correlation key within the correlation window are merged into one
 // entity, weak keys create related-to edges, and two lattices built from the
 // same facets produce identical entities with identical ids.
+//
+// See https://fendlemark.app/docs/architecture/#lattice for how correlation
+// works.
 package lattice
 
 import (

@@ -3,6 +3,9 @@
 //
 // Video frames never reach this package. The browser fits the plume model and
 // transmits only the resulting 212-dimensional signature.
+//
+// See https://fendlemark.app/docs/auth/ for enrolment, configuration, and the
+// error codes.
 package fri
 
 import (
