@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -78,15 +77,34 @@ type flow struct {
 	TSEpoch int64  `json:"ts_epoch"`
 }
 
+// runNumber is a run's id as the metadata service reports it: a number for
+// runs started locally (1824) and a string for runs started by an
+// orchestrator such as Argo Workflows ("argo-trainflow-xyz99").
+type runNumber string
+
+func (n *runNumber) UnmarshalJSON(b []byte) error {
+	var s string
+	if err := json.Unmarshal(b, &s); err == nil {
+		*n = runNumber(s)
+		return nil
+	}
+	var num json.Number
+	if err := json.Unmarshal(b, &num); err != nil {
+		return fmt.Errorf("run_number is neither a number nor a string: %s", b)
+	}
+	*n = runNumber(num.String())
+	return nil
+}
+
 type runRec struct {
-	FlowID     string   `json:"flow_id"`
-	RunNumber  int64    `json:"run_number"`
-	RunID      string   `json:"run_id"` // set for Argo- and Step-Functions-launched runs
-	User       string   `json:"user_name"`
-	TSEpoch    int64    `json:"ts_epoch"`
-	Tags       []string `json:"tags"`
-	SystemTags []string `json:"system_tags"`
-	LastHB     float64  `json:"last_heartbeat_ts"`
+	FlowID     string    `json:"flow_id"`
+	RunNumber  runNumber `json:"run_number"`
+	RunID      string    `json:"run_id"` // older metadata services sent an orchestrator's run id here
+	User       string    `json:"user_name"`
+	TSEpoch    int64     `json:"ts_epoch"`
+	Tags       []string  `json:"tags"`
+	SystemTags []string  `json:"system_tags"`
+	LastHB     float64   `json:"last_heartbeat_ts"`
 }
 
 func (m *Metaflow) Facets(ctx context.Context, q adapter.Query) ([]adapter.Facet, error) {
@@ -132,7 +150,7 @@ func (m *Metaflow) Facets(ctx context.Context, q adapter.Query) ([]adapter.Facet
 			}
 			runID := r.RunID
 			if runID == "" {
-				runID = strconv.FormatInt(r.RunNumber, 10)
+				runID = string(r.RunNumber)
 			}
 			keys := map[string]string{adapter.KeyMetaflowRunID: f.FlowID + "/" + runID, adapter.KeyMetaflowFlow: f.FlowID}
 			fields := map[string]any{"flow": f.FlowID, "run": runID, "user": r.User, "tags": r.Tags, "system_tags": r.SystemTags}

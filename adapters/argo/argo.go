@@ -136,6 +136,10 @@ func (a *Argo) Facets(ctx context.Context, q adapter.Query) ([]adapter.Facet, er
 	var out []adapter.Facet
 	for _, ns := range nss {
 		if q.Wants(adapter.KindWorkflow) {
+			// A workflow can be both live and archived. The live copy has the
+			// spec and the node status, so it wins; the archive only adds
+			// workflows that are no longer in the cluster.
+			listed := map[string]bool{}
 			cont := ""
 			for {
 				var l list
@@ -148,9 +152,10 @@ func (a *Argo) Facets(ctx context.Context, q adapter.Query) ([]adapter.Facet, er
 				}
 				for _, w := range l.Items {
 					f := a.workflowFacet(w, labels, server)
-					if !q.Since.IsZero() && f.StartedAt.Before(q.Since) {
+					if listed[f.SourceID] || !q.Since.IsZero() && f.StartedAt.Before(q.Since) {
 						continue
 					}
+					listed[f.SourceID] = true
 					out = append(out, f)
 				}
 				if l.Metadata.Continue == "" {
@@ -162,7 +167,12 @@ func (a *Argo) Facets(ctx context.Context, q adapter.Query) ([]adapter.Facet, er
 				var l list
 				if err := c.GetJSON(ctx, "/api/v1/archived-workflows", map[string][]string{"namespace": {ns}, "listOptions.limit": {"500"}}, &l); err == nil {
 					for _, w := range l.Items {
-						out = append(out, a.workflowFacet(w, labels, server))
+						f := a.workflowFacet(w, labels, server)
+						if listed[f.SourceID] || !q.Since.IsZero() && f.StartedAt.Before(q.Since) {
+							continue
+						}
+						listed[f.SourceID] = true
+						out = append(out, f)
 					}
 				}
 			}

@@ -18,7 +18,7 @@ func fixture(t *testing.T) *httptest.Server {
 	})
 	mux.HandleFunc("/flows/TrainFlow/runs", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`[{"flow_id":"TrainFlow","run_number":1824,"user_name":"marit","ts_epoch":1759222800000,"tags":["git.sha:3e1f9c0","git.repo:git@example:ml/train"],"system_tags":["argo-workflows:train-abc12","runtime:kubernetes"]},
-		                 {"flow_id":"TrainFlow","run_number":0,"run_id":"argo-trainflow-xyz99","user_name":"dov","ts_epoch":1759230000000,"tags":[],"system_tags":["argo-workflows:train-xyz99"]}]`))
+		                 {"flow_id":"TrainFlow","run_number":"argo-trainflow-xyz99","user_name":"dov","ts_epoch":1759230000000,"tags":[],"system_tags":["argo-workflows:train-xyz99"]}]`))
 	})
 	return httptest.NewServer(mux)
 }

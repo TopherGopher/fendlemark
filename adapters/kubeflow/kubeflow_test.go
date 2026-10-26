@@ -49,8 +49,11 @@ func TestParametersBecomeKeys(t *testing.T) {
 		t.Fatalf("want 1 run, got %d", len(facets))
 	}
 	k := facets[0].Keys
-	if k[adapter.KeyKFPRunID] != "kfp-run-77" || k[adapter.KeyArgoWorkflow] != "kfp-run-77" || k[adapter.KeyMLflowRunID] != "0123456789abcdef0123456789abcdef" {
+	if k[adapter.KeyKFPRunID] != "kfp-run-77" || k[adapter.KeyMLflowRunID] != "0123456789abcdef0123456789abcdef" {
 		t.Fatalf("keys: %+v", k)
+	}
+	if _, ok := k[adapter.KeyArgoWorkflow]; ok {
+		t.Fatalf("a KFP run does not know its Argo Workflow's name; it meets the workflow on kfp.run_id: %+v", k)
 	}
 	if facets[0].Links[0].URL != "https://kf.example/pipeline/#/runs/details/kfp-run-77" {
 		t.Fatalf("deep link: %+v", facets[0].Links)

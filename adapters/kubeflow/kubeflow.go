@@ -36,7 +36,7 @@ func (k *Kubeflow) Describe() adapter.Descriptor {
 	return adapter.Descriptor{
 		DisplayName: "Kubeflow",
 		Kinds:       []adapter.Kind{adapter.KindPipeline, adapter.KindWorkflow},
-		Keys:        []string{adapter.KeyKFPRunID, adapter.KeyKFPPipelineID, adapter.KeyArgoWorkflow, adapter.KeyMetaflowRunID, adapter.KeyMLflowRunID, "kfp.recurring_run_id"},
+		Keys:        []string{adapter.KeyKFPRunID, adapter.KeyKFPPipelineID, adapter.KeyMetaflowRunID, adapter.KeyMLflowRunID, "kfp.recurring_run_id"},
 		Watchable:   true,
 		Maturity:    adapter.Canonical,
 		ConfigSchema: json.RawMessage(`{"type":"object","required":["pipelines_url"],"properties":{
@@ -237,11 +237,10 @@ func (k *Kubeflow) runFacet(r run, labels map[string]string, dash string) adapte
 			}
 		}
 	}
-	// KFP names the underlying Argo Workflow after the run id, so the name is
-	// recoverable without a second call. See the adapters documentation.
-	if r.RunID != "" {
-		keys[adapter.KeyArgoWorkflow] = r.RunID
-	}
+	// No argo.workflow.name: KFP names the underlying Workflow from the
+	// pipeline name with a generated suffix, which the run does not record.
+	// The argo adapter reads the Workflow's pipeline/runid label instead, so
+	// the two meet on kfp.run_id.
 	tasks := make([]map[string]string, 0, len(r.RunDetails.TaskDetails))
 	for _, t := range r.RunDetails.TaskDetails {
 		tasks = append(tasks, map[string]string{"name": t.DisplayName, "phase": string(phase(t.State)), "started_at": t.StartTime, "ended_at": t.EndTime})

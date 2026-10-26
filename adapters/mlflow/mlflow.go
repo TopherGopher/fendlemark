@@ -169,7 +169,9 @@ func (m *MLflow) Facets(ctx context.Context, q adapter.Query) ([]adapter.Facet, 
 			filter = fmt.Sprintf("attributes.start_time >= %d", q.Since.UnixMilli())
 		}
 		token := ""
-		for {
+		// With no experiment to read there are no runs, and runs/search
+		// rejects an empty experiment_ids list.
+		for len(ids) > 0 {
 			var resp struct {
 				Runs      []run  `json:"runs"`
 				NextToken string `json:"next_page_token"`

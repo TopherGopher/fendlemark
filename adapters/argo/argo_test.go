@@ -13,6 +13,11 @@ import (
 
 func fixture(t *testing.T) *httptest.Server {
 	t.Helper()
+	return fixtureWithArchive(t, `{"items":[],"metadata":{}}`)
+}
+
+func fixtureWithArchive(t *testing.T, archive string) *httptest.Server {
+	t.Helper()
 	mux := http.NewServeMux()
 	mux.HandleFunc("/api/v1/info", func(w http.ResponseWriter, r *http.Request) { w.Write([]byte(`{"managedNamespace":"ml-training"}`)) })
 	mux.HandleFunc("/api/v1/workflows/ml-training", func(w http.ResponseWriter, r *http.Request) {
@@ -26,7 +31,7 @@ func fixture(t *testing.T) *httptest.Server {
 				"status": map[string]any{"phase": "Running", "startedAt": "2026-09-30T11:00:00Z", "nodes": map[string]any{}}},
 		}, "metadata": map[string]any{}})
 	})
-	mux.HandleFunc("/api/v1/archived-workflows", func(w http.ResponseWriter, r *http.Request) { w.Write([]byte(`{"items":[],"metadata":{}}`)) })
+	mux.HandleFunc("/api/v1/archived-workflows", func(w http.ResponseWriter, r *http.Request) { w.Write([]byte(archive)) })
 	mux.HandleFunc("/api/v1/workflow-templates/ml-training", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`{"items":[{"metadata":{"name":"train-template","uid":"t-1","creationTimestamp":"2026-01-20T00:00:00Z"}}]}`))
 	})
@@ -63,5 +68,33 @@ func TestKFPLabelBecomesKey(t *testing.T) {
 	nodes := f.Fields["nodes"].([]map[string]string)
 	if len(nodes) != 1 || nodes[0]["name"] != "train" {
 		t.Fatalf("nodes: %+v", nodes)
+	}
+}
+
+func TestLiveWorkflowWinsOverItsArchivedCopy(t *testing.T) {
+	// The archive returns summaries without spec or nodes. A workflow that is
+	// both live and archived must keep its live copy, and appear once.
+	srv := fixtureWithArchive(t, `{"items":[
+		{"metadata":{"name":"train-abc12","namespace":"ml-training","uid":"u-1","creationTimestamp":"2026-09-30T09:00:00Z"},"status":{"phase":"Succeeded","startedAt":"2026-09-30T09:00:00Z","finishedAt":"2026-09-30T09:20:00Z"}},
+		{"metadata":{"name":"train-old01","namespace":"ml-training","uid":"u-0","creationTimestamp":"2026-08-01T09:00:00Z"},"status":{"phase":"Succeeded","startedAt":"2026-08-01T09:00:00Z","finishedAt":"2026-08-01T09:30:00Z"}}],"metadata":{}}`)
+	defer srv.Close()
+	a := New()
+	if err := a.Connect(context.Background(), adapter.Config{"server": srv.URL, "namespaces": []any{"ml-training"}}); err != nil {
+		t.Fatal(err)
+	}
+	facets, err := a.Facets(context.Background(), adapter.Query{Kinds: []adapter.Kind{adapter.KindWorkflow}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	byID := map[string][]adapter.Facet{}
+	for _, f := range facets {
+		byID[f.SourceID] = append(byID[f.SourceID], f)
+	}
+	if len(facets) != 3 || len(byID["ml-training/train-old01"]) != 1 {
+		t.Fatalf("want the two live workflows and the archived-only one, got %d facets", len(facets))
+	}
+	live := byID["ml-training/train-abc12"]
+	if len(live) != 1 || len(live[0].Fields["nodes"].([]map[string]string)) != 1 || live[0].Keys[adapter.KeyKFPRunID] != "kfp-run-77" {
+		t.Fatalf("the live copy should win over the archived summary: %+v", live)
 	}
 }
