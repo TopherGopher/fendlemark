@@ -1,6 +1,6 @@
 // Package kubeflow reads pipelines, runs, and recurring runs from the
-// Kubeflow Pipelines API (v2beta1), with Katib and Notebooks disabled in
-// this build unless a Kubernetes client is configured.
+// Kubeflow Pipelines API (v2beta1), and Katib Experiments, Trials, and
+// Notebook servers from the Kubernetes API when it finds credentials there.
 //
 // See https://fendlemark.app/docs/adapters/#kubeflow for its facets,
 // correlation keys, and limits.
@@ -9,6 +9,7 @@ package kubeflow
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -17,6 +18,7 @@ import (
 
 	"fendlemark.app/fendlemark/adapter"
 	"fendlemark.app/fendlemark/adapters/internal/httpx"
+	"fendlemark.app/fendlemark/adapters/internal/kube"
 )
 
 func init() { adapter.Register("kubeflow", New) }
@@ -29,6 +31,10 @@ type Kubeflow struct {
 	dashboard string
 	labels    map[string]string
 	pollEvery time.Duration
+	katib     bool
+	notebooks bool
+	kube      *kube.Client
+	kubeErr   error // why Katib and Notebooks cannot be read, when they are wanted
 }
 
 func New() adapter.Adapter { return &Kubeflow{} }
@@ -38,7 +44,7 @@ func (k *Kubeflow) Name() string { return "kubeflow" }
 func (k *Kubeflow) Describe() adapter.Descriptor {
 	return adapter.Descriptor{
 		DisplayName: "Kubeflow",
-		Kinds:       []adapter.Kind{adapter.KindPipeline, adapter.KindWorkflow},
+		Kinds:       []adapter.Kind{adapter.KindPipeline, adapter.KindWorkflow, adapter.KindNotebook},
 		Keys:        []string{adapter.KeyKFPRunID, adapter.KeyKFPPipelineID, adapter.KeyMetaflowRunID, adapter.KeyMLflowRunID, "kfp.recurring_run_id"},
 		Watchable:   true,
 		Maturity:    adapter.Canonical,
@@ -64,9 +70,21 @@ func (k *Kubeflow) Connect(ctx context.Context, cfg adapter.Config) error {
 	if ns := cfg.String("user_namespace"); ns != "" {
 		c.Header.Set("kubeflow-userid", cfg.String("user_id"))
 	}
+	katib, notebooks := cfg.Bool("katib", true), cfg.Bool("notebooks", true)
+	var kc *kube.Client
+	var kubeErr error
+	if katib || notebooks {
+		// Without Kubernetes credentials there is nothing to read, which is
+		// not an error; credentials that cannot be used are.
+		kc, kubeErr = kube.Load(cfg.Duration("timeout", 10*time.Second))
+		if errors.Is(kubeErr, kube.ErrNoConfig) {
+			kubeErr = nil
+		}
+	}
 	k.mu.Lock()
 	defer k.mu.Unlock()
 	k.c = c
+	k.katib, k.notebooks, k.kube, k.kubeErr = katib, notebooks, kc, kubeErr
 	k.profiles = cfg.Strings("profiles")
 	k.dashboard = strings.TrimRight(cfg.String("dashboard_url"), "/")
 	k.pollEvery = cfg.Duration("poll_interval", 30*time.Second)
@@ -133,9 +151,15 @@ type recurring struct {
 func (k *Kubeflow) Facets(ctx context.Context, q adapter.Query) ([]adapter.Facet, error) {
 	k.mu.RLock()
 	c, profiles, dash, labels := k.c, k.profiles, k.dashboard, k.labels
+	katib, notebooks, kc, kubeErr := k.katib, k.notebooks, k.kube, k.kubeErr
 	k.mu.RUnlock()
 	if c == nil {
 		return nil, adapter.ErrNotConnected
+	}
+	wantKatib := katib && q.Wants(adapter.KindWorkflow)
+	wantNotebooks := notebooks && q.Wants(adapter.KindNotebook)
+	if kubeErr != nil && (wantKatib || wantNotebooks) {
+		return nil, fmt.Errorf("kubeflow: kubernetes: %w", kubeErr)
 	}
 	scopes := profiles
 	if len(scopes) == 0 {
@@ -215,6 +239,20 @@ func (k *Kubeflow) Facets(ctx context.Context, q adapter.Query) ([]adapter.Facet
 					})
 				}
 			}
+		}
+		if kc != nil && wantKatib {
+			fs, err := katibFacets(ctx, kc, ns, labels)
+			if err != nil {
+				return nil, fmt.Errorf("kubeflow: katib: %w", err)
+			}
+			out = append(out, fs...)
+		}
+		if kc != nil && wantNotebooks {
+			fs, err := notebookFacets(ctx, kc, ns, labels, dash)
+			if err != nil {
+				return nil, fmt.Errorf("kubeflow: notebooks: %w", err)
+			}
+			out = append(out, fs...)
 		}
 	}
 	return out, nil

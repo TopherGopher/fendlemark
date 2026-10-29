@@ -366,7 +366,13 @@ func (f *Fendlemark) AdapterStatuses(ctx context.Context) []server.AdapterStatus
 			hctx, cancel := context.WithTimeout(ctx, ra.cfg.Timeout)
 			live := ra.a.Health(hctx)
 			cancel()
-			if live.State != "" {
+			switch {
+			case live.State == "":
+			case st.State == adapter.Degraded && live.State == adapter.Healthy:
+				// The upstream answers, but the last listing failed, for
+				// example with a rejected token; keep saying why.
+				st.Latency = live.Latency
+			default:
 				st = live
 				if st.State == adapter.Healthy && n > 0 {
 					st.Detail = fmt.Sprintf("%s · %d facets", st.Detail, n)

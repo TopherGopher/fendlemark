@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -61,6 +63,7 @@ func TestIntegrateEasy(t *testing.T) {
 	t.Setenv("ARGO_SERVER", ar.URL)
 	t.Setenv("ARGO_NAMESPACE", "ml-training")
 	t.Setenv("KUBEFLOW_PIPELINES_URL", kf.URL)
+	noKubernetes(t)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
@@ -133,4 +136,47 @@ func TestIntegrateEasy(t *testing.T) {
 			t.Fatalf("adapter %s is %s", a.Name, a.State)
 		}
 	}
+}
+
+// noKubernetes keeps the kubeflow adapter away from any real cluster the
+// machine running the tests can reach.
+func noKubernetes(t *testing.T) {
+	t.Helper()
+	t.Setenv("KUBECONFIG", filepath.Join(t.TempDir(), "absent"))
+	t.Setenv("KUBERNETES_SERVICE_HOST", "")
+}
+
+// A listing that fails keeps the adapter degraded even though its health
+// check, which needs no credentials, still passes.
+func TestRejectedTokenStaysDegraded(t *testing.T) {
+	kf := http.NewServeMux()
+	kf.HandleFunc("/apis/v2beta1/healthz", func(w http.ResponseWriter, r *http.Request) { w.Write([]byte(`{}`)) })
+	kf.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, `{"error":"Unauthenticated"}`, http.StatusUnauthorized)
+	})
+	srv := httptest.NewServer(kf)
+	defer srv.Close()
+	for _, k := range []string{"MLFLOW_TRACKING_URI", "METAFLOW_SERVICE_URL", "ARGO_SERVER"} {
+		t.Setenv(k, "")
+	}
+	t.Setenv("KUBEFLOW_PIPELINES_URL", srv.URL)
+	noKubernetes(t)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
+	fm, err := fendlemark.IntegrateEasy(ctx)
+	if fm == nil {
+		t.Fatal(err)
+	}
+	defer fm.Close()
+	for _, st := range fm.AdapterStatuses(ctx) {
+		if st.Name != "kubeflow" {
+			continue
+		}
+		if st.State != adapter.Degraded || !strings.Contains(st.Detail, "HTTP 401") {
+			t.Fatalf("kubeflow should be degraded with the 401, got %s: %s", st.State, st.Detail)
+		}
+		return
+	}
+	t.Fatal("no kubeflow adapter")
 }
