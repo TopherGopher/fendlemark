@@ -3,13 +3,42 @@ package argo
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"testing"
+	"time"
 
 	"fendlemark.app/fendlemark/adapter"
 	"fendlemark.app/fendlemark/adapter/conformance"
 )
+
+// TestMain keeps every test away from any real cluster or credential plugin
+// on the machine running them; token discovery would otherwise read the
+// default kubeconfig. Tests that want a kubeconfig set their own.
+func TestMain(m *testing.M) {
+	dir, _ := os.MkdirTemp("", "argo-test")
+	os.Setenv("KUBECONFIG", filepath.Join(dir, "absent"))
+	os.Setenv("KUBERNETES_SERVICE_HOST", "")
+	os.Unsetenv("ARGO_TOKEN")
+	code := m.Run()
+	os.RemoveAll(dir)
+	os.Exit(code)
+}
+
+// kubeconfigFor points KUBECONFIG at server with a bearer token.
+func kubeconfigFor(t *testing.T, server, token string) string {
+	t.Helper()
+	path := filepath.Join(t.TempDir(), "config")
+	kc := fmt.Sprintf("current-context: lab\ncontexts:\n- name: lab\n  context: {cluster: lab, user: me}\nclusters:\n- name: lab\n  cluster: {server: %q}\nusers:\n- name: me\n  user: {token: %q}\n", server, token)
+	if err := os.WriteFile(path, []byte(kc), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("KUBECONFIG", path)
+	return path
+}
 
 func fixture(t *testing.T) *httptest.Server {
 	t.Helper()
@@ -96,5 +125,124 @@ func TestLiveWorkflowWinsOverItsArchivedCopy(t *testing.T) {
 	live := byID["ml-training/train-abc12"]
 	if len(live) != 1 || len(live[0].Fields["nodes"].([]map[string]string)) != 1 || live[0].Keys[adapter.KeyKFPRunID] != "kfp-run-77" {
 		t.Fatalf("the live copy should win over the archived summary: %+v", live)
+	}
+}
+
+// A Kubernetes API that serves Workflows in ml-training: a list, and a watch
+// that sends two events, then holds the reconnection open.
+func kubeFixture(t *testing.T, resumedFrom chan<- string) *httptest.Server {
+	t.Helper()
+	wf := func(phase, rv, finished string) string {
+		return `{"metadata":{"name":"train-abc12","namespace":"ml-training","uid":"u-1","resourceVersion":"` + rv + `","labels":{"pipeline/runid":"kfp-run-77"}},` +
+			`"status":{"phase":"` + phase + `","startedAt":"2026-09-30T09:00:00Z","finishedAt":"` + finished + `","nodes":{}}}`
+	}
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("Authorization") != "Bearer kube-tok" {
+			http.Error(w, "unauthorised", http.StatusUnauthorized)
+			return
+		}
+		if r.URL.Path != "/apis/argoproj.io/v1alpha1/namespaces/ml-training/workflows" {
+			http.NotFound(w, r)
+			return
+		}
+		if r.URL.Query().Get("watch") != "true" {
+			fmt.Fprintf(w, `{"items":[%s],"metadata":{"resourceVersion":"100"}}`, wf("Running", "100", ""))
+			return
+		}
+		if rv := r.URL.Query().Get("resourceVersion"); rv != "" {
+			resumedFrom <- rv
+			<-r.Context().Done()
+			return
+		}
+		fmt.Fprintf(w, `{"type":"ADDED","object":%s}`+"\n", wf("Running", "100", ""))
+		fmt.Fprintf(w, `{"type":"BOOKMARK","object":{"metadata":{"resourceVersion":"105"}}}`+"\n")
+		fmt.Fprintf(w, `{"type":"MODIFIED","object":%s}`+"\n", wf("Succeeded", "110", "2026-09-30T09:20:00Z"))
+	}))
+	t.Cleanup(srv.Close)
+	return srv
+}
+
+func TestKubeWatchWithoutArgoServer(t *testing.T) {
+	resumed := make(chan string, 1)
+	srv := kubeFixture(t, resumed)
+	kubeconfigFor(t, srv.URL, "kube-tok")
+	a := New()
+	if err := a.Connect(context.Background(), adapter.Config{"namespaces": []any{"ml-training"}, "kube_watch": true}); err != nil {
+		t.Fatal(err)
+	}
+	if st := a.Health(context.Background()); st.State != adapter.Healthy {
+		t.Fatalf("health through the Kubernetes API: %+v", st)
+	}
+	facets, err := a.Facets(context.Background(), adapter.Query{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(facets) != 1 || facets[0].Keys[adapter.KeyKFPRunID] != "kfp-run-77" || facets[0].Links != nil {
+		t.Fatalf("want the one Workflow, with no Argo UI link and no templates: %+v", facets)
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	ch, err := a.Watch(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var phases []adapter.Phase
+	for len(phases) < 2 {
+		select {
+		case ev := <-ch:
+			if ev.Op != adapter.Upsert {
+				t.Fatalf("unexpected event %+v", ev)
+			}
+			phases = append(phases, ev.Facet.Status)
+		case <-time.After(5 * time.Second):
+			t.Fatalf("timed out after %v", phases)
+		}
+	}
+	if phases[0] != adapter.Running || phases[1] != adapter.Succeeded {
+		t.Fatalf("phases: %v", phases)
+	}
+	select {
+	case rv := <-resumed:
+		if rv != "110" {
+			t.Fatalf("the watch should resume from the last resource version, 110, not %s", rv)
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("the watch did not reconnect")
+	}
+	cancel()
+	for range ch {
+	}
+}
+
+func TestServerRequiredWithoutKubeWatch(t *testing.T) {
+	if err := New().Connect(context.Background(), adapter.Config{"namespaces": []any{"ml-training"}}); err == nil {
+		t.Fatal("without kube_watch, server is required")
+	}
+}
+
+func TestTokenDiscovery(t *testing.T) {
+	var got string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		got = r.Header.Get("Authorization")
+		w.Write([]byte(`{}`))
+	}))
+	defer srv.Close()
+	kubeconfigFor(t, "https://kubernetes.example:6443", "from-kubeconfig")
+	a := New()
+	if err := a.Connect(context.Background(), adapter.Config{"server": srv.URL, "namespaces": []any{"ml-training"}}); err != nil {
+		t.Fatal(err)
+	}
+	a.Health(context.Background())
+	if got != "Bearer from-kubeconfig" {
+		t.Fatalf("without ARGO_TOKEN, the kubeconfig context's token should be used, got %q", got)
+	}
+	t.Setenv("ARGO_TOKEN", "Bearer explicit")
+	if err := a.Connect(context.Background(), adapter.Config{"server": srv.URL, "namespaces": []any{"ml-training"}}); err != nil {
+		t.Fatal(err)
+	}
+	a.Health(context.Background())
+	if got != "Bearer explicit" {
+		t.Fatalf("ARGO_TOKEN wins over the kubeconfig, got %q", got)
 	}
 }

@@ -11,6 +11,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net"
 	"net/http"
 	"net/url"
@@ -44,7 +45,14 @@ type Client struct {
 // Load finds credentials in this order: the first file in $KUBECONFIG that
 // exists, or ~/.kube/config when $KUBECONFIG is unset; then the pod's own
 // service account. It uses the kubeconfig's current context.
-func Load(timeout time.Duration) (*Client, error) {
+func Load(timeout time.Duration) (*Client, error) { return LoadPath("", timeout) }
+
+// LoadPath is Load with an explicit kubeconfig, which must exist. An empty
+// path means the standard search.
+func LoadPath(path string, timeout time.Duration) (*Client, error) {
+	if path != "" {
+		return fromKubeconfig(path, timeout)
+	}
 	for _, p := range kubeconfigPaths() {
 		if _, err := os.Stat(p); err == nil {
 			return fromKubeconfig(p, timeout)
@@ -279,26 +287,37 @@ func newClient(server string, timeout time.Duration, tlsCfg *tls.Config) (*httpx
 	return c, nil
 }
 
-// List reads a list of custom resources, all namespaces when namespace is
-// empty, into out. A resource the cluster does not serve, because its CRD is
-// not installed, is reported with ok false and no error.
-func (k *Client) List(ctx context.Context, group, version, namespace, resource string, selector string, out any) (ok bool, err error) {
+// Bearer is the bearer token the credentials carry, if any. Argo Server in
+// client mode accepts the same token as the Kubernetes API.
+func (k *Client) Bearer() string {
+	k.refresh()
+	return k.c.Bearer
+}
+
+// refresh rereads a token file, since projected service account tokens rotate.
+func (k *Client) refresh() {
 	if k.tokenFile != "" {
-		// Projected service account tokens rotate, so read the file each time.
 		if b, err := os.ReadFile(k.tokenFile); err == nil {
 			k.c.Bearer = strings.TrimSpace(string(b))
 		}
 	}
+}
+
+func resourcePath(group, version, namespace, resource string) string {
 	path := "/apis/" + group + "/" + version + "/"
 	if namespace != "" {
 		path += "namespaces/" + url.PathEscape(namespace) + "/"
 	}
-	path += resource
-	var q url.Values
-	if selector != "" {
-		q = url.Values{"labelSelector": {selector}}
-	}
-	if err := k.c.GetJSON(ctx, path, q, out); err != nil {
+	return path + resource
+}
+
+// List reads a list of custom resources, all namespaces when namespace is
+// empty, into out; query carries options such as limit and continue. A
+// resource the cluster does not serve, because its CRD is not installed, is
+// reported with ok false and no error.
+func (k *Client) List(ctx context.Context, group, version, namespace, resource string, query url.Values, out any) (ok bool, err error) {
+	k.refresh()
+	if err := k.c.GetJSON(ctx, resourcePath(group, version, namespace, resource), query, out); err != nil {
 		var he *httpx.Error
 		if errors.As(err, &he) && he.Status == http.StatusNotFound {
 			return false, nil
@@ -306,4 +325,78 @@ func (k *Client) List(ctx context.Context, group, version, namespace, resource s
 		return false, err
 	}
 	return true, nil
+}
+
+// WatchEvent is one event from a Kubernetes watch: ADDED, MODIFIED, DELETED,
+// BOOKMARK, or ERROR, whose object is then a Status.
+type WatchEvent struct {
+	Type   string          `json:"type"`
+	Object json.RawMessage `json:"object"`
+}
+
+// ErrExpired means the resource version a watch started from is too old
+// (HTTP 410); start again from an empty one.
+var ErrExpired = errors.New("kube: resource version expired")
+
+// Watch streams changes to a resource, calling fn for each event, until the
+// server closes the stream, ctx is done, or fn returns an error. With an
+// empty resourceVersion the stream starts with an ADDED event for every
+// object that exists. The server closes a stream after timeoutSeconds, so
+// callers reconnect from the last resource version they saw.
+func (k *Client) Watch(ctx context.Context, group, version, namespace, resource, resourceVersion string, fn func(WatchEvent) error) error {
+	k.refresh()
+	q := url.Values{"watch": {"true"}, "allowWatchBookmarks": {"true"}, "timeoutSeconds": {"300"}}
+	if resourceVersion != "" {
+		q.Set("resourceVersion", resourceVersion)
+	}
+	u := k.c.Base + resourcePath(group, version, namespace, resource) + "?" + q.Encode()
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("User-Agent", "fendlemark/0.9.13")
+	if k.c.Bearer != "" {
+		req.Header.Set("Authorization", "Bearer "+k.c.Bearer)
+	} else if k.c.User != "" {
+		req.SetBasicAuth(k.c.User, k.c.Password)
+	}
+	// The stream outlives the client's request timeout, so use its transport
+	// without one; the server's timeoutSeconds bounds it instead.
+	resp, err := (&http.Client{Transport: k.c.HTTP.Transport}).Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode == http.StatusGone {
+		return ErrExpired
+	}
+	if resp.StatusCode < 200 || resp.StatusCode > 299 {
+		b, _ := io.ReadAll(io.LimitReader(resp.Body, 4096))
+		return &httpx.Error{Status: resp.StatusCode, Body: string(b), URL: u}
+	}
+	dec := json.NewDecoder(resp.Body)
+	for {
+		var ev WatchEvent
+		if err := dec.Decode(&ev); err != nil {
+			if errors.Is(err, io.EOF) || ctx.Err() != nil {
+				return ctx.Err()
+			}
+			return err
+		}
+		if ev.Type == "ERROR" {
+			var st struct {
+				Code    int    `json:"code"`
+				Message string `json:"message"`
+			}
+			json.Unmarshal(ev.Object, &st)
+			if st.Code == http.StatusGone {
+				return ErrExpired
+			}
+			return fmt.Errorf("kube: watch %s: %s", resource, st.Message)
+		}
+		if err := fn(ev); err != nil {
+			return err
+		}
+	}
 }

@@ -99,14 +99,14 @@ func katibFacets(ctx context.Context, kc *kube.Client, ns string, labels map[str
 	var exps struct {
 		Items []experiment `json:"items"`
 	}
-	ok, err := kc.List(ctx, "kubeflow.org", "v1beta1", ns, "experiments", "", &exps)
+	ok, err := kc.List(ctx, "kubeflow.org", "v1beta1", ns, "experiments", nil, &exps)
 	if err != nil || !ok {
 		return nil, err
 	}
 	var trials struct {
 		Items []trial `json:"items"`
 	}
-	if _, err := kc.List(ctx, "kubeflow.org", "v1beta1", ns, "trials", "", &trials); err != nil {
+	if _, err := kc.List(ctx, "kubeflow.org", "v1beta1", ns, "trials", nil, &trials); err != nil {
 		return nil, err
 	}
 	byExp := map[string][]map[string]string{}
@@ -180,7 +180,7 @@ func notebookFacets(ctx context.Context, kc *kube.Client, ns string, labels map[
 	var nbs struct {
 		Items []notebook `json:"items"`
 	}
-	ok, err := kc.List(ctx, "kubeflow.org", "v1", ns, "notebooks", "", &nbs)
+	ok, err := kc.List(ctx, "kubeflow.org", "v1", ns, "notebooks", nil, &nbs)
 	if err != nil || !ok {
 		return nil, err
 	}

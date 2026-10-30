@@ -84,11 +84,11 @@ users:
 			Metadata struct{ Name string } `json:"metadata"`
 		} `json:"items"`
 	}
-	ok, err := c.List(context.Background(), "kubeflow.org", "v1", "team-ml", "notebooks", "", &nbs)
+	ok, err := c.List(context.Background(), "kubeflow.org", "v1", "team-ml", "notebooks", nil, &nbs)
 	if err != nil || !ok || len(nbs.Items) != 1 || nbs.Items[0].Metadata.Name != "nb" {
 		t.Fatalf("list: ok=%v err=%v %+v", ok, err, nbs)
 	}
-	ok, err = c.List(context.Background(), "kubeflow.org", "v1beta1", "team-ml", "experiments", "", &nbs)
+	ok, err = c.List(context.Background(), "kubeflow.org", "v1beta1", "team-ml", "experiments", nil, &nbs)
 	if err != nil || ok {
 		t.Fatalf("a resource the cluster does not serve should be ok=false with no error, got ok=%v err=%v", ok, err)
 	}
@@ -114,12 +114,12 @@ func TestInCluster(t *testing.T) {
 		t.Fatal(err)
 	}
 	var out map[string]any
-	if _, err := c.List(context.Background(), "kubeflow.org", "v1", "team-ml", "notebooks", "", &out); err == nil {
+	if _, err := c.List(context.Background(), "kubeflow.org", "v1", "team-ml", "notebooks", nil, &out); err == nil {
 		t.Fatal("the first token should be rejected")
 	}
 	// The kubelet rotates the projected token; the next request uses the new one.
 	os.WriteFile(tok, []byte("rotated\n"), 0o600)
-	if ok, err := c.List(context.Background(), "kubeflow.org", "v1", "team-ml", "notebooks", "", &out); err != nil || !ok {
+	if ok, err := c.List(context.Background(), "kubeflow.org", "v1", "team-ml", "notebooks", nil, &out); err != nil || !ok {
 		t.Fatalf("rotated token: ok=%v err=%v", ok, err)
 	}
 }

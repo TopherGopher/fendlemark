@@ -1,6 +1,7 @@
 // Package argo reads Workflows, WorkflowTemplates, and CronWorkflows from
-// Argo Server's REST API, with optional direct watching of Workflow
-// resources through the Kubernetes API.
+// Argo Server's REST API. With kube_watch it lists and watches Workflow
+// resources through the Kubernetes API instead, and uses Argo Server only
+// for the archive and templates.
 //
 // See https://fendlemark.app/docs/adapters/#argo for its facets,
 // correlation keys, and limits.
@@ -9,7 +10,9 @@ package argo
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"net/url"
 	"os"
 	"sort"
 	"strings"
@@ -18,6 +21,7 @@ import (
 
 	"fendlemark.app/fendlemark/adapter"
 	"fendlemark.app/fendlemark/adapters/internal/httpx"
+	"fendlemark.app/fendlemark/adapters/internal/kube"
 )
 
 func init() { adapter.Register("argo", New) }
@@ -25,7 +29,9 @@ func init() { adapter.Register("argo", New) }
 // Argo is the adapter.
 type Argo struct {
 	mu         sync.RWMutex
-	c          *httpx.Client
+	connected  bool
+	c          *httpx.Client // Argo Server; nil when only kube_watch is configured
+	kc         *kube.Client  // the Kubernetes API, with kube_watch
 	server     string
 	namespaces []string
 	archived   bool
@@ -58,21 +64,44 @@ func (a *Argo) Connect(ctx context.Context, cfg adapter.Config) error {
 	if len(ns) == 0 {
 		return fmt.Errorf("argo: namespaces must list at least one namespace")
 	}
-	if srv == "" {
-		return fmt.Errorf("argo: server is required (direct kube_watch without Argo Server is not available in this build)")
+	kubeWatch := cfg.Bool("kube_watch", false)
+	if srv == "" && !kubeWatch {
+		return fmt.Errorf("argo: server is required unless kube_watch is true")
 	}
-	c, err := httpx.New(srv, cfg.Duration("timeout", 10*time.Second))
-	if err != nil {
-		return fmt.Errorf("argo: %w", err)
+	timeout := cfg.Duration("timeout", 10*time.Second)
+	var kc *kube.Client
+	if kubeWatch {
+		var err error
+		if kc, err = kube.LoadPath(cfg.String("kubeconfig"), timeout); err != nil {
+			return fmt.Errorf("argo: kube_watch: %w", err)
+		}
 	}
-	if tok := firstNonEmpty(cfg.Secret("token"), os.Getenv("ARGO_TOKEN")); tok != "" {
+	var c *httpx.Client
+	if srv != "" {
+		var err error
+		if c, err = httpx.New(srv, timeout); err != nil {
+			return fmt.Errorf("argo: %w", err)
+		}
+		tok := firstNonEmpty(cfg.Secret("token"), os.Getenv("ARGO_TOKEN"))
+		if tok == "" {
+			// Token discovery: in client mode Argo Server accepts the
+			// kubeconfig context's own bearer token.
+			if kc == nil {
+				kc2, err := kube.LoadPath(cfg.String("kubeconfig"), timeout)
+				if err == nil {
+					tok = kc2.Bearer()
+				}
+			} else {
+				tok = kc.Bearer()
+			}
+		}
 		c.Bearer = strings.TrimPrefix(tok, "Bearer ")
 	}
 	a.mu.Lock()
 	defer a.mu.Unlock()
-	a.c, a.server, a.namespaces = c, strings.TrimRight(srv, "/"), ns
+	a.connected, a.c, a.kc, a.server, a.namespaces = true, c, kc, strings.TrimRight(srv, "/"), ns
 	a.archived = cfg.Bool("include_archived", true)
-	a.kubeWatch = cfg.Bool("kube_watch", false)
+	a.kubeWatch = kubeWatch
 	a.pollEvery = cfg.Duration("poll_interval", 30*time.Second)
 	a.labels = map[string]string{}
 	if l, ok := cfg["labels"].(map[string]any); ok {
@@ -85,12 +114,13 @@ func (a *Argo) Connect(ctx context.Context, cfg adapter.Config) error {
 
 type workflow struct {
 	Metadata struct {
-		Name        string            `json:"name"`
-		Namespace   string            `json:"namespace"`
-		UID         string            `json:"uid"`
-		Labels      map[string]string `json:"labels"`
-		Annotations map[string]string `json:"annotations"`
-		Created     string            `json:"creationTimestamp"`
+		ResourceVersion string            `json:"resourceVersion"`
+		Name            string            `json:"name"`
+		Namespace       string            `json:"namespace"`
+		UID             string            `json:"uid"`
+		Labels          map[string]string `json:"labels"`
+		Annotations     map[string]string `json:"annotations"`
+		Created         string            `json:"creationTimestamp"`
 	} `json:"metadata"`
 	Spec struct {
 		Entrypoint string `json:"entrypoint"`
@@ -129,11 +159,43 @@ type list struct {
 	} `json:"metadata"`
 }
 
+// liveWorkflows lists the Workflows in a namespace, from the Kubernetes API
+// with kube_watch and from Argo Server otherwise.
+func (a *Argo) liveWorkflows(ctx context.Context, c *httpx.Client, kc *kube.Client, ns string) ([]workflow, error) {
+	var out []workflow
+	cont := ""
+	for {
+		var l list
+		if kc != nil {
+			q := url.Values{"limit": {"500"}}
+			if cont != "" {
+				q.Set("continue", cont)
+			}
+			if _, err := kc.List(ctx, "argoproj.io", "v1alpha1", ns, "workflows", q, &l); err != nil {
+				return nil, err
+			}
+		} else {
+			qv := map[string][]string{"listOptions.limit": {"500"}, "fields": {"items.metadata,items.spec.entrypoint,items.spec.arguments,items.spec.workflowTemplateRef,items.status.phase,items.status.message,items.status.startedAt,items.status.finishedAt,items.status.progress,items.status.nodes,metadata.continue"}}
+			if cont != "" {
+				qv["listOptions.continue"] = []string{cont}
+			}
+			if err := c.GetJSON(ctx, "/api/v1/workflows/"+ns, qv, &l); err != nil {
+				return nil, err
+			}
+		}
+		out = append(out, l.Items...)
+		if l.Metadata.Continue == "" {
+			return out, nil
+		}
+		cont = l.Metadata.Continue
+	}
+}
+
 func (a *Argo) Facets(ctx context.Context, q adapter.Query) ([]adapter.Facet, error) {
 	a.mu.RLock()
-	c, nss, archived, labels, server := a.c, a.namespaces, a.archived, a.labels, a.server
+	connected, c, kc, nss, archived, labels, server := a.connected, a.c, a.kc, a.namespaces, a.archived, a.labels, a.server
 	a.mu.RUnlock()
-	if c == nil {
+	if !connected {
 		return nil, adapter.ErrNotConnected
 	}
 	var out []adapter.Facet
@@ -143,30 +205,19 @@ func (a *Argo) Facets(ctx context.Context, q adapter.Query) ([]adapter.Facet, er
 			// spec and the node status, so it wins; the archive only adds
 			// workflows that are no longer in the cluster.
 			listed := map[string]bool{}
-			cont := ""
-			for {
-				var l list
-				qv := map[string][]string{"listOptions.limit": {"500"}, "fields": {"items.metadata,items.spec.entrypoint,items.spec.arguments,items.spec.workflowTemplateRef,items.status.phase,items.status.message,items.status.startedAt,items.status.finishedAt,items.status.progress,items.status.nodes,metadata.continue"}}
-				if cont != "" {
-					qv["listOptions.continue"] = []string{cont}
-				}
-				if err := c.GetJSON(ctx, "/api/v1/workflows/"+ns, qv, &l); err != nil {
-					return nil, fmt.Errorf("argo: workflows in %s: %w", ns, err)
-				}
-				for _, w := range l.Items {
-					f := a.workflowFacet(w, labels, server)
-					if listed[f.SourceID] || !q.Since.IsZero() && f.StartedAt.Before(q.Since) {
-						continue
-					}
-					listed[f.SourceID] = true
-					out = append(out, f)
-				}
-				if l.Metadata.Continue == "" {
-					break
-				}
-				cont = l.Metadata.Continue
+			ws, err := a.liveWorkflows(ctx, c, kc, ns)
+			if err != nil {
+				return nil, fmt.Errorf("argo: workflows in %s: %w", ns, err)
 			}
-			if archived {
+			for _, w := range ws {
+				f := a.workflowFacet(w, labels, server)
+				if listed[f.SourceID] || !q.Since.IsZero() && f.StartedAt.Before(q.Since) {
+					continue
+				}
+				listed[f.SourceID] = true
+				out = append(out, f)
+			}
+			if archived && c != nil {
 				var l list
 				if err := c.GetJSON(ctx, "/api/v1/archived-workflows", map[string][]string{"namespace": {ns}, "listOptions.limit": {"500"}}, &l); err == nil {
 					for _, w := range l.Items {
@@ -180,7 +231,7 @@ func (a *Argo) Facets(ctx context.Context, q adapter.Query) ([]adapter.Facet, er
 				}
 			}
 		}
-		if q.Wants(adapter.KindPipeline) {
+		if q.Wants(adapter.KindPipeline) && c != nil {
 			var tpl struct {
 				Items []struct {
 					Metadata struct {
@@ -197,7 +248,7 @@ func (a *Argo) Facets(ctx context.Context, q adapter.Query) ([]adapter.Facet, er
 						Title: t.Metadata.Name, Status: adapter.Succeeded, StartedAt: orNow(httpx.ParseTime(t.Metadata.Created)),
 						Keys:   map[string]string{"argo.template": ns + "/" + t.Metadata.Name},
 						Fields: map[string]any{"namespace": ns, "type": "WorkflowTemplate"},
-						Links:  []adapter.Link{{Label: "Open in Argo", URL: server + "/workflow-templates/" + ns + "/" + t.Metadata.Name}},
+						Links:  argoLinks(server, "/workflow-templates/"+ns+"/"+t.Metadata.Name),
 					})
 				}
 			}
@@ -228,7 +279,7 @@ func (a *Argo) Facets(ctx context.Context, q adapter.Query) ([]adapter.Facet, er
 						Title: cw.Metadata.Name, Status: st, StartedAt: orNow(httpx.ParseTime(cw.Metadata.Created)),
 						Keys:   map[string]string{"argo.cron": ns + "/" + cw.Metadata.Name},
 						Fields: map[string]any{"namespace": ns, "type": "CronWorkflow", "schedule": cw.Spec.Schedule, "suspended": cw.Spec.Suspend, "last_scheduled": cw.Status.LastScheduledTime, "active": len(cw.Status.Active)},
-						Links:  []adapter.Link{{Label: "Open in Argo", URL: server + "/cron-workflows/" + ns + "/" + cw.Metadata.Name}},
+						Links:  argoLinks(server, "/cron-workflows/"+ns+"/"+cw.Metadata.Name),
 					})
 				}
 			}
@@ -285,9 +336,16 @@ func (a *Argo) workflowFacet(w workflow, labels map[string]string, server string
 	return adapter.Facet{
 		Source: "argo", SourceID: ns + "/" + name, Kind: adapter.KindWorkflow, Title: name,
 		Status: phase(w.Status.Phase, w.Metadata.Labels), StartedAt: started, EndedAt: httpx.ParseTime(w.Status.FinishedAt),
-		Keys: keys, Fields: fields,
-		Links: []adapter.Link{{Label: "Open in Argo", URL: server + "/workflows/" + ns + "/" + name}},
+		Keys: keys, Fields: fields, Links: argoLinks(server, "/workflows/"+ns+"/"+name),
 	}
+}
+
+// argoLinks deep-links into the Argo UI, which Argo Server serves.
+func argoLinks(server, path string) []adapter.Link {
+	if server == "" {
+		return nil
+	}
+	return []adapter.Link{{Label: "Open in Argo", URL: server + path}}
 }
 
 func phase(p string, labels map[string]string) adapter.Phase {
@@ -307,16 +365,20 @@ func phase(p string, labels map[string]string) adapter.Phase {
 	return adapter.Unknown
 }
 
-// Watch polls the list endpoint and emits an event for every workflow whose
-// phase, finish time, or node set changed. Argo Server's streaming endpoint
-// uses a framing this build does not consume; polling at poll_interval is
-// indistinguishable at the lattice's reconcile interval.
+// Watch emits an event for every workflow whose phase, finish time, or node
+// set changed. With kube_watch it follows a Kubernetes watch on Workflow
+// resources; otherwise it polls Argo Server's list endpoint at
+// poll_interval, since Argo Server's streaming endpoint uses a framing this
+// build does not consume.
 func (a *Argo) Watch(ctx context.Context) (<-chan adapter.Event, error) {
 	a.mu.RLock()
-	c, every := a.c, a.pollEvery
+	connected, kc, every := a.connected, a.kc, a.pollEvery
 	a.mu.RUnlock()
-	if c == nil {
+	if !connected {
 		return nil, adapter.ErrNotConnected
+	}
+	if kc != nil {
+		return a.kubeWatchLoop(ctx, kc), nil
 	}
 	if every <= 0 {
 		every = 30 * time.Second
@@ -367,14 +429,21 @@ func (a *Argo) Watch(ctx context.Context) (<-chan adapter.Event, error) {
 
 func (a *Argo) Health(ctx context.Context) adapter.Status {
 	a.mu.RLock()
-	c, nss := a.c, a.namespaces
+	connected, c, kc, nss := a.connected, a.c, a.kc, a.namespaces
 	a.mu.RUnlock()
-	if c == nil {
+	if !connected {
 		return adapter.Status{State: adapter.Disabled, Detail: "not connected"}
 	}
 	start := time.Now()
-	var info map[string]any
-	if err := c.GetJSON(ctx, "/api/v1/info", nil, &info); err != nil {
+	var err error
+	if c != nil {
+		var info map[string]any
+		err = c.GetJSON(ctx, "/api/v1/info", nil, &info)
+	} else {
+		var l list
+		_, err = kc.List(ctx, "argoproj.io", "v1alpha1", nss[0], "workflows", url.Values{"limit": {"1"}}, &l)
+	}
+	if err != nil {
 		return adapter.Status{State: adapter.Unreachable, Detail: err.Error(), Latency: time.Since(start)}
 	}
 	return adapter.Status{State: adapter.Healthy, Detail: fmt.Sprintf("%d namespaces", len(nss)), Latency: time.Since(start)}
@@ -406,4 +475,79 @@ func firstNonEmpty(vs ...string) string {
 		}
 	}
 	return ""
+}
+
+// kubeWatchLoop follows a Kubernetes watch on Workflows in each namespace,
+// reconnecting from the last resource version it saw when the server ends a
+// stream, and from the start when that version has expired.
+func (a *Argo) kubeWatchLoop(ctx context.Context, kc *kube.Client) <-chan adapter.Event {
+	a.mu.RLock()
+	nss, labels, server, archived := a.namespaces, a.labels, a.server, a.archived && a.c != nil
+	a.mu.RUnlock()
+	ch := make(chan adapter.Event, 256)
+	var wg sync.WaitGroup
+	for _, ns := range nss {
+		wg.Add(1)
+		go func(ns string) {
+			defer wg.Done()
+			seen := map[string]string{}
+			rv := ""
+			for ctx.Err() == nil {
+				err := kc.Watch(ctx, "argoproj.io", "v1alpha1", ns, "workflows", rv, func(ev kube.WatchEvent) error {
+					var w workflow
+					if err := json.Unmarshal(ev.Object, &w); err != nil {
+						return err
+					}
+					if w.Metadata.ResourceVersion != "" {
+						rv = w.Metadata.ResourceVersion
+					}
+					if ev.Type == "BOOKMARK" {
+						return nil
+					}
+					f := a.workflowFacet(w, labels, server)
+					var out adapter.Event
+					switch ev.Type {
+					case "DELETED":
+						delete(seen, f.Ref())
+						if archived {
+							// The archive may still hold it; the next full
+							// reconciliation decides.
+							return nil
+						}
+						out = adapter.Event{Op: adapter.Delete, Facet: f}
+					default:
+						sig := string(f.Status) + "|" + f.EndedAt.Format(time.RFC3339) + "|" + fmt.Sprint(len(f.Fields["nodes"].([]map[string]string)))
+						if seen[f.Ref()] == sig {
+							return nil
+						}
+						seen[f.Ref()] = sig
+						out = adapter.Event{Op: adapter.Upsert, Facet: f}
+					}
+					select {
+					case ch <- out:
+						return nil
+					case <-ctx.Done():
+						return ctx.Err()
+					}
+				})
+				switch {
+				case ctx.Err() != nil:
+					return
+				case errors.Is(err, kube.ErrExpired):
+					rv = ""
+				case err != nil:
+					select {
+					case <-ctx.Done():
+						return
+					case <-time.After(5 * time.Second):
+					}
+				}
+			}
+		}(ns)
+	}
+	go func() {
+		wg.Wait()
+		close(ch)
+	}()
+	return ch
 }
